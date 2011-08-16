@@ -1,0 +1,14 @@
+Tools used for processing PET data
+==================================
+
+Requires
+--------
+
+  * python (currently using EPD-6.3-2)
+
+  * numpy, scipy
+
+  * nibabel
+
+  * nipype and its requirements
+
