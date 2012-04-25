@@ -2,7 +2,7 @@ import os, sys
 from glob import glob
 import tempfile
 from shutil import rmtree
-sys.path.insert(0,'/home/jagust/cindeem/CODE/ucsf')
+sys.path.insert(0,'/home/jagust/cindeem/CODE/PetProcessing')
 
 import nipype.interfaces.spm as spm
 from nipype.interfaces.base import CommandLine
@@ -167,12 +167,14 @@ def spm_smooth(infiles, fwhm=8):
     smth = spm.Smooth(matlab_cmd='matlab-spm8')
     smth.inputs.in_files = infiles
     smth.inputs.fwhm = fwhm
+    smth.inputs.ignore_exception = True
     sout = smth.run()
     os.chdir(startdir)
     return sout
     
 def realigntoframe1(niftilist):
     """given list of nifti files
+    copies relevent files to realign_QA
     realigns to the 1st frame
     """
     startdir = os.getcwd()
@@ -192,6 +194,7 @@ def realigntoframe1(niftilist):
     rlgn = spm.Realign()
     rlgn.inputs.matlab_cmd = 'matlab-spm8'
     rlgn.inputs.in_files = copiednifti
+    rlgn.inputs.ignore_exception = True
     #print rlgn.mlab.cmdline
     rlgnout = rlgn.run()
     os.chdir(startdir)
@@ -201,6 +204,7 @@ def realigntoframe1(niftilist):
 
 def realigntoframe17(niftilist):
     """given list of nifti files
+    copies/creates realign_QA
     removes first 5 frames
     realignes rest to the 17th frame
     """
@@ -226,6 +230,7 @@ def realigntoframe17(niftilist):
     # realign
     rlgn = spm.Realign(matlab_cmd='matlab-spm8')
     rlgn.inputs.in_files = alteredlist
+    rlgn.inputs.ignore_exception = True
     #rlgn.inputs.write_which = [2,0]
     #rlgn.register_to_mean = True
     rlgnout = rlgn.run()
@@ -298,6 +303,7 @@ def simple_coregister(target, moving, other=None):
     corg = spm.Coregister(matlab_cmd = 'matlab-spm8')
     corg.inputs.target = target
     corg.inputs.source = moving
+    corg.inputs.ignore_exception = True
     if other is not None:
         corg.inputs.apply_to_files = other
     corg_out = corg.run()
@@ -313,6 +319,7 @@ def simple_warp(template, warped, other=None):
     warp = spm.Normalize(matlab_cmd = 'matlab-spm8')
     warp.inputs.template = template
     warp.inputs.source = warped
+    warp.inputs.ignore_exception = True
     if other is not None:
         warp.inputs.apply_to_files = other
     warp_out = warp.run()
@@ -329,6 +336,7 @@ def simple_segment(mri):
     seg.inputs.gm_output_type = [False, False, True]
     seg.inputs.wm_output_type = [False, False, True]
     seg.inputs.csf_output_type = [False, False, True]
+    seg.inputs.ignore_exception = True
     segout = seg.run()
     os.chdir(startdir)
     return segout
@@ -480,6 +488,7 @@ def apply_transform_onefile(transform,file):
     mlab_cmd = mlab.MatlabCommand(matlab_cmd = 'matlab-spm8')
     mlab_cmd.inputs.nodesktop = True
     mlab_cmd.inputs.nosplash = True
+    mlab_cmd.inputs.ignore_exception = True
     mlab_cmd.inputs.mfile = True
     mlab_cmd.inputs.script_file = 'pyspm8_apply_transform.m'
     script = """
@@ -504,6 +513,7 @@ def reslice(space_define, infile):
     mlab_cmd.inputs.nodesktop = True
     mlab_cmd.inputs.nosplash = True
     mlab_cmd.inputs.mfile = True
+    mlab_cmd.inputs.ignore_exception = True
     mlab_cmd.inputs.script_file = 'pyspm8_reslice.m'
     script = """
     flags.mean = 0;
