@@ -1,6 +1,9 @@
+# emacs: -*- mode: python; py-indent-offset: 4; indent-tabs-mode: nil -*-
+# vi: set ft=python sts=4 ts=4 sw=4 et:
 import os, sys
 from glob import glob
 import tempfile
+import logging
 from shutil import rmtree
 sys.path.insert(0,'/home/jagust/cindeem/CODE/PetProcessing')
 
@@ -51,6 +54,34 @@ def get_logging_configdict(logfile):
         return log_settings
 
 
+def set_up_dir(root, subid, tracer):
+    """ check for and Make Subjects Target Directories
+    Returns Dict of final directories and if they exist"""
+    outdirs = {}
+        
+    subdir, exists = bg.make_dir(root, dirname=subid)
+    outdirs.update(dict(subdir=[subdir, exists]))
+    tracerdir,exists = bg.make_dir(subdir,
+                                dirname = '%s' % (tracer.lower()) )
+    outdirs.update(dict(tracerdir=[tracerdir, exists]))
+    
+    rawdatadir, exists  = bg.make_dir(subdir, dirname = 'RawData')
+    outdirs.update(dict(rawdatadir=[rawdatadir, exists]))
+    
+    rawtracer, exists  = bg.make_dir(rawdatadir, dirname = tracer)
+    outdirs.update(dict(rawtracer=[rawtracer, exists]))
+    
+    anatomydir, exists  = bg.make_dir(subdir,dirname='anatomy')
+    outdirs.update(dict(anatomydir=[anatomydir, exists]))
+    
+    refdir, exists = bg.make_rec_dir(tracerdir,dirname='ref_region')
+    outdirs.update(dict(refdir=[refdir, exists]))
+    
+    #print 'directories created for %s' % subid
+    logging.info('directories created for %s'%(subid))
+    for k, v in sorted(outdirs.values()):
+        logging.info('%s : previously existed = %s'%(k,v))
+    return outdirs
 
 
 
@@ -167,7 +198,7 @@ def spm_smooth(infiles, fwhm=8):
     smth = spm.Smooth(matlab_cmd='matlab-spm8')
     smth.inputs.in_files = infiles
     smth.inputs.fwhm = fwhm
-    smth.inputs.ignore_exception = True
+    #smth.inputs.ignore_exception = True
     sout = smth.run()
     os.chdir(startdir)
     return sout
@@ -740,6 +771,25 @@ def parse_fs_statsfile(statsfile):
         nvox = eval(tmp[2])
         roidict.update({roi:[mean, std, nvox]})
     return roidict
+
+def parse_fs_statsfile_vert(statsfile):
+    """opens a fs generated stats file and returns
+    a dict of roi keys with [mean, std, nvert], for
+    each roi
+    """
+    roidict = {}
+    for line in open(statsfile):
+        if line[0] == '#':
+            continue
+        tmp = line.split()
+        roi = tmp[0]
+        mean = eval(tmp[4])
+        std = eval(tmp[5])
+        nvox = eval(tmp[1])
+        roidict.update({roi:[mean, std, nvox]})
+    return roidict
+
+
 
 def aseg_label_dict(lut, type='ctx'):
     """ Given a color LUT (look up table)

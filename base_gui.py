@@ -3,10 +3,10 @@ import sys, os
 sys.path.insert(0, '/home/jagust/cindeem/CODE/ruffus')
 import MultiDirDialog as mdd
 from glob import glob
-
+import nibabel as ni
 import nipype
 from nipype.interfaces.base import CommandLine
-
+import numpy as np
 
 def MyDirsDialog(prompt='Choose Subject Dirs',indir='',title='Choose Subject Dirs'):
       """
@@ -429,6 +429,20 @@ def make_cerebellum(aseg):
       cerebellum = glob('%s/grey_cerebellum.*'%(pth))
       return cerebellum[0]
 
+def make_cerebellum_nibabel(aseg):
+      """ use nibabel to make cerebellum"""
+      #cwd = os.getcwd()
+      pth, nme = os.path.split(aseg)
+      #os.chdir(pth)
+      img = ni.load(aseg)
+      newdat = np.zeros(img.get_shape())
+      dat = img.get_data()
+      newdat[dat == 8] = 1
+      newdat[dat == 47] = 1
+      newimg = ni.Nifti1Image(newdat, img.get_affine())
+      newfile = os.path.join(pth, 'grey_cerebellum.nii')
+      newimg.to_filename(newfile)
+      return newfile
       
 if __name__ == '__main__':
 
