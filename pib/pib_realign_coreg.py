@@ -8,7 +8,7 @@ from glob import glob
 sys.path.insert(0, '/home/jagust/cindeem/CODE/PetProcessing')
 import preprocessing as pp
 import base_gui as bg
-import rapid_art as qa
+import qa 
 import logging, logging.config
 from time import asctime
 
@@ -31,7 +31,7 @@ if __name__ == '__main__':
     
     cleantime = asctime().replace(' ','-').replace(':', '-')
     logfile = os.path.join(root,'logs',
-                           'setup_pibdirectory_%s.log'%(cleantime))
+                           'pib_realign_coreg_%s.log'%(cleantime))
 
     log_settings = pp.get_logging_configdict(logfile)
     logging.config.dictConfig(log_settings)
@@ -53,7 +53,12 @@ if __name__ == '__main__':
             logging.error('%s only has %d frames, RUNBYHAND'%(subid,
                                                               len(nifti)))
             continue
-              
+
+        pth, _ = os.path.split(nifti[0])
+        realigndir = os.path.join(pth, 'realign_QA')
+        if os.path.isdir(realigndir):
+            logging.error('%s exists, remove to rerun'%(realigndir))
+            continue
         rlgnout, newnifti = pp.realigntoframe17(nifti)
         tmpparameterfile = rlgnout.outputs.realignment_parameters
         realigndir, _ = os.path.split(tmpparameterfile)
@@ -76,8 +81,10 @@ if __name__ == '__main__':
 
         # QA
         # make 4d for QA
-        qadir, exists = make_qa_dir(realigndir, name='data_QA')
+        qadir, exists = qa.make_qa_dir(realigndir, name='data_QA')
         data4d = qa.make_4d_nibabel(allrealigned, outdir=qadir)
         snrimg = qa.gen_sig2noise_img(data4d,qadir)
-        artout = run_artdetect(data4d,tmpparameterfile)
-        screen_data_dirnme(data4d, qadir)
+        artout = qa.run_artdetect(data4d,tmpparameterfile)
+        #qa.screen_data_dirnme(data4d, qadir)
+        qa.plot_movement(tmpparameterfile, subid)
+        qa.calc_robust_median_diff(data4d)

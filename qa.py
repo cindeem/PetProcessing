@@ -9,6 +9,37 @@ import json
 import nipy
 import nipy.algorithms.diagnostics as diag
 from nipype.utils.filemanip import fname_presuffix
+import scikits.statsmodels.robust.scale as scale
+import matplotlib.pyplot as plt
+import time
+
+
+def plot_movement(infile, subid):
+    """given a file from spm with movement parameters
+    plots a figure with 2 subplots
+    plot1: movement in x, y, z
+    plot2, rotational movement
+    """
+    dat = np.loadtxt(infile)
+    plt.figure(figsize=(12,6))
+    plt.subplot(211)
+    plt.plot(dat[:,0], 'ro-', label='x')
+    plt.plot(dat[:,1], 'go-', label='y')
+    plt.plot(dat[:,2], 'bo-', label='z')
+    plt.legend(loc='upper left')
+    plt.title('%s Translations' % subid)
+    plt.subplot(212)
+    plt.plot(dat[:,3], 'ro-', label='pitch')
+    plt.plot(dat[:,4], 'go-', label='yaw')
+    plt.plot(dat[:,5], 'bo-', label='roll')
+    plt.legend(loc='upper left')
+    plt.title('%s Rotations' % subid)
+    figfile = infile.replace('.txt', '.png')
+    plt.savefig(figfile)
+    print 'saved %s'%(figfile)
+    plt.close()
+    
+
 
 def make_4d_nibabel(infiles,outdir=None):
     shape = ni.load(infiles[0]).get_shape()
@@ -79,9 +110,10 @@ def run_artdetect(file4d, param_file):
     ad.inputs.realigned_files = file4d
     ad.inputs.realignment_parameters = param_file
     ad.inputs.parameter_source = 'SPM'
-    ad.inputs.norm_threshold = 1
+    ad.inputs.norm_threshold = 3
     ad.inputs.use_differences = [True, False]
-    ad.inputs.zintensity_threshold = 3
+    ad.inputs.zintensity_threshold = 5
+    ad.inputs.save_plot = False
     adout = ad.run()
     os.chdir(startdir)
     return adout
@@ -113,9 +145,56 @@ def save_qa_img_dirnme(in4d, outdir):
     diag.plot_tsdiffs(diag.time_slice_diffs(img))
     cleantime = time.asctime().replace(' ','-').replace(':', '_')
     figfile = os.path.join(outdir, 'QA_%s_%s.png'%(nme, cleantime))
-    pylab.savefig(figfile)
+    plt.savefig(figfile)
 
+def calc_robust_median_diff(in4d):
+    """Calculates the robust median fo slice to slice diffs"""
+    img = ni.load(in4d)
+    dat = img.get_data()
+    shape = dat.shape
+    tdat = dat.T
+    tdat.shape = (shape[-1], np.prod(shape[:-1]))
+    dat_diff = tdat[1:,:] - tdat[:-1,:]
+    mad = scale.mad(dat_diff, axis=1)
+    mad_std = (mad - mad.mean())/ mad.std()
+    plt.plot(mad_std, 'ro-')
+    plt.title('Robust Frame difference median')
+    plt.grid()
+    outfile = fname_presuffix(in4d, prefix='Robust_framediff_median',
+                              suffix = '.png', use_ext=False)
+    plt.savefig(outfile)
+    print 'Saved ', outfile
+    plt.close()
+    
 
+def screen_pet(in4d):
+    dat = ni.load(in4d).get_data()
+    shape = dat.shape
+    tdat = dat.T
+    tdat.shape = (shape[-1],shape[-2], np.prod(shape[:-2]))
+    slice_var = tdat.var(axis=2)
+    slice_var = (slice_var - slice_var.mean()) / slice_var.std()
+    tdat.shape = (shape[-1], np.prod(shape[:-1]))
+    frame_vars = tdat.var(axis=1)
+    frame_vars = (frame_vars - frame_vars.mean()) / frame_vars.std()
+    frame_means = tdat.mean(axis=1)
+    plt.subplot(411)
+    plt.plot(slice_var, 'o-')
+    plt.subplot(412)
+    plt.plot(frame_vars, 'o-')
+    plt.subplot(413)
+    plt.plot(frame_means, 'o-')
+    plt.subplot(414)
+    plt.plot(slice_var.max(axis=1), 'ro-', label='max')
+    plt.plot(slice_var.min(axis=1), 'go-', label='min')
+    plt.plot(slice_var.mean(axis=1), 'ko-', label='mean')
+    plt.legend()
+    outfile = fname_presuffix(in4d, prefix='QA_frames',
+                              suffix = '.png', use_ext=False)    
+    plt.savefig(outfile)
+    print 'Saved ', outfile
+    plt.close()    
+    
 
 if __name__ == '__main__':
 
