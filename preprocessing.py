@@ -823,6 +823,11 @@ def aseg_label_dict(lut, type='ctx'):
         parts = line.split()
 	if len(parts) < 2:
 	    continue
+        name_as_int = int(parts[0])
+        valrange = np.vstack((np.arange(1002, 1036),np.arange(2002, 2036)))
+        if type is 'ctx' and name_as_int not in valrange:
+            # label is not a cortical label we care about
+            continue
         outd[parts[0]] = parts[1]
     return outd
 	
