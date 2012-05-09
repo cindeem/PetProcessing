@@ -2,7 +2,7 @@
 # vi: set ft=python sts=4 ts=4 sw=4 et:
 #!/usr/bin/env python
 
-import sys, os
+import sys, os, shutil
 import wx
 from glob import glob
 sys.path.insert(0, '/home/jagust/cindeem/CODE/PetProcessing')
@@ -79,12 +79,66 @@ if __name__ == '__main__':
         mean_20min = pp.make_mean_20min(allrealigned)
         mean_40_60min = pp.make_mean_40_60(allrealigned)
 
+        # clean up
+        # remove copied unrealigned frames
+        bg.remove_files(newnifti)
+        
+
         # QA
         # make 4d for QA
         qadir, exists = qa.make_qa_dir(realigndir, name='data_QA')
         data4d = qa.make_4d_nibabel(allrealigned, outdir=qadir)
-        snrimg = qa.gen_sig2noise_img(data4d,qadir)
-        artout = qa.run_artdetect(data4d,tmpparameterfile)
+        #snrimg = qa.gen_sig2noise_img(data4d,qadir)
+        #artout = qa.run_artdetect(data4d,tmpparameterfile)
         #qa.screen_data_dirnme(data4d, qadir)
         qa.plot_movement(tmpparameterfile, subid)
         qa.calc_robust_median_diff(data4d)
+        qa.screen_pet(data4d)
+
+        # Coregister cerebellum, brainmask and aparc_aseg to pet space
+        #
+        logging.info('Coreg %s'%(subid))
+        coregdir, exists = bg.make_dir(pth, 'coreg')
+        if exists:
+            logging.error('%s exists, remove to rerun'%(coregdir))
+            continue
+        # copy brainmask, aparc_aseg, cerebellum to coreg dir
+        basedir, _ = os.path.split(pth)
+        # brainmask
+        globstr = os.path.join(basedir, 'anatomy', 'brainmask.nii*')
+        brainmask = pp.find_single_file(globstr)
+        if brainmask is None:
+            logging.error('%s not found. skipping'%globstr)
+            shutil.rmtree(coregdir)
+            continue
+        cbrainmask = bg.copy_file(brainmask, coregdir)
+        cbrainmask = bg.unzip_file(cbrainmask)
+        # aparc aseg
+        globstr = os.path.join(basedir, 'anatomy', '*aparc_aseg.nii*')
+        aparc = pp.find_single_file(globstr)
+        if aparc is None:
+            logging.error('%s not found. skipping'%globstr)
+            shutil.rmtree(coregdir)
+            continue
+        caparc = bg.copy_file(aparc, coregdir)
+        caparc = bg.unzip_file(caparc)
+        # cerebellum
+        globstr = os.path.join(pth, 'ref_region', 'grey_cerebellum.nii*')
+        cere = pp.find_single_file(globstr)
+        if cere is None:
+            logging.error('%s not found. skipping'%globstr)
+            shutil.rmtree(coregdir)
+            continue
+        ccere = bg.copy_file(cere, coregdir)
+        ccere = bg.unzip_file(ccere)
+        # have all out files, coreg
+        xfm = os.path.join(coregdir, 'mri_to_pet.xfm')
+        corgout = pp.invert_coreg(cbrainmask, mean_20min,xfm)
+        pp.reslice(mean_20min, cbrainmask)
+        pp.apply_transform_onefile(xfm, ccere)
+        pp.reslice(mean_20min, ccere)
+        pm.apply_transform_onefile(xfm, caparc)
+        pp.reslice(mean_20min, caparc)
+        
+        
+        
