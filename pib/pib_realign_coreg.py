@@ -39,14 +39,14 @@ if __name__ == '__main__':
     
     tracer = 'PIB'
     user = os.environ['USER']
-    logging.info('###START Setup Directory :::')
-    logging.info('###TRACER Setup %s  :::'%(tracer))
+    logging.info('###START pib realign coreg :::')
+    logging.info('###TRACER  %s  :::'%(tracer))
     logging.info('###USER : %s'%(user))
     subs = bg.MyDirsDialog(prompt='Choose Subjects ',
                            indir='%s/'%root)
     for sub in subs:
         _, subid = os.path.split(sub)
-
+        logging.info('%s'%subid)
         nifti = glob('%s/pib/%s_PIB*.nii'%(sub, subid))
         nifti.sort()
         if len(nifti) < 34:
@@ -100,7 +100,7 @@ if __name__ == '__main__':
         logging.info('Coreg %s'%(subid))
         coregdir, exists = bg.make_dir(pth, 'coreg')
         if exists:
-            logging.error('%s exists, remove to rerun'%(coregdir))
+            logging.warning('%s exists, remove to rerun'%(coregdir))
             continue
         # copy brainmask, aparc_aseg, cerebellum to coreg dir
         basedir, _ = os.path.split(pth)
@@ -132,12 +132,12 @@ if __name__ == '__main__':
         ccere = bg.copy_file(cere, coregdir)
         ccere = bg.unzip_file(ccere)
         # have all out files, coreg
-        xfm = os.path.join(coregdir, 'mri_to_pet.xfm')
+        xfm = os.path.join(coregdir, 'mri_to_pet.mat')
         corgout = pp.invert_coreg(cbrainmask, mean_20min,xfm)
         pp.reslice(mean_20min, cbrainmask)
         pp.apply_transform_onefile(xfm, ccere)
         pp.reslice(mean_20min, ccere)
-        pm.apply_transform_onefile(xfm, caparc)
+        pp.apply_transform_onefile(xfm, caparc)
         pp.reslice(mean_20min, caparc)
         
         

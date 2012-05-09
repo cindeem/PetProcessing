@@ -78,7 +78,7 @@ if __name__ == '__main__':
             logging.warning('%s has existing anatomy,'\
                             'skipping'%(brainmask))
         elif fsmri is None:
-            logging.error('NO MRI: %s'%(fsmri)) 
+            logging.error('%s NO MRI: %s'%(subid,fsmri)) 
             
         else:
             fsmri = bg.copy_file(fsmri, outdirs['anatomydir'][0])
@@ -94,7 +94,7 @@ if __name__ == '__main__':
             logging.warning('%s has existing anatomy,'\
                             'skipping'%(aparcnii))
         elif aparc is None:
-            logging.error('NO APARC ASEG: %s'%aparc)
+            logging.error('%s NO APARC ASEG: %s'%(subid, aparc))
 
         else:
             aparc = bg.copy_file(aparc, outdirs['anatomydir'][0])
