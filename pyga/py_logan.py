@@ -65,7 +65,7 @@ def load_3d(infiles):
     retun array of shape (frame, x, y, z) with nan removed"""
     nfiles = len(infiles)
     shape = ni.load(infiles[0]).get_shape()
-    newshape = tuple([len(frames)] + [x for x in shape])
+    newshape = tuple([len(infiles)] + [x for x in shape])
     outdata = np.zeros(newshape)
     for val, f in enumerate(infiles):
         outdata[val,:,:,:] = ni.load(f).get_data().squeeze()
