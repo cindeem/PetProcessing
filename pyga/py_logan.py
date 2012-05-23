@@ -81,17 +81,21 @@ def mask_data(mask, dat4d):
     """given a mask file and a 4d array
     mask data with data in maskfile
     return maksed_data and mask_bool"""
+    nframes = dat4d.shape[-1]
     maskdat = ni.load(mask).get_data().squeeze()
     if not maskdat.shape == dat4d.shape[:-1]:
         raise IOError('shape mismatch, %s: %s and dat4d: %s'%(mask,
                                                               maskdat.shape,
                                                               dat4d.shape[:-1]))
     # mask for both anatomical and PET data (logical_and mask
-    data_mask = dat4d.prod(axis=-1) > 0
-    full_mask = np.logical_and(maskdat, data_mask)
-    
-    out = [slice[full_mask.T] for slice in dat4d.T]
-    return np.asarray(out), full_mask
+    data_mask = dat4d.all(axis=-1) > 0
+    fullmask = np.logical_and(maskdat>0, data_mask)
+                             
+    new = np.empty((fullmask[fullmask].size,nframes))
+    for i in np.arange(nframes):
+        new[:,i] = dat4d[:,:,:,i][fullmask].flatten()
+    new.shape = (fullmask[fullmask].size, nframes)
+    return new, fullmask
 
 def get_ki_vd_lstsq(x,y):
     """solves best fitting line using np.linalg.lstsq
@@ -163,13 +167,17 @@ def calc_xy(ref, masked_dat,midtimes, k2ref=.15):
     y = integrated_data / data
     x = integrated_reference / data + (1 / k2ref) * reference / data
     """
-    big_durs = repmat_1d(midtimes,masked_dat.shape[1])
-    int_dat = scipy.integrate.cumtrapz(masked_dat,big_durs.T,axis=0)
-    big_ref = repmat_1d(ref,masked_dat.shape[1])
+    big_durs = repmat_1d(midtimes,masked_dat.shape[0])
+    int_dat = scipy.integrate.cumtrapz(masked_dat.T,big_durs.T,axis=0)
+    big_ref = repmat_1d(ref,masked_dat.shape[0])
     int_ref = scipy.integrate.cumtrapz(big_ref.T,big_durs.T, axis=0)
-    y = (int_dat)  / masked_dat[1:,:]# 33, nvox in mask
-    x = (int_ref / masked_dat[1:,:]) + ( 1 / k2ref) *(big_ref.T[1:,:] / masked_dat[1:,:]) 
+    y = (int_dat.T)  / masked_dat[:,1:]# 33, nvox in mask
+    x = (int_ref.T / masked_dat[:,1:]) + ( 1 / k2ref) *(big_ref[:,1:] / masked_dat[:,1:]) 
     return x,y
+
+
+
+    
 
 def get_lstsq(x,y):
     """solves best fitting line using np.linalg.lstsq
@@ -183,26 +191,27 @@ def get_lstsq(x,y):
     residues = results[1]
     return ki,vd,residues
 
-def calc_ki(ref, data, timing_file, range=(35,90)):
+def calc_ki(x,y, timing_file, range=(35,90)):
     """ calculates ki of data given reference, timing file,
     and range of steady state data (in minutes)"""
     
-    midtimes, durs = midframes_from_file(timing_file)
+    
     ft = frametimes_from_file(timing_file)
-    x,y  = calc_xy(ref, data, midtimes)
-    allki = np.zeros(data.shape[1])
-    resids = np.zeros(data.shape[1])
-    start_end = np.logical_and(ft[1:,0] / 60. >= range[0],ft[1:,2] / 60. <= range[1])
-    for val, (tmpx, tmpy) in enumerate(zip(x.T,y.T)):
+    
+    allki = np.zeros(x.shape[0])
+    resids = np.zeros(x.shape[0])
+    start_end = np.logical_and(ft[1:,0] / 60. >= range[0],
+                               ft[1:,2] / 60. <= range[1])
+    for val, (tmpx, tmpy) in enumerate(zip(x,y)):
         ki,vd,residues = get_lstsq(tmpx[start_end],tmpy[start_end])
         allki[val] = ki
         resids[val] = residues
     return allki, resids
 
-def results_to_array(results, mask, shape):
+def results_to_array(results, mask):
     """ puts values in results back in fill data array
     of size shape using values in boolean mask"""
-    dat = np.zeros(shape)
+    dat = np.zeros(mask.shape)
     dat[mask] = results
     return dat
 
@@ -218,11 +227,13 @@ if __name__ == '__main__':
     timing_file = '%s/frametimes.csv'%root
     midtimes, durs = midframes_from_file(timing_file)
     data4d = get_data_nibabel(frames)
+    
     ref = get_ref(refroifile, data4d)
     ref_fig = save_inputplot(ref, (midtimes + durs/2.), root)
     masked_data, mask_roi = mask_data(mask, data4d)
-    allki, residuals = calc_ki(ref, masked_data, timing_file, range=range)
-    dvr = results_to_array(allki, mask_roi, data4d.shape[1:])
+    x,y  = calc_xy(ref,masked_data, midtimes)
+    allki, residuals = calc_ki(x, y, timing_file, range=range)
+    dvr = results_to_array(allki, mask_roi)
     
     save_data2nii(dvr, mask, filename='DVR', outdir=root)
 

@@ -97,8 +97,10 @@ if __name__ == '__main__':
         ref = pyl.get_ref(rcere, data4d)
         ref_fig = pyl.save_inputplot(ref, (midtimes + durs/2.), dvrdir)
         masked_data, mask_roi = pyl.mask_data(rbrainmask, data4d)
-        allki, residuals = pyl.calc_ki(ref, masked_data, timingf, range=range)
-        dvr = pyl.results_to_array(allki, mask_roi, data4d.shape[1:])
+        x,y  = pyl.calc_xy(ref, masked_data, midtimes)
+        allki, residuals = pyl.calc_ki(x, y, timingf, range=range)
+        dvr = pyl.results_to_array(allki, mask_roi)
     
-        pyl.save_data2nii(dvr, rbrainmask, filename='DVR-%s'%subid, outdir=dvrdir)
-        logging.info('%s Finished Logan'%subid)
+        outf = pyl.save_data2nii(dvr, rbrainmask,
+                                 filename='DVR-%s'%subid, outdir=dvrdir)
+        logging.info('%s Finished Logan: %s'%(subid, outf))
