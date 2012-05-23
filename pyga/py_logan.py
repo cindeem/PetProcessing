@@ -16,13 +16,13 @@ def get_ref(refroi, dat):
     in dat, returns vector of means across time
     """
     refdat = ni.load(refroi).get_data().squeeze()
-    if not refdat.shape == dat.shape[1:]:
+    if not refdat.shape == dat.shape[:-1]:
         raise IOError('%s has shape %s, not %s'%(refroi, refdat.shape, dat.shape[1:]))
-    means = np.zeros(dat.shape[0])
+    means = np.zeros(dat.shape[-1])
     refdat = np.nan_to_num(refdat)
-    for val,slice in enumerate(dat):
+    for val,slice in enumerate(dat.T):
         ind = np.logical_and(slice > 0,
-                             refdat > 0)
+                             refdat.T > 0)
         means[val] = slice[ind].mean()
     return means
 
@@ -63,13 +63,8 @@ def is_iterable(input):
 def load_3d(infiles):
     """given a list of 3d frames, load into 4D array
     retun array of shape (frame, x, y, z) with nan removed"""
-    nfiles = len(infiles)
-    shape = ni.load(infiles[0]).get_shape()
-    newshape = tuple([len(infiles)] + [x for x in shape])
-    outdata = np.zeros(newshape)
-    for val, f in enumerate(infiles):
-        outdata[val,:,:,:] = ni.load(f).get_data().squeeze()
-    return np.nan_to_num(outdata)
+    tmp = ni.concat_images(infiles)
+    return np.nan_to_num(tmp.get_data())
 
 def get_data_nibabel(infiles):
     """ uses nibabel to open nifti file
@@ -87,12 +82,16 @@ def mask_data(mask, dat4d):
     mask data with data in maskfile
     return maksed_data and mask_bool"""
     maskdat = ni.load(mask).get_data().squeeze()
-    if not maskdat.shape == dat4d.shape[1:]:
+    if not maskdat.shape == dat4d.shape[:-1]:
         raise IOError('shape mismatch, %s: %s and dat4d: %s'%(mask,
                                                               maskdat.shape,
-                                                              dat4d.shape))
-    out = [slice[maskdat>0] for slice in dat4d]
-    return np.asarray(out), maskdat > 0
+                                                              dat4d.shape[:-1]))
+    # mask for both anatomical and PET data (logical_and mask
+    data_mask = dat4d.prod(axis=-1) > 0
+    full_mask = np.logical_and(maskdat, data_mask)
+    
+    out = [slice[full_mask.T] for slice in dat4d.T]
+    return np.asarray(out), full_mask
 
 def get_ki_vd_lstsq(x,y):
     """solves best fitting line using np.linalg.lstsq
@@ -175,6 +174,8 @@ def calc_xy(ref, masked_dat,midtimes, k2ref=.15):
 def get_lstsq(x,y):
     """solves best fitting line using np.linalg.lstsq
     """
+    if np.all(x == 0) or np.all(y == 0):
+        return 0.,0.,0.
     newx = np.ones((x.shape[0],2))
     newx[:,0] = x
     results = np.linalg.lstsq(newx,y)
