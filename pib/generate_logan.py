@@ -28,6 +28,8 @@ if __name__ == '__main__':
     # start wx gui app
     app = wx.App()
 
+    roifile = '/home/jagust/cindeem/CODE/PetProcessing/pib/fsrois_pibindex.csv'
+
     arda = '/home/jagust/arda/lblid'
     root = bg.SimpleDirDialog(prompt='Choose PIB data dir',
                               indir = '/home/jagust')
@@ -104,3 +106,16 @@ if __name__ == '__main__':
         outf = pyl.save_data2nii(dvr, rbrainmask,
                                  filename='DVR-%s'%subid, outdir=dvrdir)
         logging.info('%s Finished Logan: %s'%(subid, outf))
+        roid = pp.roilabels_fromcsv(roifile)
+        logging.info('PIBINDEX ROI file: %s'%(roifile))
+        
+        # get raparc
+        corgdir = os.path.join(pth, 'coreg')
+        globstr = '%s/rB*aparc_aseg.nii'%(corgdir)
+        raparc = pp.find_single_file(globstr)
+        if raparc is None:
+            logging.error('%s missing, unable to get pibindex '%(globstr))
+            continue
+        meand = pp.mean_from_labels(roid, raparc, dvr)
+        csvfile = os.path.join(dvrdir, 'PIBINDEX_%s_%s.csv'%(subid,cleantime))
+        pp.meand_to_file(meand, csvfile)

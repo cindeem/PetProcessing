@@ -20,7 +20,7 @@ import numpy as np
 sys.path.insert(0, '/home/jagust/cindeem/CODE/GraphicalAnalysis/pyGA')
 import pyGraphicalAnalysis as pyga
 
-
+import csv
 #made non writeable by lab
 
 def get_logging_configdict(logfile):
@@ -831,8 +831,52 @@ def aseg_label_dict(lut, type='ctx'):
         outd[parts[0]] = parts[1]
     return outd
 	
+def roilabels_fromcsv(infile):
+    """ given a csv file with fields
+    'pibindex_Ltemporal', '1009', '1015', '1030', '', '', '', '', '', ''
+    parses into roi name and array of label values and returns dict"""
+    spam = csv.reader(open(infile, 'rb'),
+                      delimiter=',', quotechar='"')
+    roid = {}
+    for item in spam:
+        roi = item[0]
+        labels = [x for x in item[1:] if not x == '']
+        roid[roi] = np.array(labels, dtype=int)
+    return roid
 
+def mean_from_labels(roid, labelimg, data):
+    meand = {}
+    labels = nibabel.load(labelimg).get_data()
+    if not labels.shape == data.shape:
+        return None
+    allmask = np.zeros(labels.shape, dtype=bool)
+    for roi, mask in roid.items():
+        fullmask = np.zeros(labels.shape, dtype=bool)
+        for label_id in mask:
+            fullmask = np.logical_or(fullmask, labels == label_id)
+        fullmask = np.logical_and(fullmask, data>0)
+        allmask = np.logical_or(allmask, fullmask)
+        roimean = data[fullmask].mean()
+        roinvox = data[fullmask].shape[0]
+        meand[roi] = [roimean, roinvox]
+    allmask = np.logical_and(allmask, data > 0)
+    meand['ALL'] = [data[allmask].mean(), data[allmask].shape[0]]
+    return meand
 
+def meand_to_file(meand, csvfile):
+    """given a dict of roi->[mean, nvox]
+    unpack to array
+    output to file
+    """
+    fid = open(csvfile, 'w+')
+    csv_writer = csv.writer(fid)
+    csv_writer.writerow(['SUBID', 'mean','nvox'])
+    for k, (mean, nvox) in meand.items():
+        row = ['%s'%k,'%f'%mean,'%d'%nvox]
+        csv_writer.writerow(row)
+    fid.close()
+    
+    
 if __name__ == '__main__':
 
 	## test generateing freesurfer label dictionaries
