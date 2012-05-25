@@ -109,13 +109,21 @@ def frametimes_from_ecats(filelist):
     return out
 
 
-def frametimes_to_seconds(frametimes):
+def frametimes_to_seconds(frametimes, type = 'sec'):
     """ assumes a frametimes array
+    type = 'sec', or 'min'
     [frame, start, duration, stop]
-    converts to seconds"""
+    converts to type (default sec (seconds))
+    """
+    
     newframetimes = frametimes.copy()
     newframetimes[:,1:] = frametimes[:,1:] / 1000.
+    if type == 'min':
+        newframetimes[:,1:] = newframetimes[:,1:]  / 60.
     return newframetimes
+
+
+
 
 def make_outfile(infile, name = 'frametimes'):
     pth, _ = os.path.split(infile)
