@@ -871,7 +871,7 @@ def meand_to_file(meand, csvfile):
     fid = open(csvfile, 'w+')
     csv_writer = csv.writer(fid)
     csv_writer.writerow(['SUBID', 'mean','nvox'])
-    for k, (mean, nvox) in meand.items():
+    for k, (mean, nvox) in sorted(meand.items()):
         row = ['%s'%k,'%f'%mean,'%d'%nvox]
         csv_writer.writerow(row)
     fid.close()

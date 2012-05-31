@@ -5,8 +5,11 @@ from datetime import datetime
 
 
 
-def parse_subid(infile):
-    m = re.search('B[0-9]{2}-[0-9]{3}', infile)
+def parse_subid(infile, visit=False):
+    if visit:
+        m = re.search('B[0-9]{2}-[0-9]{3}_v[0-9]', infile)
+    else:
+        m = re.search('B[0-9]{2}-[0-9]{3}', infile)
     try:
         return m.group()
     except:
@@ -14,8 +17,8 @@ def parse_subid(infile):
         return 'NA'
 
     
-def get_data(dict, infile):
-    subid = parse_subid(infile)
+def get_data(dict, infile, visit=False):
+    subid = parse_subid(infile, visit=visit)
     if subid == 'NA':
         return
     roid = {}
@@ -23,16 +26,22 @@ def get_data(dict, infile):
         if 'SUBID' in row:
             continue
         roid[row[0]] = row[1:]
-    dict[subid]  = roid
+    if dict.has_key(subid):
+        print 'duplicate for %s'%subid
+    else:
+        dict[subid]  = roid
 
+# specify if subjects will have more than one visit
+visit = False
 data_dir ='/home/jagust/UCD_Project/pet'
+#data_dir = '/home/jagust/bacs_pet/PIB'
 globstr = os.path.join(data_dir, 'B*/pib/dvr/PIB*')
 allpi = glob(globstr)
 allpi.sort()
 
 allsd = {}
 for f in allpi:
-    get_data(allsd, f)
+    get_data(allsd, f, visit=visit)
 
 newname = 'ALL_PIBINDEX' + datetime.now().strftime('-%Y-%m-%d_%H-%M') + '.csv'
 outfile = os.path.join(data_dir, newname)
@@ -49,10 +58,12 @@ for item in sorted(allsd[subjects[0]]):
 csv_writer.writerow(headers)
 # write headers
 
+keys = sorted(allsd[subjects[0]])
 for subid in subjects:
     row = [subid]
     data = allsd[subid]
-    for mean, std in sorted(data.values()):
+    for k in keys:
+        mean, std = data[k]
         row+= [mean, std]
     csv_writer.writerow(row)
 fid.close()
