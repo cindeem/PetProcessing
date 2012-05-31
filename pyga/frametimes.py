@@ -153,20 +153,25 @@ def read_frametimes(infile):
 
 if __name__ == '__main__':
     #run tests
-    infile = 'test/pibecat_frames34.v'
+    infile = '../test/B09_237-42A890F600004FB4-de.v'
     ft = frametime_from_ecat(infile)
-    np.testing.assert_equal(ft[0,0], 1)
-    np.testing.assert_equal(ft[0,1] , 0)
-    np.testing.assert_equal(ft[0,2] , 15000)
-    np.testing.assert_equal(ft[0,3] , 15000)
+    np.testing.assert_equal(ft[0,0], 23.)
+    np.testing.assert_equal(ft[0,1] , 1020016.0)
+    np.testing.assert_equal(ft[0,2] , 180000.0)
+    np.testing.assert_equal(ft[0,3] , 1200016.0)
 
+    # test multiple and sorting
+    allv  = glob('../test/*.v')
+    ft_all = frametimes_from_ecats(allv)
+    np.testing.assert_equal(ft_all[0,0],17.0)
     # test naming
     outf = make_outfile(infile)
-    np.testing.assert_equal('test/frametimes' in outf, True)
-
+    np.testing.assert_equal('../test/frametimes' in outf, True)
+    
 
     # test writing
-    ft_sec = ft.copy()
+    ft_sec = ft_all[0,:].copy()
+    ft_sec.shape = (1,4)
     ft_sec[:,1:] = ft_sec[:,1:] / 1000.
     
     write_frametimes(ft, outf)
@@ -175,11 +180,15 @@ if __name__ == '__main__':
 
     # roundtrip
     ft = read_frametimes(outf)
-    np.testing.assert_equal(ft[0,0], 1)
-    np.testing.assert_equal(ft[0,1] , 0)
-    np.testing.assert_equal(ft[0,2] , 15000)
-    np.testing.assert_equal(ft[0,3] , 15000)
+    np.testing.assert_equal(ft[0,0], 23.)
+    np.testing.assert_equal(ft[0,1] , 1020016.0)
+    np.testing.assert_equal(ft[0,2] , 180000.0)
+    np.testing.assert_equal(ft[0,3] , 1200016.0)
     eft = read_frametimes(outf)
+    # roundtrip seconds
+    ft = read_frametimes(outf_sec)
+    np.testing.assert_almost_equal(ft[0,1], 540.016)
+    os.unlink(outf_sec)
     os.unlink(outf)
 
     ## dicom
