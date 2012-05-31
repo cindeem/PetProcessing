@@ -86,7 +86,7 @@ if __name__ == '__main__':
     ft = ft.read_frametimes(timingf)
     ft_sec = ft.copy() / 60.
     start = singlechoice(['%d'%x for x in ft_sec[:,1]], text='Start Time')
-    end = singlechoice(['%d'%x for x in ft_sec[:,1]], text='End Time')
+    end = singlechoice(['%d'%x for x in ft_sec[:,-1]], text='End Time')
     k2ref = 0.15
     range = (int(start),int(end))
     logging.info('Running Logan')

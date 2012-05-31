@@ -81,6 +81,7 @@ def frametime_from_ecat(ecatf):
         # fix adj, divide by 60000 to get minutes
         out[i,2] = dur
         out[i,3] = startt - adj + dur
+    out = out[out[:,0].argsort(),]
     return out
 
 
@@ -106,6 +107,7 @@ def frametimes_from_ecats(filelist):
             out = np.vstack((out, tmp))
         except:
             out = tmp
+    out = out[out[:,0].argsort(),]
     return out
 
 
