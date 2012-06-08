@@ -145,7 +145,10 @@ def read_frametimes(infile):
     for row in jnk:
         if not 'frame' in row[0]:
             outarray.append(row)
-    return np.asarray(outarray, dtype=float)
+    outarray = np.asarray(outarray, dtype=float)
+    # sort by frame
+    outarray = outarray[outarray[:,0].argsort(),]
+    return outarray
 
 
 

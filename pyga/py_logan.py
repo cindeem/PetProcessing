@@ -150,7 +150,7 @@ def save_data2nii(data, reference_img, filename='generic_file',outdir='.'):
     img = ni.load(reference_img)
     data = np.reshape(data, img.get_shape())
     out_img = ni.Nifti1Image(data, img.get_affine())
-    outfile = os.path.join(outdir, '%s_%s'%(filename,time.strftime('%Y-%m-%d-%H-%M')))
+    outfile = os.path.join(outdir, '%s_%s.nii.gz'%(filename,time.strftime('%Y-%m-%d-%H-%M')))
     out_img.to_filename(outfile)
     return outfile
     
