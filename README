@@ -10,5 +10,7 @@ Requires
 
   * nibabel
 
+  * nipy
+
   * nipype and its requirements
 
