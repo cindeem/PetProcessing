@@ -36,7 +36,7 @@ if __name__ == '__main__':
     
     cleantime = asctime().replace(' ','-').replace(':', '-')
     logfile = os.path.join(root,'logs',
-                           'pib_logandvr%s.log'%(cleantime))
+                           'pib_%s_%s.log'%(__file__, cleantime))
 
     log_settings = pp.get_logging_configdict(logfile)
     logging.config.dictConfig(log_settings)

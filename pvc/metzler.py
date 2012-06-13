@@ -5,9 +5,12 @@ import sys
 import numpy as np
 sys.path.insert(0, '/home/jagust/cindeem/CODE/PetProcessing')
 import preprocessing as pp
+sys.path.insert(0, '/home/jagust/cindeem/CODE/PetProcessing/pvc')
+import ecat_smooth as es
 import nibabel as ni
-import nipy
 import nipype.interfaces.freesurfer as freesurfer
+import nipy
+import nipy.algorithms
 
 def make_pvc(pet, psf_brainmask, brainmask, prefix = 'pvc_'):
     """ uses the given per psf brain mask to correct the data in pet
