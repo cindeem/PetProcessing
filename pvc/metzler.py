@@ -63,7 +63,7 @@ def make_aseg_brainmask(infile):
     newimg.to_filename(outfile)
     return outfile
 
-def smooth_mask_spm(mask, fwhm = 14):
+def smooth_mask_spm(mask, fwhm = 7):
     sout = pp.spm_smooth([mask] , fwhm=fwhm)
     
     if not sout.runtime.returncode ==0:
