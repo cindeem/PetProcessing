@@ -1,7 +1,7 @@
 # emacs: -*- mode: python; py-indent-offset: 4; indent-tabs-mode: nil -*-
 # vi: set ft=python sts=4 ts=4 sw=4 et:
 #!/usr/bin/env python
-import sys
+import sys,os
 import numpy as np
 sys.path.insert(0, '/home/jagust/cindeem/CODE/PetProcessing')
 import preprocessing as pp
@@ -49,7 +49,7 @@ def make_aseg_brainmask(infile):
     creates a new file aseg_brainmask.nii in same directory
     as the original aseg.nii file"""
     maskint = ((2,3), (7,13), (16, 20), (26,28),(41,42), (46,56),
-               (58,60),(77,77),(251,255))
+               (58,60),(77,77),(251,255),(1000,5000))
     aseg = ni.load(infile)
     asegd = aseg.get_data()
 
@@ -93,3 +93,9 @@ def calc_pvc(pet, mask, smask):
                       mask, prefix='pvcfs_')
     return pvcpet
     
+def fsl_erode2d(infile):
+    outfile = pp.prefix_filename(infile, prefix='ero-')
+    outfile = outfile.replace('.nii', '.nii.gz')
+    cmd = ' '.join(['fslmaths', infile, '-kernel 2D', '-ero',outfile])
+    os.system(cmd)
+    return outfile

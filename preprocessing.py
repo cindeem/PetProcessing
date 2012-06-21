@@ -854,12 +854,14 @@ def mean_from_labels(roid, labelimg, data):
         fullmask = np.zeros(labels.shape, dtype=bool)
         for label_id in mask:
             fullmask = np.logical_or(fullmask, labels == label_id)
-        fullmask = np.logical_and(fullmask, data>0)
-        allmask = np.logical_or(allmask, fullmask)
-        roimean = data[fullmask].mean()
-        roinvox = data[fullmask].shape[0]
-        meand[roi] = [roimean, roinvox]
-    allmask = np.logical_and(allmask, data > 0)
+            data_mask = np.logical_and(data>0, np.isfinite(data))
+            fullmask = np.logical_and(fullmask, data_mask)
+            # update allmask
+            allmask = np.logical_or(allmask, fullmask)
+            roimean = data[fullmask].mean()
+            roinvox = data[fullmask].shape[0]
+            meand[roi] = [roimean, roinvox]
+    # get values of all regions
     meand['ALL'] = [data[allmask].mean(), data[allmask].shape[0]]
     return meand
 
