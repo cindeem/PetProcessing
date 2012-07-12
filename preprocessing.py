@@ -865,6 +865,31 @@ def mean_from_labels(roid, labelimg, data):
     meand['ALL'] = [data[allmask].mean(), data[allmask].shape[0]]
     return meand
 
+def mean_from_labels_percent(roid, labelimg, data, percent = .50):
+    meand = {}
+    labels = nibabel.load(labelimg).get_data()
+    if not labels.shape == data.shape:
+        return None
+    allmask = np.zeros(labels.shape, dtype=bool)
+    for roi, mask in roid.items():
+        fullmask = np.zeros(labels.shape, dtype=bool)
+        for label_id in mask:
+            fullmask = np.logical_or(fullmask, labels == label_id)
+            data_mask = np.logical_and(data>0, np.isfinite(data))
+            fullmask = np.logical_and(fullmask, data_mask)
+            # update allmask
+            allmask = np.logical_or(allmask, fullmask)
+            roidat = data[fullmask]
+            roidat.sort()
+            topindx = int(roidat.shape[0] * percent)
+            roimean = roidat[topindx:].mean()
+            roinvox = roidat[topindx:].shape[0]
+            meand[roi] = [roimean, roinvox]
+    # get values of all regions
+    meand['ALL'] = [data[allmask].mean(), data[allmask].shape[0]]
+    return meand    
+    
+
 def meand_to_file(meand, csvfile):
     """given a dict of roi->[mean, nvox]
     unpack to array

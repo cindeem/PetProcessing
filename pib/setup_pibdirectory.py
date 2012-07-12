@@ -30,7 +30,7 @@ if __name__ == '__main__':
                                 indir = '/home/jagust')
     cleantime = asctime().replace(' ','-').replace(':', '-')
     logfile = os.path.join(root,'logs',
-                           'setup_pibdirectory_%s.log'%(cleantime))
+                           '%s_%s.log'%(__file__,cleantime))
 
     log_settings = pp.get_logging_configdict(logfile)
     logging.config.dictConfig(log_settings)
@@ -41,6 +41,7 @@ if __name__ == '__main__':
     logging.info('###START Setup Directory :::')
     logging.info('###TRACER Setup %s  :::'%(tracer))
     logging.info('###USER : %s'%(user))
+    logging.info('%s'%__file__)
     subs = bg.MyDirsDialog(prompt='Choose Subjects ',
                            indir='%s/'%mridir)
     
