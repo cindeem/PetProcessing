@@ -49,6 +49,7 @@ if __name__ == '__main__':
         _, subid = os.path.split(sub)
         logging.info('%s'%subid)
         # find fdg nifti files
+        tracerdir = os.path.join(sub, tracer.lower())
         globstr = os.path.join(sub, tracer.lower(), '%s_%s*'%(subid, tracer))
         nifti = bg.glob(globstr)
         
@@ -84,7 +85,7 @@ if __name__ == '__main__':
         no_nanfiles = pp.clean_nan(tmprealigned)
         #make 4d volume to visualize movement
         img4d = qa.make_4d_nibabel(no_nanfiles)
-            
+        bg.zip_files(tmprealigned)
         #save qa image
         #qa.save_qa_img(img4d)
         qa.plot_movement(tmpparameterfile, subid)
@@ -94,4 +95,79 @@ if __name__ == '__main__':
         
         bg.remove_files(no_nanfiles)
         bg.remove_files(newnifti)
-            
+
+        # coreg pons to pet
+        # find PONS
+        pons_searchstr = '%s/ref_region/pons_tu.nii*' % tracerdir
+        pons =  pp.find_single_file(pons_searchstr)
+        if 'gz' in pons:
+            pons = bg.unzip_file(pons)
+        if pons is None:
+            logging.warning('no pons_tu found for %s'%(subid))
+            continue
+        # find MRI
+        searchstring = '%s/anatomy/brainmask.nii' % sub
+        mri = pp.find_single_file(searchstring)
+        if mri is None:
+            logging.warning('no brainmask found for %s'%(subid))
+            continue
+        # find aparc_aseg
+        searchstring = '%s/anatomy/B*aparc_aseg.nii*' % sub
+        aparc = pp.find_single_file(searchstring)
+        if aparc is None:
+            logging.warning('%s not found'%(searchstring))
+            continue
+        aparc = bg.unzip_file(aparc)
+        
+        # find PET
+        pet = movedmean # use previously made summed image
+        # copy files to tmp dir
+        logging.info('coreg ref region to %s'%pet)
+        coreg_dir,exists = bg.make_dir(tracerdir, dirname='coreg_mri2fdg')
+        if exists:
+            logging.warning('existing dir %s remove to re-run'%(coreg_dir))
+            continue
+        cmri = bg.copy_file(mri, coreg_dir)
+        cpons = bg.copy_file(pons, coreg_dir)
+        cpet = bg.copy_file(pet, coreg_dir)
+        caparc = bg.copy_file(aparc, coreg_dir)
+        xfm_file = pp.make_transform_name(cpet, cmri)
+        logging.info( 'coreg %s'%(subid))
+        corg_out = pp.invert_coreg(cmri, cpet, xfm_file)
+        if not corg_out.runtime.returncode == 0:
+            logging.warning(corg_out.runtime.stderr)
+            continue
+        apply_out = pp.apply_transform_onefile(xfm_file,cpons)
+        if not apply_out.runtime.returncode == 0:
+            logging.warning(apply_out.runtime.stderr)
+            continue
+        apply_out = pp.apply_transform_onefile(xfm_file,caparc)
+        if not apply_out.runtime.returncode == 0:
+            logging.warning(apply_out.runtime.stderr)
+            continue
+        rout_mri = pp.reslice(cpet, cmri)
+        if not rout_mri.runtime.returncode == 0:
+            logging.warning(rout_mri.runtime.stderr)
+        else:
+            rmri = pp.prefix_filename(cmri, prefix='r')
+            _, rmri_nme = os.path.split(rmri)
+            new_rmri = rmri_nme.replace('rbr', 'rfdg_br')
+            newmri = bg.copy_file(rmri, '%s/anatomy/%s'%(sub,new_rmri))
+            if newmri:
+                bg.remove_files([cmri,rmri])
+        rout_pons = pp.reslice(cpet, cpons)
+        if not rout_pons.runtime.returncode == 0:
+            logging.warning(rout_pons.runtime.stderr)
+        else:
+            rpons = pp.prefix_filename(cpons, prefix='r')
+            newpons = bg.copy_file(rpons, '%s/ref_region'%(tracerdir))
+            if newpons:
+                bg.remove_files([cpons,rpons])
+        rout_aparc = pp.reslice(cpet, caparc)
+        if not rout_aparc.runtime.returncode == 0:
+            logging.warning(rout_aparc.runtime.stderr)
+        bg.remove_files(cpet)
+        bg.remove_files(caparc)
+        bg.zip_files(aparc)
+        bg.zip_files(nifti)
+        logging.info( '%s finished realign QA coreg' % subid)

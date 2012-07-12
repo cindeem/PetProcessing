@@ -1,3 +1,5 @@
+# emacs: -*- mode: python; py-indent-offset: 4; indent-tabs-mode: nil -*-
+# vi: set ft=python sts=4 ts=4 sw=4 et:
 import wx
 import sys, os
 sys.path.insert(0, '/home/jagust/cindeem/CODE/ruffus')
@@ -7,6 +9,7 @@ import nibabel as ni
 import nipype
 from nipype.interfaces.base import CommandLine
 import numpy as np
+import logging
 
 def MyDirsDialog(prompt='Choose Subject Dirs',indir='',title='Choose Subject Dirs'):
       """
@@ -317,6 +320,17 @@ def unzip_file(infile):
         else:
             return base
 
+
+def zip_files(files):
+    if not hasattr(files, '__iter__'):
+        files = [files]
+    for f in files:
+        cmd = CommandLine('gzip %s' % f)
+        cout = cmd.run()
+        if not cout.runtime.returncode == 0:
+            logging.error('Failed to zip %s'%(f))
+          
+      
 
 def convertallecat(ecats, newname):
       """ converts all ecat files and removes .v files"""
