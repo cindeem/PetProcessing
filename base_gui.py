@@ -2,12 +2,14 @@
 # vi: set ft=python sts=4 ts=4 sw=4 et:
 import wx
 import sys, os
+import tempfile
 sys.path.insert(0, '/home/jagust/cindeem/CODE/ruffus')
 import MultiDirDialog as mdd
 from glob import glob
 import nibabel as ni
 import nipype
 from nipype.interfaces.base import CommandLine
+from nipype.interfaces.fsl import Split as fsl_split
 import numpy as np
 import logging
 
@@ -337,6 +339,91 @@ def convertallecat(ecats, newname):
       for f in ecats:
             ecat2nifti(f, newname)
             os.remove(f)
+
+def tar_cmd(infile):
+    """ given a ipped tar archive, untars"""
+    cwd = os.getcwd()
+    pth, nme = os.path.split(infile)
+    os.chdir(pth)
+    cl = CommandLine('tar xfvz %s'%(infile))
+    cout = cl.run()
+    os.chdir(cwd)
+    return pth
+
+def find_dicoms(pth):
+    """looks in pth to find files, sorts and returns list
+    of lists (to handle multiple directories)"""
+    toplevel = [os.path.join(pth, x) for x in os.listdir(pth)]
+    alldir = [x for x in toplevel if os.path.isdir(x)]
+    results = {}
+    for item in alldir:
+        tmpfiles = glob('%s/*'%(item))
+        tmpfiles.sort()
+        results.update({item:tmpfiles})
+    return results
+
+
+def convert_dicom(dcm0, fname):
+    """given first dicom and fname uses mri_convert to convert
+    to a 4d nii.gz file"""
+    newdcm0 = dcm0.replace('(', '\(').replace(')', '\)')
+    cmd = 'mri_convert --out_orientation LAS %s %s'%(newdcm0, fname)
+    cl = CommandLine(cmd)
+    cout = cl.run()
+    if not cout.runtime.returncode == 0:
+        logging.error('DICOM Failed to convert %s'%(dcm0))
+        return None
+    else:
+        return fname
+
+def fsl_split4d(in4d):
+    cwd = os.getcwd()
+    pth, nme, ext = nipype.utils.filemanip.split_filename(in4d)
+    os.chdir(pth)
+    split = fsl_split()
+    split.inputs.in_file = in4d
+    split.inputs.dimension = 't'
+    split.inputs.out_base_name = nme
+    split_out = split.run()
+    os.chdir(cwd)
+    if not split_out.runtime.returncode == 0:
+        logging.error('Failed to split 4d file %s'%in4d)
+        return None
+    else:
+        return split_out.outputs.out_files
+    
+    return pth   
+
+
+def copy_tmpdir(infile):
+    """copies file to tempdir, returns path
+    to file copied into tmpdir"""
+    tmpdir = tempfile.mkdtemp()
+    newfile = copy_file(infile, tmpdir)
+    return newfile
+
+def biograph_dicom_convert(input, dest):
+    """ given a tgz file holding dicoms,
+    expands in temdir, uses mri_convert to convert
+    file to nifti (4D) in tmpdir
+    copies single frames to dest"""
+    newfile = copy_tmpdir(input)
+    pth = tar_cmd(newfile)
+    results = find_dicoms(pth)
+    all4d = []
+    for name, files in results.items():
+        dcm0 = files[0]
+        fname = name + '.nii.gz'
+        tmp4d = convert_dicom(dcm0, fname)
+        all4d.append(tmp4d)
+    for item in all4d:
+        if ni.load(item).get_shape()[-1] > 1:
+            tmpsplit = fsl_split4d(item)
+            copy_files(tmpsplit[1:], dest)
+        else:
+            copy_file(item, dest)
+    
+    
 
 def move_and_convert(mgz, dest, newname):
       """takes a mgz file, moves it,

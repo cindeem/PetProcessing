@@ -170,4 +170,16 @@ if __name__ == '__main__':
         bg.remove_files(caparc)
         bg.zip_files(aparc)
         bg.zip_files(nifti)
-        logging.info( '%s finished realign QA coreg' % subid)
+
+        # pons norm
+        outfname = os.path.join(tracerdir,
+                                'ponsnormed_%s_%s.nii'%(subid,
+                                                        tracer.lower()))
+        # generate pons normed image
+        pp.make_pons_normed(pet, newpons, outfname)
+        no_nanfiles = pp.clean_nan([outfname])
+        logging.info('saved %s'%(outfname))
+
+
+        
+        logging.info( '%s finished realign QA coreg ponsnorm' % subid)
