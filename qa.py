@@ -9,7 +9,7 @@ import json
 import nipy
 import nipy.algorithms.diagnostics as diag
 from nipype.utils.filemanip import fname_presuffix
-import scikits.statsmodels.robust.scale as scale
+import statsmodels.robust.scale as scale
 import matplotlib.pyplot as plt
 import time
 
