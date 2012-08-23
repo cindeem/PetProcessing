@@ -367,7 +367,8 @@ def convert_dicom(dcm0, fname):
     """given first dicom and fname uses mri_convert to convert
     to a 4d nii.gz file"""
     newdcm0 = dcm0.replace('(', '\(').replace(')', '\)')
-    cmd = 'mri_convert --out_orientation LAS %s %s'%(newdcm0, fname)
+    cmd = '/usr/local/freesurfer_x86_64-5.1.0/bin/mri_convert '
+    cmd = cmd + ' --out_orientation LAS %s %s'%(newdcm0, fname)
     cl = CommandLine(cmd)
     cout = cl.run()
     if not cout.runtime.returncode == 0:
