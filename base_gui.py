@@ -355,20 +355,41 @@ def find_dicoms(pth):
     of lists (to handle multiple directories)"""
     toplevel = [os.path.join(pth, x) for x in os.listdir(pth)]
     alldir = [x for x in toplevel if os.path.isdir(x)]
+
+    if len(alldir) < 1:
+        alldir = [pth]
     results = {}
     for item in alldir:
+        if '.tgz' in item:
+            continue
         tmpfiles = glob('%s/*'%(item))
         tmpfiles.sort()
-        results.update({item:tmpfiles})
+        cleanfiles = clean_dicom_filenames(tmpfiles)
+        results.update({item:cleanfiles})
     return results
 
+
+def clean_dicom_filenames(dcms):
+    """remove parenthesis from all dicom filenames"""
+    newfiles = []
+    for dcm  in dcms:
+        # hanlde unix issue
+        tmpdcm = dcm.replace('(', '\(').replace(')', '\)')
+        # get rid of meaningless scans
+        if '._B' in dcm or '.tgz' in dcm:
+            continue
+        newname = dcm.replace('(','').replace(')','')
+        cmd = 'mv %s %s'%(tmpdcm, newname)
+        out = CommandLine(cmd).run()
+        newfiles.append(newname)
+    return newfiles
 
 def convert_dicom(dcm0, fname):
     """given first dicom and fname uses mri_convert to convert
     to a 4d nii.gz file"""
-    newdcm0 = dcm0.replace('(', '\(').replace(')', '\)')
+    
     cmd = '/usr/local/freesurfer_x86_64-5.1.0/bin/mri_convert '
-    cmd = cmd + ' --out_orientation LAS %s %s'%(newdcm0, fname)
+    cmd = cmd + ' --out_orientation LAS %s %s'%(dcm0, fname)
     cl = CommandLine(cmd)
     cout = cl.run()
     if not cout.runtime.returncode == 0:
@@ -403,7 +424,7 @@ def copy_tmpdir(infile):
     newfile = copy_file(infile, tmpdir)
     return newfile
 
-def biograph_dicom_convert(input, dest):
+def biograph_dicom_convert(input, dest, subid, tracer):
     """ given a tgz file holding dicoms,
     expands in temdir, uses mri_convert to convert
     file to nifti (4D) in tmpdir
@@ -412,9 +433,13 @@ def biograph_dicom_convert(input, dest):
     pth = tar_cmd(newfile)
     results = find_dicoms(pth)
     all4d = []
-    for name, files in results.items():
+    for val, (name, files) in enumerate(results.items()):
         dcm0 = files[0]
-        fname = name + '.nii.gz'
+        if not tracer.upper() in name.upper():
+            fname = os.path.join(pth,
+                                 '%s_%s%d'%(subid, tracer,val) + '.nii.gz')
+        else:
+            fname = os.path.join(pth, name + '.nii.gz')
         tmp4d = convert_dicom(dcm0, fname)
         all4d.append(tmp4d)
     for item in all4d:
