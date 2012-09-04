@@ -40,7 +40,7 @@ if __name__ == '__main__':
     data_dir = bg.SimpleDirDialog(prompt='Choose PIB data dir',
                                   indir='/home/jagust')
     
-    if 'UCD_project' in data_dir:
+    if 'UCD_Project' in data_dir:
         visit = False
     else:
         visit = True
@@ -75,7 +75,11 @@ if __name__ == '__main__':
         row = [subid]
         data = allsd[subid]
         for k in keys:
-            mean, std = data[k]
+            try:
+                mean, std = data[k]
+            except:
+                mean= 'NA'
+                std = 'NA'
             row+= [mean, std]
         csv_writer.writerow(row)
     fid.close()

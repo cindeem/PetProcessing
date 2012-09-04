@@ -153,18 +153,24 @@ def roi_stats_nibabel(data, mask, gm=None,gmthresh=0.3):
     
 
 
-def labelroi_stats_nibabel(data, mask,label):
+def labelroi_stats_nibabel(data, mask,label, othermask=None):
     """ uses nibabel to pull stats form roi defined by
-    a labelled image
+    a labelled image (mask)
+    othermask can be used to mask the labelled mask (eg stroke)
     returns mean, std, nvox
     """
     dat = nibabel.load(data).get_data()
-    roi = nibabel.load(mask).get_data()    
+    roi = nibabel.load(mask).get_data()
     if not dat.shape == roi.shape:
         raise IOError('shape mismatch of DATA and ROI')
-
+    if othermask is not None:
+        msk = nibabel.load(othermask).get_data()
+        if not msk.shape == dat.shape:
+            raise IOError('shape mismatch of DATA and othermask')
     fullmask = roi == label
     allmask = np.logical_and(fullmask, dat>0)
+    if othermask is not None:
+        allmask = np.logical_and(fullmask, msk > 0)
     roidat = dat[allmask]
     if roidat.shape[0] < 2:
         return 0,0,0
