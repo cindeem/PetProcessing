@@ -850,7 +850,7 @@ def roilabels_fromcsv(infile):
         roid[roi] = np.array(labels, dtype=int)
     return roid
 
-def mean_from_labels(roid, labelimg, data):
+def mean_from_labels(roid, labelimg, data, othermask = None):
     meand = {}
     labels = nibabel.load(labelimg).get_data()
     if not labels.shape == data.shape:
@@ -862,6 +862,9 @@ def mean_from_labels(roid, labelimg, data):
             fullmask = np.logical_or(fullmask, labels == label_id)
             data_mask = np.logical_and(data>0, np.isfinite(data))
             fullmask = np.logical_and(fullmask, data_mask)
+            if othermask is not None:
+                maskdat = nibabel.load(othermask).get_data()
+                fullmask = np.logical_and(fullmask, maskdat > 0)
             # update allmask
             allmask = np.logical_or(allmask, fullmask)
             roimean = data[fullmask].mean()
