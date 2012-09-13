@@ -12,6 +12,21 @@ import qa
 import logging, logging.config
 from time import asctime
 
+def find_realigned(pth):
+    """ finds realigned files in realign_QA directory"""
+    realigndir = 'realign_QA'
+    globstr = os.path.join(pth, realigndir, 'rB*_FDG_*nii*')
+    tmprealigned = glob(globstr)
+    if len(tmprealigned)< 1:
+        tmprealigned = None
+    tmprealigned.sort()
+    globstr = os.path.join(pth, realigndir, 'rp_B*.txt*')
+    tmpparameterfile = pp.find_single_file(globstr)
+    return tmprealigned, tmpparameterfile 
+        
+    tmpparameterfile = rlgnout.outputs.realignment_parameters
+    
+
 if __name__ == '__main__':
     """
     Uses specified FDG directory
@@ -57,19 +72,29 @@ if __name__ == '__main__':
             logging.warning('fdg frames not found or too few for %s  skipping'%(subid))
             continue
         nifti.sort()
-        
+
+        hasqa = False
         rlgnout, newnifti = pp.realigntoframe1(nifti)
         if rlgnout is None and newnifti is None:
-            logging.warning('existing realign_QA dir for %s remove to re-run'%(subid))
-            continue
-        if rlgnout.runtime.returncode is not 0:
+            logging.warning('%s :existing realign_QA '%(subid))
+            tmprealigned, tmpparameterfile = find_realigned(tracerdir)
+            if tmprealigned is None or tmpparameterfile is None:
+                logging.warning('%s :missing realigned, skipping '%(subid))
+                continue
+            logging.info('found %s %s'%(tmprealigned, tmpparameterfile))
+            tmpparameterfile = bg.unzip_file(tmpparameterfile)
+            tmprealigned = [bg.unzip_file(x) for x in tmprealigned]
+            hasqa = True
+                         
+        elif rlgnout.runtime.returncode is not 0:
             logging.warning('Failed to realign %s' % subid)
             continue
-        tmprealigned = rlgnout.outputs.realigned_files
-        tmpmean = rlgnout.outputs.mean_image
-        tmpparameterfile = rlgnout.outputs.realignment_parameters
+        else:
+            tmprealigned = rlgnout.outputs.realigned_files
+            tmpmean = rlgnout.outputs.mean_image
+            tmpparameterfile = rlgnout.outputs.realignment_parameters
 
-        logging.info( 'realigned %s' % subid)
+            logging.info( 'realigned %s' % subid)
 
         # make final mean image
         meanimg = pp.make_summed_image(tmprealigned)
@@ -79,22 +104,23 @@ if __name__ == '__main__':
         movedmean = bg.copy_file(meanimg, nifti_dir)
 
         #QA
-        logging.info( 'qa %s' % subid)
-        qa.plot_movement(tmpparameterfile,subid)
-        # get rid of NAN in files
-        no_nanfiles = pp.clean_nan(tmprealigned)
-        #make 4d volume to visualize movement
-        img4d = qa.make_4d_nibabel(no_nanfiles)
-        bg.zip_files(tmprealigned)
-        #save qa image
-        #qa.save_qa_img(img4d)
-        qa.plot_movement(tmpparameterfile, subid)
-        qa.calc_robust_median_diff(img4d)
-        qa.screen_pet(img4d) 
-        #remove tmpfiles
-        
-        bg.remove_files(no_nanfiles)
-        bg.remove_files(newnifti)
+        if not hasqa:
+            logging.info( 'qa %s' % subid)
+            qa.plot_movement(tmpparameterfile,subid)
+            # get rid of NAN in files
+            no_nanfiles = pp.clean_nan(tmprealigned)
+            #make 4d volume to visualize movement
+            img4d = qa.make_4d_nibabel(no_nanfiles)
+            bg.zip_files(tmprealigned)
+            #save qa image
+            #qa.save_qa_img(img4d)
+            qa.plot_movement(tmpparameterfile, subid)
+            qa.calc_robust_median_diff(img4d)
+            qa.screen_pet(img4d) 
+            #remove tmpfiles
+
+            bg.remove_files(no_nanfiles)
+            bg.remove_files(newnifti)
 
         # coreg pons to pet
         # find PONS

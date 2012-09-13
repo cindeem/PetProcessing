@@ -112,12 +112,13 @@ if __name__ == '__main__':
                 caparcnii = bg.copy_file(aparcnii, refdir)                        
                 bg.make_brainstem(caparcnii)
                 brainstem = bg.unzip_file(brainstem)
-                bg.remove_files([caparcnii])
+                bg.remove_files([caparcnii.replace('.gz','')])
             except:
-                logging.warning('Fail: unable to make %s'%(brainstem))
+                logging.warning('Check  %s'%(brainstem))
         
         rawtracer, exists = outdirs['rawtracer']
-        os.system('rm %s'%rawtracer)
+        rawtracer_base, _ = os.path.split(rawtracer)
+        os.system('rm -rf %s'%rawtracer_base)
         tracerdir, _ = outdirs['tracerdir']
         
         newname = '%s_%s' % (subid, tracer)
