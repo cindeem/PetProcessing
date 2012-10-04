@@ -102,9 +102,13 @@ if __name__ == '__main__':
         x,y  = pyl.calc_xy(ref, masked_data, midtimes)
         allki, residuals = pyl.calc_ki(x, y, timingf, range=range)
         dvr = pyl.results_to_array(allki, mask_roi)
+        resid = pyl.results_to_array(residuals, mask_roi)
     
         outf = pyl.save_data2nii(dvr, rbrainmask,
                                  filename='DVR-%s'%subid, outdir=dvrdir)
+        _ = pyl.save_data2nii(resid, rbrainmask,
+                              filename = 'RESID-%s'%subid,
+                              outdir = dvrdir)
         logging.info('%s Finished Logan: %s'%(subid, outf))
         roid = pp.roilabels_fromcsv(roifile)
         logging.info('PIBINDEX ROI file: %s'%(roifile))
