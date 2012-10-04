@@ -84,6 +84,34 @@ def set_up_dir(root, subid, tracer):
     return outdirs
 
 
+def setup_dir(root, subid, tracer):
+    """ check for and Make Subjects Target Directories
+    Returns Dict of final directories and if they exist"""
+    outdirs = {}
+        
+    subdir, exists = bg.make_dir(root, dirname=subid)
+    outdirs.update(dict(subdir=[subdir, exists]))
+    tracerdir,exists = bg.make_dir(subdir,
+                                dirname = '%s' % (tracer.lower()) )
+    outdirs.update(dict(tracerdir=[tracerdir, exists]))
+    
+    rawdatadir, exists  = bg.make_dir(subdir, dirname = 'raw')
+    outdirs.update(dict(rawdatadir=[rawdatadir, exists]))
+    
+    rawtracer, exists  = bg.make_dir(rawdatadir, dirname = tracer)
+    outdirs.update(dict(rawtracer=[rawtracer, exists]))
+    
+    anatomydir, exists  = bg.make_dir(subdir,dirname='anatomy')
+    outdirs.update(dict(anatomydir=[anatomydir, exists]))
+    
+    refdir, exists = bg.make_rec_dir(tracerdir,dirname='ref_region')
+    outdirs.update(dict(refdir=[refdir, exists]))
+    
+    #print 'directories created for %s' % subid
+    logging.info('directories created for %s'%(subid))
+    for k, v in sorted(outdirs.values()):
+        logging.info('%s : previously existed = %s'%(k,v))
+    return outdirs
 
 def check_subject(subject_directory):
     """checks to make sure this is a valid subject
