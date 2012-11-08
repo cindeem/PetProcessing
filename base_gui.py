@@ -495,10 +495,10 @@ def biograph_dicom_convert(input, dest, subid, tracer):
         final4d = all4d[0]
     basename = '%s_%s_frame'%(subid, tracer.upper())    
     tmpsplit = fsl_split4d(final4d, basenme = basename)    
-    copy_files(tmpsplit, dest)
+    newfiles = copy_files(tmpsplit, dest)
     pth, _ = os.path.split(final4d)
     os.system('rm -rf %s'%(pth)) 
-    
+    return newfiles
     
     
 
