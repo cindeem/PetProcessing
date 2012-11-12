@@ -73,7 +73,7 @@ if __name__ == '__main__':
             logging.warning('fdg frames not found or too few for %s  skipping'%(subid))
             continue
         nifti.sort()
-
+        nifti = bg.unzip_files(nifti)
         hasqa = False
         rlgnout, newnifti = pp.realigntoframe1(nifti)
         if rlgnout is None and newnifti is None:

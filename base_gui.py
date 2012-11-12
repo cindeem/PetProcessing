@@ -323,6 +323,12 @@ def unzip_file(infile):
         else:
             return base
 
+def unzip_files(inlist):
+    result = []
+    for f in inlist:
+        unzipped = unzip_file(f)
+        result.append(unzipped)
+    return result
 
 def zip_files(files):
     if not hasattr(files, '__iter__'):
