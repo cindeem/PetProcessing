@@ -8,6 +8,9 @@ from glob import glob
 sys.path.insert(0, '/home/jagust/cindeem/CODE/PetProcessing')
 import preprocessing as pp
 import base_gui as bg
+sys.path.insert(0, '/home/jagust/cindeem/src/nicm/nicm')
+import nicm
+
 import logging, logging.config
 from time import asctime
 
@@ -120,7 +123,13 @@ if __name__ == '__main__':
         tracerdir, _ = outdirs['tracerdir']
         
         newname = '%s_%s' % (subid, tracer)
-        bg.biograph_dicom_convert(tgz[0], tracerdir, subid, tracer)
-        
+        niftis = bg.biograph_dicom_convert(tgz[0], tracerdir, subid, tracer)
+        ## center new nifti files
+        orig_dir, _ = bg.make_dir(tracerdir, dirname='orig')
+        copied_orig = bg.copy_files(niftis, orig_dir)
+        bg.remove_files(niftis)
+        for f,nf  in zip(copied_orig, niftis):
+            print f, nf
+            nicm.CMTransform(f).fix(new_file = nf)
         logging.info('biograph dicoms converted for %s ' % (subid))                
             

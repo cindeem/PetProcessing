@@ -57,6 +57,9 @@ if __name__ == '__main__':
         logging.info('%s'%subid)
         # make filepath to tracer dir
         pth = os.path.join(sub, tracer.lower())
+        if not os.path.exists(pth):
+            logging.error('SKIP: missing %s'%pth)
+            continue
         pvcdir, exists = bg.make_dir(pth, 'pvc_metzler')
         if exists:
             logging.error('%s exists, remove to re-run'%(pvcdir))
