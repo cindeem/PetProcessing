@@ -44,8 +44,9 @@ if __name__ == '__main__':
                               indir = '/home/jagust')
     
     cleantime = asctime().replace(' ','-').replace(':', '-')
+    _, scriptnme = os.path.split(__file__)
     logfile = os.path.join(root,'logs',
-                           '%s_%s.log'%(__file__, cleantime))
+                           '%s_%s.log'%(scriptnme, cleantime))
 
     log_settings = pp.get_logging_configdict(logfile)
     logging.config.dictConfig(log_settings)
