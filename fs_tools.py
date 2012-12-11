@@ -407,3 +407,27 @@ def annot_stats(subid, annot, hemi, subjects_dir):
         print cout.runtime.stderr
         return None
     return outf
+
+def annot_pet_stats(subid, annot, hemi, datafile, subjects_dir):
+    """ requires proper SUBJECTS_DIR"""
+    cmd = ' '.join(['mris_anatomical_stats',
+                    '-a',
+                    annot,
+                    '-t',
+                    datafile,
+                    '-b',
+                    subid,
+                    hemi])
+    _, annot_nme = os.path.split(annot)
+    outf = os.path.join(subjects_dir, subid,
+                        'stats',
+                        annot_nme.replace('rois.annot',
+                                          'FDG_rois.stats'))
+    if os.path.isfile(outf):
+        os.system('rm %s'%outf)
+    cmd = ' '.join([cmd, '>> %s'%(outf)])
+    cout = CommandLine(cmd).run()
+    if not cout.runtime.returncode == 0:
+        print cout.runtime.stderr
+        return None
+    return outf    
