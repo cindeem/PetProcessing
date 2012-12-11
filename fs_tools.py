@@ -6,6 +6,7 @@ import tempfile
 import logging
 from shutil import rmtree
 sys.path.insert(0,'/home/jagust/cindeem/CODE/PetProcessing')
+import base_gui as bg
 import csv
 from nipype.interfaces.base import CommandLine
 from nipype.utils.filemanip import split_filename, fname_presuffix
@@ -311,3 +312,98 @@ def pet_2_surf(pet, dat, subjects_dir, proj='projfrac-max'):
         else:
             outfiles[hemi] = outfile
     return outfiles
+
+
+def generate_aparc_labels(subid, hemi, subjects_dir):
+    newlabel_dir = os.path.join(subjects_dir, subid, 'label', 'aparc_labels')
+    cmd = ' '.join(['mri_annotation2label',
+                    '--subject',
+                    subid,
+                    '--hemi',
+                    hemi,
+                    '--outdir',
+                    newlabel_dir,
+                    '--sd',
+                    subjects_dir])
+    cout = CommandLine(cmd).run()
+    if not cout.runtime.returncode == 0:
+        print cout.runtime.stderr
+        return None, cout
+    return newlabel_dir, cout
+
+
+def generate_roilabels(labellist, outlabel):
+    cmd = 'mri_mergelabels'
+    labels = ' '.join(['-i %s'%x for x in labellist])
+    outlabel_str = ' '.join(['-o', outlabel])
+    cmd = ' '.join([cmd, labels, outlabel_str])
+    cout = CommandLine(cmd).run()
+    if not cout.runtime.returncode == 0:
+        print cout.runtime.stderr
+        return cout
+    return cout    
+
+
+def rousset_labellist(labeldir, hemi, outdir='rousset_labels'):
+    rousset_labels = {'frontal':['frontalpole','lateralorbitofrontal'],
+                      'temporal' : ['temporalpole'],
+                      'parietal' : ['inferiorparietal'],
+                      'precuneus' : ['precuneus'],
+                      'cingulate' : ['posteriorcingulate', 'isthmuscingulate']
+                      }
+    pth, _ = os.path.split(labeldir)
+    outdir, exists = bg.make_dir(pth, outdir)
+    
+    # for each rousset label make or copy
+    labelfiles = []
+    for label, regions in rousset_labels.items():
+        outlabel = os.path.join(outdir, '%s.rousset_%s.label'%(hemi, label))
+        tmpregions = [os.path.join(labeldir,
+                                   '%s.%s.label'%(hemi, x)) for x in regions]
+        if len(regions) == 1:
+            bg.copy_file(tmpregions[0], outlabel)
+        else:
+            generate_roilabels(tmpregions, outlabel)
+        labelfiles.append(outlabel)
+    return labelfiles
+
+def labels_to_annot(subid, hemi, ctab, annot, labels):
+    """ requires proper SUBJECTS_DIR"""
+    labels_str = ' '.join(['--l %s'%x for x in labels])
+    cmd = ' '.join(['mris_label2annot',
+                    '--s',
+                    subid,
+                    '--h',
+                    hemi,
+                    '--ctab',
+                    ctab,
+                    '--a',
+                    annot])
+    cmd = ' '.join([cmd, labels_str])
+    cout = CommandLine(cmd).run()
+    if not cout.runtime.returncode == 0:
+        print cout.runtime.stderr
+        return None
+    else:
+        return cout
+    
+
+def annot_stats(subid, annot, hemi, subjects_dir):
+    """ requires proper SUBJECTS_DIR"""
+    cmd = ' '.join(['mris_anatomical_stats',
+                    '-a',
+                    annot,
+                    '-b',
+                    subid,
+                    hemi])
+    
+    outf = os.path.join(subjects_dir, subid,
+                        'stats', annot.replace('.annot','.stats'))
+    if os.path.isfile(outf):
+        os.system('rm %s'%outf)
+    cmd = ' '.join([cmd, '>> %s'%(outf)])
+    cout = CommandLine(cmd).run()
+    if not cout.runtime.returncode == 0:
+        print cout.runtime.stderr
+        return None
+    return outf
