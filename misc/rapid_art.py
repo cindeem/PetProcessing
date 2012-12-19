@@ -74,7 +74,7 @@ def make_qa_dir(inroot, name='data_QA'):
         os.mkdir(qadir)
         return qadir, False
 
-def run_artdetect(file4d, param_file, param_source='SPM'):
+def run_artdetect(file4d, param_file, thresh = 4, param_source='SPM'):
     startdir = os.getcwd()
     pth, _ = os.path.split(param_file)
     os.chdir(pth)
@@ -85,7 +85,7 @@ def run_artdetect(file4d, param_file, param_source='SPM'):
     ad.inputs.norm_threshold = 1
     ad.inputs.mask_type = 'spm_global'
     ad.inputs.use_differences = [True, False]
-    ad.inputs.zintensity_threshold = 4
+    ad.inputs.zintensity_threshold = thresh
     adout = ad.run()
     os.chdir(startdir)
     return adout
@@ -120,7 +120,7 @@ def save_qa_img_dirnme(in4d, outdir):
     pylab.savefig(figfile)
 
 
-def main(infile, param_file, param_source, outdir=None):
+def main(infile, param_file, param_source, thresh, outdir=None):
 
     
     if len(infile) > 1:
@@ -141,7 +141,7 @@ def main(infile, param_file, param_source, outdir=None):
             print '%s exists, remove to re-run'%qadir
             return None
     param_file = bg.copy_file(param_file, qadir)
-    artout = run_artdetect(merged, param_file, param_source)
+    artout = run_artdetect(merged, param_file, thresh, param_source)
 
     vox_outliers =  artout.outputs.outlier_files
 
@@ -183,6 +183,12 @@ if __name__ == '__main__':
         default = 'SPM',
         help = 'Params are from SPM or FSL (defualt SPM), specify which')
     parser.add_argument(
+        '-thresh',
+        type = int,
+        dest = 'thresh',
+        default = 4,
+        help = 'Intensity threshold (default 4)')
+    parser.add_argument(
         '-outdir',        
         dest = 'outdir',
         help = """Optional output directory (QA_data folder will be created
@@ -194,6 +200,10 @@ if __name__ == '__main__':
     else:
         args = parser.parse_args()
         print args
-        main(args.infiles, args.params, args.params_source, args.outdir)
+        main(args.infiles,
+             args.params,
+             args.params_source,
+             args.thresh,
+             args.outdir)
         
   
