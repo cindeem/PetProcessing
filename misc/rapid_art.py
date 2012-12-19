@@ -153,8 +153,10 @@ def main(infile, param_file, param_source, outdir=None):
             tmp = np.loadtxt(artout.outputs.outlier_files)[:mot]
         except:
             tmp = np.loadtxt(artout.outputs.outlier_files)
-        tmp.tofile('bad_movement_frames.txt', sep='\n')
-    np.array([mot,intensity]).tofile('motion_intensity_outliers',
+	tmp.tofile(os.path.join(qadir,'bad_movement_frames.txt'), 
+                   sep='\n')
+    np.array([mot,intensity]).tofile(os.path.join(qadir,
+                                                  'motion_intensity_outliers'),
                                      sep = '\n')
     print 'QA written to %s'%(qadir)
         
