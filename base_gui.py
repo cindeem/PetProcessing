@@ -390,9 +390,11 @@ def clean_dicom_filenames(dcms):
         if '._B' in dcm or '.tgz' in dcm:
             continue
         newname = dcm.replace('(','').replace(')','')
-        cmd = 'mv %s %s'%(tmpdcm, newname)
-        out = CommandLine(cmd).run()
+        if not newname == tmpdcm:
+            cmd = 'mv %s %s'%(tmpdcm, newname)
+            out = CommandLine(cmd).run()
         newfiles.append(newname)
+            
     return newfiles
 
 def convert_dicom(dcm0, fname):
