@@ -23,6 +23,15 @@ import pyGraphicalAnalysis as pyga
 import csv
 #made non writeable by lab
 
+def get_subid(instr):
+    """ given input string searches for lblid pattern
+    Bxx-xxx and returns if found, otherwise raises exception"""
+    m = re.search('B[0-9]{2}-[0-9]{3}', instr)
+    try:
+        return m.group()
+    except:
+        raise IOError('no valid ID found in %s'%(instr))
+
 def get_logging_configdict(logfile):
         log_settings = {
                 'version': 1,
