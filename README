@@ -14,3 +14,5 @@ Requires
 
   * nipype and its requirements
 
+  * pysurfer
+
