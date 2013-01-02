@@ -1,0 +1,51 @@
+
+# C extensions
+##############
+*.so
+
+# Python
+#########
+build/
+_build
+MANIFEST
+dist/
+*.egg-info/
+.shelf
+.tox/
+*.pyc
+
+# Editor temporary/working/backup files #
+#########################################
+.#*
+[#]*#
+*~
+*$
+*.bak
+*.diff
+*.org
+.project
+*.rej
+.settings/
+.*.sw[nop]
+.sw[nop]
+*.tmp
+.project
+.pydevproject
+
+# Logs and databases 
+######################
+*.log
+
+# Unit test / coverage reports
+###############################
+.coverage
+.tox
+nosetests.xml
+
+# OS generated files #
+######################
+.gdb_history
+.DS_Store?
+ehthumbs.db
+Icon?
+Thumbs.db
