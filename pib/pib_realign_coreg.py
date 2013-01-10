@@ -98,7 +98,7 @@ if __name__ == '__main__':
         # Coregister cerebellum, brainmask and aparc_aseg to pet space
         #
         logging.info('Coreg %s'%(subid))
-        coregdir, exists = bg.make_dir(pth, 'coreg')
+        coregdir, exists = pp.make_dir(pth, 'coreg')
         if exists:
             logging.warning('%s exists, remove to rerun'%(coregdir))
             continue

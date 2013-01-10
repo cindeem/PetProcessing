@@ -165,42 +165,8 @@ class MyRadioChoices(wx.Dialog):
             
 #### END WX ###
 
-def make_subject_dict(dirs, outdict):
-      """given a set of directories
-      initialize a dictionary to hold
-      names
-      directories
-      diagnoses
-      """
-      
-      for item in dirs:
-          scanid = item.strip('/home/jagust/arda/lblid')
-          outdict.update({scanid:[item,None]})
-      
 
-def make_dir(base_dir, dirname='fdg_nifti'):
-    """ makes a new directory if it doesnt alread exist
-    returns full path
-    
-    Parameters
-    ----------
-    base_dir : str
-    the root directory
-    dirname  : str (default pib_nifti)
-    new directory name
-    
-    Returns
-    -------
-    newdir  : str
-    full path of new directory
-    """
-    newdir = os.path.join(base_dir,dirname)
-    if not os.path.isdir(base_dir):
-        raise IOError('ERROR: base dir %s DOES NOT EXIST'%(base_dir))
-    directory_exists = os.path.isdir(newdir)
-    if not directory_exists:
-        os.mkdir(newdir)
-    return newdir, directory_exists
+
 
 def make_rec_dir(base_dir, dirname='fdg_nifti'):
     """ makes a new directories recursively if it doesnt already exist

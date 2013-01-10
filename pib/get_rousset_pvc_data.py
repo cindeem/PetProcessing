@@ -59,7 +59,7 @@ if __name__ == '__main__':
         if not os.path.isdir(dvrdir):
             logging.error('%s missing. skipping'%(dvrdir))
             continue
-        pvcdir, exists = bg.make_dir(dvrdir, 'pvc_rousset')
+        pvcdir, exists = pp.make_dir(dvrdir, 'pvc_rousset')
         if not exists:
             logging.error('%s does not exist, skipping'%(pvcdir))
             continue

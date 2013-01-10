@@ -35,7 +35,29 @@ def make_subject_dict(dirs, outdict):
           scanid = item.strip('/home/jagust/arda/lblid')
           outdict.update({scanid:[item,None]})
       
-
+def make_dir(base_dir, dirname='fdg_nifti'):
+    """ makes a new directory if it doesnt alread exist
+    returns full path
+    
+    Parameters
+    ----------
+    base_dir : str
+    the root directory
+    dirname  : str (default pib_nifti)
+    new directory name
+    
+    Returns
+    -------
+    newdir  : str
+    full path of new directory
+    """
+    newdir = os.path.join(base_dir,dirname)
+    if not os.path.isdir(base_dir):
+        raise IOError('ERROR: base dir %s DOES NOT EXIST'%(base_dir))
+    directory_exists = os.path.isdir(newdir)
+    if not directory_exists:
+        os.mkdir(newdir)
+    return newdir, directory_exists
 
 
 def get_subid(instr):
@@ -83,19 +105,19 @@ def set_up_dir(root, subid, tracer):
     Returns Dict of final directories and if they exist"""
     outdirs = {}
         
-    subdir, exists = bg.make_dir(root, dirname=subid)
+    subdir, exists = make_dir(root, dirname=subid)
     outdirs.update(dict(subdir=[subdir, exists]))
-    tracerdir,exists = bg.make_dir(subdir,
+    tracerdir,exists = make_dir(subdir,
                                 dirname = '%s' % (tracer.lower()) )
     outdirs.update(dict(tracerdir=[tracerdir, exists]))
     
-    rawdatadir, exists  = bg.make_dir(subdir, dirname = 'RawData')
+    rawdatadir, exists  = make_dir(subdir, dirname = 'RawData')
     outdirs.update(dict(rawdatadir=[rawdatadir, exists]))
     
-    rawtracer, exists  = bg.make_dir(rawdatadir, dirname = tracer)
+    rawtracer, exists  = make_dir(rawdatadir, dirname = tracer)
     outdirs.update(dict(rawtracer=[rawtracer, exists]))
     
-    anatomydir, exists  = bg.make_dir(subdir,dirname='anatomy')
+    anatomydir, exists  = make_dir(subdir,dirname='anatomy')
     outdirs.update(dict(anatomydir=[anatomydir, exists]))
     
     refdir, exists = bg.make_rec_dir(tracerdir,dirname='ref_region')
@@ -113,19 +135,19 @@ def setup_dir(root, subid, tracer):
     Returns Dict of final directories and if they exist"""
     outdirs = {}
         
-    subdir, exists = bg.make_dir(root, dirname=subid)
+    subdir, exists = make_dir(root, dirname=subid)
     outdirs.update(dict(subdir=[subdir, exists]))
-    tracerdir,exists = bg.make_dir(subdir,
+    tracerdir,exists = make_dir(subdir,
                                 dirname = '%s' % (tracer.lower()) )
     outdirs.update(dict(tracerdir=[tracerdir, exists]))
     
-    rawdatadir, exists  = bg.make_dir(subdir, dirname = 'raw')
+    rawdatadir, exists  = make_dir(subdir, dirname = 'raw')
     outdirs.update(dict(rawdatadir=[rawdatadir, exists]))
     
-    rawtracer, exists  = bg.make_dir(rawdatadir, dirname = tracer)
+    rawtracer, exists  = make_dir(rawdatadir, dirname = tracer)
     outdirs.update(dict(rawtracer=[rawtracer, exists]))
     
-    anatomydir, exists  = bg.make_dir(subdir,dirname='anatomy')
+    anatomydir, exists  = make_dir(subdir,dirname='anatomy')
     outdirs.update(dict(anatomydir=[anatomydir, exists]))
     
     refdir, exists = bg.make_rec_dir(tracerdir,dirname='ref_region')
@@ -269,7 +291,7 @@ def realigntoframe1(niftilist):
     startdir = os.getcwd()
     niftilist.sort()
     basepth, _ = os.path.split(niftilist[0])
-    tmpdir, exists = bg.make_dir(basepth, 'realign_QA')
+    tmpdir, exists = make_dir(basepth, 'realign_QA')
     if exists:
         return None, None
     # copy files to tmp dir
@@ -300,7 +322,7 @@ def realigntoframe17(niftilist):
     startdir = os.getcwd()
     niftilist.sort()
     basepth, _ = os.path.split(niftilist[0])
-    tmpdir, exists = bg.make_dir(basepth, 'realign_QA')
+    tmpdir, exists = make_dir(basepth, 'realign_QA')
     if exists:
         return None, None    
     # copy files to tmp dir

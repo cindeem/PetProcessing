@@ -63,7 +63,7 @@ if __name__ == '__main__':
             logging.error('%s doesnt exist,skipping'%(tracerdir))
             continue
         # make/check warp dir
-        warpdir, exists = bg.make_dir(tracerdir, 'warp_%s'%tname)
+        warpdir, exists = pp.make_dir(tracerdir, 'warp_%s'%tname)
         if exists:
             logging.warning('%s exists, remove to rerun'%(warpdir))
             continue

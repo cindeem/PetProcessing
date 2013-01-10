@@ -80,7 +80,7 @@ if __name__ == '__main__':
             continue
         
         # find roi directory
-        roidir, exists = bg.make_dir(pth, dirname='stroke_masked_roi_data')
+        roidir, exists = pp.make_dir(pth, dirname='stroke_masked_roi_data')
                 
         # get  pons normed
         globstr = '%s/nonan-ponsnormed*fdg**nii*'%(pth)
