@@ -23,6 +23,38 @@ import pyGraphicalAnalysis as pyga
 import csv
 #made non writeable by lab
 
+def convert_dicom(dcm0, fname):
+    """given first dicom and fname uses mri_convert to convert
+    to a 4d nii.gz file"""
+    
+
+    cmd = '/usr/local/freesurfer_x86_64-5.1.0/bin/mri_convert '
+    cmd = cmd + ' --out_orientation LAS %s %s'%(dcm0, fname)
+    cl = CommandLine(cmd)
+    cout = cl.run()
+    if not cout.runtime.returncode == 0:
+        logging.error('DICOM Failed to convert %s'%(dcm0))
+        return None
+    else:
+        return fname
+
+def clean_dicom_filenames(dcms):
+    """remove parenthesis from all dicom filenames"""
+    newfiles = []
+    for dcm  in dcms:
+        # hanlde unix issue
+        tmpdcm = dcm.replace('(', '\(').replace(')', '\)')
+        # get rid of meaningless scans
+        if '._B' in dcm or '.tgz' in dcm:
+            continue
+        newname = dcm.replace('(','').replace(')','')
+        if not newname == tmpdcm:
+            cmd = 'mv %s %s'%(tmpdcm, newname)
+            out = CommandLine(cmd).run()
+        newfiles.append(newname)
+            
+    return newfiles
+
 def find_dicoms(pth):
     """looks in pth to find files, sorts and returns list
     of lists (to handle multiple directories)"""
