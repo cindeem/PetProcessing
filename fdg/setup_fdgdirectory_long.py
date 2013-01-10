@@ -83,7 +83,7 @@ if __name__ == '__main__':
             
         else:
             fsmri = pp.copy_file(fsmri, outdirs['anatomydir'][0])
-            brainmask = bg.convert(fsmri, brainmask)
+            brainmask = pp.convert(fsmri, brainmask)
             pp.remove_files([fsmri])
             # copy aseg+aparc
         aparcnii = os.path.join(outdirs['anatomydir'][0],
@@ -99,7 +99,7 @@ if __name__ == '__main__':
 
         else:
             aparc = pp.copy_file(aparc, outdirs['anatomydir'][0])
-            aparcnii = bg.convert(aparc, aparcnii)     
+            aparcnii = pp.convert(aparc, aparcnii)     
             pp.remove_files([aparc])
         # make pons
         refdir,_ = outdirs['refdir']
@@ -124,7 +124,7 @@ if __name__ == '__main__':
         
         newname = '%s_%s' % (subid, tracer)
         copied_ecats = pp.copy_files(ecats, tracerdir)
-        bg.convertallecat(copied_ecats, newname)
+        pp.convertallecat(copied_ecats, newname)
         
         logging.info('ecats converted for %s ' % (subid))                
             

@@ -87,7 +87,7 @@ if __name__ == '__main__':
             
         else:
             fsmri = pp.copy_file(fsmri, outdirs['anatomydir'][0])
-            brainmask = bg.convert(fsmri, brainmask)
+            brainmask = pp.convert(fsmri, brainmask)
             pp.remove_files([fsmri])
             # copy aseg+aparc
         aparcnii = os.path.join(outdirs['anatomydir'][0],
@@ -103,7 +103,7 @@ if __name__ == '__main__':
 
         else:
             aparc = pp.copy_file(aparc, outdirs['anatomydir'][0])
-            aparcnii = bg.convert(aparc, aparcnii)     
+            aparcnii = pp.convert(aparc, aparcnii)     
             pp.remove_files([aparc])
         # make cerebellum
         refdir,_ = outdirs['refdir']
@@ -128,10 +128,10 @@ if __name__ == '__main__':
             continue
         else:        
             # Copy PET data, convert to nifti
-            newraw = bg.copy_dir(petdir, rawtracer)
+            newraw = pp.copy_dir(petdir, rawtracer)
             
-            ecats = bg.copy_dir(rawtracer, tracerdir, pattern='*.v')
+            ecats = pp.copy_dir(rawtracer, tracerdir, pattern='*.v')
             newname = '%s_%s' % (subid, tracer)
-            bg.convertallecat(ecats, newname)
+            pp.convertallecat(ecats, newname)
             logging.info('ecats converted for %s ' % (subid))                
             

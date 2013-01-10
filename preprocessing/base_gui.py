@@ -173,73 +173,11 @@ class MyRadioChoices(wx.Dialog):
 
 
 
-def remove_files(files):
-    """removes files """
-    if not hasattr(files, '__iter__'):
-        cl = CommandLine('rm %s'% files)
-        out = cl.run()
-        if not out.runtime.returncode == 0:
-            print 'failed to delete %s' % files
-            print out.runtime.stderr
-        return
-    for f in files:
-        cl = CommandLine('rm %s'% f)
-        out = cl.run()
-        if not out.runtime.returncode == 0:
-            print 'failed to delete %s' % f
-            print out.runtime.stderr
+
     
-def copy_files(infiles, newdir):
-    """wraps copy file to run across multiple files
-    returns list"""
-    newfiles = []
-    for f in infiles:
-        newf = copy_file(f, newdir)
-        newfiles.append(newf)
-    return newfiles
-
-def copy_file(infile, newdir):
-    """ copy infile to new directory
-    return full path of new file
-    """
-    cl = CommandLine('cp %s %s'%(infile, newdir))
-    out = cl.run()
-    if not out.runtime.returncode == 0:
-        print 'failed to copy %s' % infile
-        print out.runtime.stderr
-        return None
-    else:
-        basenme = os.path.split(infile)[1]
-        newfile = os.path.join(newdir, basenme)
-        return newfile
-
-def convert(infile, outfile):
-    """converts freesurfer .mgz format to nifti
-    """
-    c1 = CommandLine('mri_convert --out_orientation LAS %s %s'%(infile,
-                                                                outfile))
-    out = c1.run()
-    if not out.runtime.returncode == 0:
-        #failed
-        print 'did not convert %s from .mgz to .nii'%(infile)
-    else:
-        path = os.path.split(infile)[0]
-        niifile = os.path.join(path,outfile)
-        return niifile
 
 
-def ecat2nifti(ecat, newname):
-    """run ecat_convert_nibabel.py"""
-    cmd = 'ecat_convert_nibabel.py'
-    format = '-format NIFTI'
-    outname = '-newname %s'%(newname)
-    cmdstr = ' '.join([cmd, format, outname,ecat])    
-    cl = CommandLine(cmdstr)
-    out = cl.run()
-    if not out.runtime.returncode == 0:
-        return False
-    else:
-        return True
+
 
 def copy_dir(dir, dest, pattern='*'):
       """copies files matching pattern in dir to dest

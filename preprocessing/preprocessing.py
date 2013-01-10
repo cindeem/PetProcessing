@@ -22,6 +22,46 @@ import pyGraphicalAnalysis as pyga
 
 import csv
 #made non writeable by lab
+
+def copy_dir(dir, dest, pattern='*'):
+      """copies files matching pattern in dir to dest
+      returns list of abspath to new copied items """
+      items = glob('%s/%s'%(dir,pattern))
+      newitems = []
+      for item in items:
+            newitem = copy_file(item, dest)
+            newitems.append(newitem)
+      return newitems
+
+
+def ecat2nifti(ecat, newname):
+    """run ecat_convert_nibabel.py"""
+    cmd = 'ecat_convert_nibabel.py'
+    format = '-format NIFTI'
+    outname = '-newname %s'%(newname)
+    cmdstr = ' '.join([cmd, format, outname,ecat])    
+    cl = CommandLine(cmdstr)
+    out = cl.run()
+    if not out.runtime.returncode == 0:
+        return False
+    else:
+        return True
+
+
+def convert(infile, outfile):
+    """converts freesurfer .mgz format to nifti
+    """
+    c1 = CommandLine('mri_convert --out_orientation LAS %s %s'%(infile,
+                                                                outfile))
+    out = c1.run()
+    if not out.runtime.returncode == 0:
+        #failed
+        print 'did not convert %s from .mgz to .nii'%(infile)
+    else:
+        path = os.path.split(infile)[0]
+        niifile = os.path.join(path,outfile)
+        return niifile
+
 def copy_files(infiles, newdir):
     """wraps copy file to run across multiple files
     returns list"""
