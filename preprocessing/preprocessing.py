@@ -22,6 +22,29 @@ import pyGraphicalAnalysis as pyga
 
 import csv
 #made non writeable by lab
+def copy_files(infiles, newdir):
+    """wraps copy file to run across multiple files
+    returns list"""
+    newfiles = []
+    for f in infiles:
+        newf = copy_file(f, newdir)
+        newfiles.append(newf)
+    return newfiles
+
+def copy_file(infile, newdir):
+    """ copy infile to new directory
+    return full path of new file
+    """
+    cl = CommandLine('cp %s %s'%(infile, newdir))
+    out = cl.run()
+    if not out.runtime.returncode == 0:
+        print 'failed to copy %s' % infile
+        print out.runtime.stderr
+        return None
+    else:
+        basenme = os.path.split(infile)[1]
+        newfile = os.path.join(newdir, basenme)
+        return newfile
 
 def remove_files(files):
     """removes files """
@@ -337,7 +360,7 @@ def realigntoframe1(niftilist):
     # copy files to tmp dir
     copiednifti = []
     for f in niftilist:
-        newf = bg.copy_file(f, tmpdir)
+        newf = copy_file(f, tmpdir)
         copiednifti.append(str(newf))
     print 'copied nifti', copiednifti
     # realign to frame1
@@ -368,7 +391,7 @@ def realigntoframe17(niftilist):
     # copy files to tmp dir
     copiednifti = []
     for f in niftilist:
-        newf = bg.copy_file(f, tmpdir)
+        newf = copy_file(f, tmpdir)
         copiednifti.append(str(newf))
     # put files in correct order
     os.chdir(tmpdir)

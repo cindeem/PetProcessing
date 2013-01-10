@@ -99,7 +99,7 @@ if __name__ == '__main__':
             if strokem is None:
                 logging.error('%s missing, skipping'%(globstr))
                 continue
-            cstrokem = bg.copy_file(strokem, roidir)
+            cstrokem = pp.copy_file(strokem, roidir)
             globstr = '%s/coreg/*.mat*'%pth
             xfm = pp.find_single_file(globstr)
             if xfm is None:

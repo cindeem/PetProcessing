@@ -102,7 +102,7 @@ if __name__ == '__main__':
             
         # move data back to main directory
         nifti_dir,_ = os.path.split(nifti[0])
-        movedmean = bg.copy_file(meanimg, nifti_dir)
+        movedmean = pp.copy_file(meanimg, nifti_dir)
 
         #QA
         if not hasqa:
@@ -154,10 +154,10 @@ if __name__ == '__main__':
         if exists:
             logging.warning('existing dir %s remove to re-run'%(coreg_dir))
             continue
-        cmri = bg.copy_file(mri, coreg_dir)
-        cpons = bg.copy_file(pons, coreg_dir)
-        cpet = bg.copy_file(pet, coreg_dir)
-        caparc = bg.copy_file(aparc, coreg_dir)
+        cmri = pp.copy_file(mri, coreg_dir)
+        cpons = pp.copy_file(pons, coreg_dir)
+        cpet = pp.copy_file(pet, coreg_dir)
+        caparc = pp.copy_file(aparc, coreg_dir)
         xfm_file = pp.make_transform_name(cpet, cmri)
         logging.info( 'coreg %s'%(subid))
         corg_out = pp.invert_coreg(cmri, cpet, xfm_file)
@@ -179,7 +179,7 @@ if __name__ == '__main__':
             rmri = pp.prefix_filename(cmri, prefix='r')
             _, rmri_nme = os.path.split(rmri)
             new_rmri = rmri_nme.replace('rbr', 'rfdg_br')
-            newmri = bg.copy_file(rmri, '%s/anatomy/%s'%(sub,new_rmri))
+            newmri = pp.copy_file(rmri, '%s/anatomy/%s'%(sub,new_rmri))
             if newmri:
                 pp.remove_files([cmri,rmri])
         rout_pons = pp.reslice(cpet, cpons)
@@ -187,7 +187,7 @@ if __name__ == '__main__':
             logging.warning(rout_pons.runtime.stderr)
         else:
             rpons = pp.prefix_filename(cpons, prefix='r')
-            newpons = bg.copy_file(rpons, '%s/ref_region'%(tracerdir))
+            newpons = pp.copy_file(rpons, '%s/ref_region'%(tracerdir))
             if newpons:
                 pp.remove_files([cpons,rpons])
         rout_aparc = pp.reslice(cpet, caparc)

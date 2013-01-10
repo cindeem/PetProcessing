@@ -71,7 +71,7 @@ if __name__ == '__main__':
             logging.error('%s missing, skipping'%(globstr))
             continue
         # copy ponsnormd to pvc directory
-        cponsnormd = bg.copy_file(ponsnormd, pvcdir)
+        cponsnormd = pp.copy_file(ponsnormd, pvcdir)
         # get raparc
         corgdir = os.path.join(pth, 'coreg_mri2fdg')
         globstr = '%s/rB*aparc_aseg.nii'%(corgdir)
@@ -80,7 +80,7 @@ if __name__ == '__main__':
             logging.error('%s missing, skipping '%(globstr))
             continue
         #copy raparc_aseg to pvd dir
-        craparc = bg.copy_file(raparc, pvcdir)
+        craparc = pp.copy_file(raparc, pvcdir)
         # make brainamsk
         bmask = metzler.make_aseg_brainmask(craparc)
         os.unlink(craparc)

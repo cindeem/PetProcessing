@@ -111,7 +111,7 @@ if __name__ == '__main__':
             logging.error('%s not found. skipping'%globstr)
             shutil.rmtree(coregdir)
             continue
-        cbrainmask = bg.copy_file(brainmask, coregdir)
+        cbrainmask = pp.copy_file(brainmask, coregdir)
         cbrainmask = bg.unzip_file(cbrainmask)
         # aparc aseg
         globstr = os.path.join(basedir, 'anatomy', '*aparc_aseg.nii*')
@@ -120,7 +120,7 @@ if __name__ == '__main__':
             logging.error('%s not found. skipping'%globstr)
             shutil.rmtree(coregdir)
             continue
-        caparc = bg.copy_file(aparc, coregdir)
+        caparc = pp.copy_file(aparc, coregdir)
         caparc = bg.unzip_file(caparc)
         # cerebellum
         globstr = os.path.join(pth, 'ref_region', 'grey_cerebellum.nii*')
@@ -129,7 +129,7 @@ if __name__ == '__main__':
             logging.error('%s not found. skipping'%globstr)
             shutil.rmtree(coregdir)
             continue
-        ccere = bg.copy_file(cere, coregdir)
+        ccere = pp.copy_file(cere, coregdir)
         ccere = bg.unzip_file(ccere)
         # have all out files, coreg
         xfm = os.path.join(coregdir, 'mri_to_pet.mat')

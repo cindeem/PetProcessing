@@ -81,7 +81,7 @@ if __name__ == '__main__':
             logging.error('%s NO MRI: %s'%(subid,fsmri)) 
             
         else:
-            fsmri = bg.copy_file(fsmri, outdirs['anatomydir'][0])
+            fsmri = pp.copy_file(fsmri, outdirs['anatomydir'][0])
             brainmask = bg.convert(fsmri, brainmask)
             pp.remove_files([fsmri])
             # copy aseg+aparc
@@ -97,7 +97,7 @@ if __name__ == '__main__':
             logging.error('%s NO APARC ASEG: %s'%(subid, aparc))
 
         else:
-            aparc = bg.copy_file(aparc, outdirs['anatomydir'][0])
+            aparc = pp.copy_file(aparc, outdirs['anatomydir'][0])
             aparcnii = bg.convert(aparc, aparcnii)     
             pp.remove_files([aparc])
         # make cerebellum
@@ -109,7 +109,7 @@ if __name__ == '__main__':
         else:
             # copy aseg+aparc to refdir
             try:
-                caparcnii = bg.copy_file(aparcnii, refdir)                        
+                caparcnii = pp.copy_file(aparcnii, refdir)                        
                 bg.make_cerebellum_nibabel(caparcnii)
                 pp.remove_files([caparcnii])
             except:
@@ -120,7 +120,7 @@ if __name__ == '__main__':
         tracerdir, _ = outdirs['tracerdir']
         
         newname = '%s_%s' % (subid, tracer)
-        copied_ecats = bg.copy_files(ecats, tracerdir)
+        copied_ecats = pp.copy_files(ecats, tracerdir)
         bg.convertallecat(copied_ecats, newname)
         
         logging.info('ecats converted for %s ' % (subid))                

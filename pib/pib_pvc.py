@@ -70,7 +70,7 @@ if __name__ == '__main__':
             logging.error('%s missing, skipping'%(globstr))
             continue
         # copy dvr to pvc directory
-        cdvr = bg.copy_file(dvr, pvcdir)
+        cdvr = pp.copy_file(dvr, pvcdir)
         # get raparc
         corgdir = os.path.join(pth, 'coreg')
         globstr = '%s/rB*aparc_aseg.nii'%(corgdir)
@@ -79,7 +79,7 @@ if __name__ == '__main__':
             logging.error('%s missing, skipping '%(globstr))
             continue
         #copy raparc_aseg to pvd dir
-        craparc = bg.copy_file(raparc, pvcdir)
+        craparc = pp.copy_file(raparc, pvcdir)
         # make brainamsk
         bmask = metzler.make_aseg_brainmask(craparc)
         os.unlink(craparc)

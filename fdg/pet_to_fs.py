@@ -76,8 +76,8 @@ if __name__ == '__main__':
             logging.error('pet2mri sum: %s brainmask: %s'%(sum, brainmask))
             continue
         ## coreg pet 2 brainmask
-        cpons = bg.copy_file(ponsnormed, coregdir)
-        csum = bg.copy_file(sum, coregdir)
+        cpons = pp.copy_file(ponsnormed, coregdir)
+        csum = pp.copy_file(sum, coregdir)
         
         corg_out = pp.simple_coregister(str(brainmask),
                                         str(csum),
@@ -87,7 +87,7 @@ if __name__ == '__main__':
             continue
         rpons = corg_out.outputs.coregistered_files
         # copy ponsnormed to freesurfer subjects petdir
-        cponsnormed = bg.copy_file(rpons, petdir)
+        cponsnormed = pp.copy_file(rpons, petdir)
         globstr = os.path.join(fsdir, 'mri', 'T1.mgz')
         t1 = pp.find_single_file(globstr)
         if t1 is None:

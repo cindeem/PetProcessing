@@ -95,9 +95,9 @@ if __name__ == '__main__':
             continue
         brainmask = bg.unzip_file(brainmask)
         # copy to warp dir
-        cmean20 = bg.copy_file(mean20, warpdir)
-        cdvr = bg.copy_file(dvr, warpdir)
-        cbm = bg.copy_file(brainmask, warpdir)
+        cmean20 = pp.copy_file(mean20, warpdir)
+        cdvr = pp.copy_file(dvr, warpdir)
+        cbm = pp.copy_file(brainmask, warpdir)
         # coreg pet to brainmask
         logging.info('Run coreg')
         # cast everything to string

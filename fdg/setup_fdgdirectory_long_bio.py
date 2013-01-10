@@ -86,7 +86,7 @@ if __name__ == '__main__':
             logging.error('%s NO MRI: %s'%(subid,fsmri)) 
             
         else:
-            fsmri = bg.copy_file(fsmri, outdirs['anatomydir'][0])
+            fsmri = pp.copy_file(fsmri, outdirs['anatomydir'][0])
             brainmask = bg.convert(fsmri, brainmask)
             pp.remove_files([fsmri])
             # copy aseg+aparc
@@ -102,7 +102,7 @@ if __name__ == '__main__':
             logging.error('%s NO APARC ASEG: %s'%(subid, aparc))
 
         else:
-            aparc = bg.copy_file(aparc, outdirs['anatomydir'][0])
+            aparc = pp.copy_file(aparc, outdirs['anatomydir'][0])
             aparcnii = bg.convert(aparc, aparcnii)     
             pp.remove_files([aparc])
         # make cpons
@@ -112,7 +112,7 @@ if __name__ == '__main__':
             logging.warning('brainstem %s exists, skipping'%(brainstem))
         else: # copy aseg+aparc to refdir
             try:
-                caparcnii = bg.copy_file(aparcnii, refdir)
+                caparcnii = pp.copy_file(aparcnii, refdir)
                 bg.make_brainstem(caparcnii)
                 brainstem = bg.unzip_file(brainstem)
                 pp.remove_files([caparcnii.replace('.gz','')])
@@ -127,7 +127,7 @@ if __name__ == '__main__':
         niftis = bg.biograph_dicom_convert(tgz[0], tracerdir, subid, tracer)
         ## center new nifti files
         orig_dir, _ = pp.make_dir(tracerdir, dirname='orig')
-        copied_orig = bg.copy_files(niftis, orig_dir)
+        copied_orig = pp.copy_files(niftis, orig_dir)
         pp.remove_files(niftis)
         for f,nf  in zip(copied_orig, niftis):
             print f, nf

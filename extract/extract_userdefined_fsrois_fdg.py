@@ -96,14 +96,14 @@ if __name__ == '__main__':
                 logging.error('NO aparcaseg for %s'%globstr)
                 continue
             aparc = aparc[0]
-            caparc = bg.copy_file(aparc, roidir)
+            caparc = pp.copy_file(aparc, roidir)
             caparc = bg.unzip_file(caparc)# in case zipped
             globstr = '%s/coreg_mri2fdg/*.mat*'%pth
             xfm = pp.find_single_file(globstr)
             if xfm is None:
                 logging.error('NO transform for %s'%globstr)
                 continue
-            cxfm = bg.copy_file(xfm, roidir)
+            cxfm = pp.copy_file(xfm, roidir)
             cxfm = bg.unzip_file(cxfm)# in case zipped
             pp.apply_transform_onefile(cxfm, caparc)
             pp.reslice(dat, caparc)
