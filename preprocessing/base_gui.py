@@ -185,15 +185,6 @@ class MyRadioChoices(wx.Dialog):
       
 
 
-def tar_cmd(infile):
-    """ given a ipped tar archive, untars"""
-    cwd = os.getcwd()
-    pth, nme = os.path.split(infile)
-    os.chdir(pth)
-    cl = CommandLine('tar xfvz %s'%(infile))
-    cout = cl.run()
-    os.chdir(cwd)
-    return pth
 
 def find_dicoms(pth):
     """looks in pth to find files, sorts and returns list

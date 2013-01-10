@@ -5,7 +5,7 @@ sys.path.insert(0, '/home/jagust/cindeem/CODE/PetProcessing')
 import base_gui as bg
 import argparse
 
-#  pth = bg.tar_cmd(intgz)
+#  pth = pp.tar_cmd(intgz)
 #  dcms = bg.find_dicoms(pth)
 
 
@@ -25,7 +25,7 @@ def main(tgz, newid, outdir=None):
     origdir, orignme = os.path.split(tgz)
     tmptgz = bg.copy_tmpdir(tgz)
     # un-archive
-    pth = bg.tar_cmd(tmptgz)
+    pth = pp.tar_cmd(tmptgz)
     newdir, exists = pp.make_dir(pth, dirname='dicomfiles')
     startdir = os.getcwd()
     os.chdir(pth)

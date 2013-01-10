@@ -23,6 +23,17 @@ import pyGraphicalAnalysis as pyga
 import csv
 #made non writeable by lab
 
+def tar_cmd(infile):
+    """ given a ipped tar archive, untars"""
+    cwd = os.getcwd()
+    pth, nme = os.path.split(infile)
+    os.chdir(pth)
+    cl = CommandLine('tar xfvz %s'%(infile))
+    cout = cl.run()
+    os.chdir(cwd)
+    return pth
+
+
 def convertallecat(ecats, newname):
       """ converts all ecat files and removes .v files"""
       for f in ecats:
