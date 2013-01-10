@@ -22,6 +22,51 @@ import pyGraphicalAnalysis as pyga
 
 import csv
 #made non writeable by lab
+def fsl_split4d(in4d, basenme = None):
+    cwd = os.getcwd()
+    pth, nme, ext = nipype.utils.filemanip.split_filename(in4d)
+    if basenme is None:
+        basenme = nme
+    os.chdir(pth)
+    split = fsl_split()
+    split.inputs.in_file = in4d
+    split.inputs.dimension = 't'
+    split.inputs.out_base_name = basenme
+    split_out = split.run()
+    os.chdir(cwd)
+    if not split_out.runtime.returncode == 0:
+        logging.error('Failed to split 4d file %s'%in4d)
+        return None
+    else:
+        return split_out.outputs.out_files
+    
+    return pth   
+
+
+def biograph_to_nifti(dicomf):
+    """ given a dicom file <dicomf> in a directory of dicoms
+    , use dcm2nii to convert
+    to a 4d.nii.gz file in a tempdir"""
+    tmp, _ = os.path.split(os.path.abspath(__file__))
+    default_file = os.path.join(tmp,
+                                'dcm2nii.ini')
+    tmpdir = tempfile.mkdtemp()
+    convert = dcm2nii.Dcm2nii()
+    convert.inputs.source_names = dicomf
+    convert.inputs.output_dir = tmpdir
+    convert.inputs.config_file = default_file
+    cout = convert.run()
+    if not cout.runtime.returncode == 0:
+        logging.error(cout.runtime.stderr)
+        return None
+    else:
+        ext = ''
+        if 'GZip' in cout.runtime.stdout:
+            ext = '.gz'
+        outf = cout.runtime.stdout.split('->')[-1].split('\n')[0]
+        return os.path.join(tmpdir,outf + ext)
+    
+
 
 def convert_dicom(dcm0, fname):
     """given first dicom and fname uses mri_convert to convert
