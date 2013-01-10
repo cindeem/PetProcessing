@@ -59,6 +59,29 @@ def make_dir(base_dir, dirname='fdg_nifti'):
         os.mkdir(newdir)
     return newdir, directory_exists
 
+def make_rec_dir(base_dir, dirname='fdg_nifti'):
+    """ makes a new directories recursively if it doesnt already exist
+    returns full path
+    
+    Parameters
+    ----------
+    base_dir : str
+    the root directory
+    dirname  : str (default pib_nifti)
+    new directory name
+    
+    Returns
+    -------
+    newdir  : str
+    full path of new directory
+    """
+    newdir = os.path.join(base_dir,dirname)
+    directory_exists = os.path.isdir(newdir)
+    if not directory_exists:
+        os.makedirs(newdir)
+    return newdir, directory_exists
+
+
 
 def get_subid(instr):
     """ given input string searches for lblid pattern
@@ -120,7 +143,7 @@ def set_up_dir(root, subid, tracer):
     anatomydir, exists  = make_dir(subdir,dirname='anatomy')
     outdirs.update(dict(anatomydir=[anatomydir, exists]))
     
-    refdir, exists = bg.make_rec_dir(tracerdir,dirname='ref_region')
+    refdir, exists = make_rec_dir(tracerdir,dirname='ref_region')
     outdirs.update(dict(refdir=[refdir, exists]))
     
     #print 'directories created for %s' % subid
@@ -150,7 +173,7 @@ def setup_dir(root, subid, tracer):
     anatomydir, exists  = make_dir(subdir,dirname='anatomy')
     outdirs.update(dict(anatomydir=[anatomydir, exists]))
     
-    refdir, exists = bg.make_rec_dir(tracerdir,dirname='ref_region')
+    refdir, exists = make_rec_dir(tracerdir,dirname='ref_region')
     outdirs.update(dict(refdir=[refdir, exists]))
     
     #print 'directories created for %s' % subid

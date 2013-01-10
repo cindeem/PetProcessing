@@ -168,28 +168,6 @@ class MyRadioChoices(wx.Dialog):
 
 
 
-def make_rec_dir(base_dir, dirname='fdg_nifti'):
-    """ makes a new directories recursively if it doesnt already exist
-    returns full path
-    
-    Parameters
-    ----------
-    base_dir : str
-    the root directory
-    dirname  : str (default pib_nifti)
-    new directory name
-    
-    Returns
-    -------
-    newdir  : str
-    full path of new directory
-    """
-    newdir = os.path.join(base_dir,dirname)
-    directory_exists = os.path.isdir(newdir)
-    if not directory_exists:
-        os.makedirs(newdir)
-    return newdir, directory_exists
-
 
 
 
