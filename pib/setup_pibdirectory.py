@@ -57,7 +57,7 @@ if __name__ == '__main__':
     finalchoice = bg.MyScanChoices(alldirs)
     #global outdict
     outdict = {}
-    bg.make_subject_dict(finalchoice,outdict) 
+    pp.make_subject_dict(finalchoice,outdict) 
     
     for item in sorted(outdict):
         if 'None' in outdict[item][0]:

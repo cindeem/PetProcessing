@@ -23,6 +23,21 @@ import pyGraphicalAnalysis as pyga
 import csv
 #made non writeable by lab
 
+def make_subject_dict(dirs, outdict):
+      """given a set of directories
+      initialize a dictionary to hold
+      names
+      directories
+      diagnoses
+      """
+      
+      for item in dirs:
+          scanid = item.strip('/home/jagust/arda/lblid')
+          outdict.update({scanid:[item,None]})
+      
+
+
+
 def get_subid(instr):
     """ given input string searches for lblid pattern
     Bxx-xxx and returns if found, otherwise raises exception"""
