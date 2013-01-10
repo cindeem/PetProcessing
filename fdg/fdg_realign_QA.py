@@ -73,7 +73,7 @@ if __name__ == '__main__':
             logging.warning('fdg frames not found or too few for %s  skipping'%(subid))
             continue
         nifti.sort()
-        nifti = bg.unzip_files(nifti)
+        nifti = pp.unzip_files(nifti)
         hasqa = False
         rlgnout, newnifti = pp.realigntoframe1(nifti)
         if rlgnout is None and newnifti is None:
@@ -83,8 +83,8 @@ if __name__ == '__main__':
                 logging.warning('%s :missing realigned, skipping '%(subid))
                 continue
             logging.info('found %s %s'%(tmprealigned, tmpparameterfile))
-            tmpparameterfile = bg.unzip_file(tmpparameterfile)
-            tmprealigned = [bg.unzip_file(x) for x in tmprealigned]
+            tmpparameterfile = pp.unzip_file(tmpparameterfile)
+            tmprealigned = [pp.unzip_file(x) for x in tmprealigned]
             hasqa = True
                          
         elif rlgnout.runtime.returncode is not 0:
@@ -128,7 +128,7 @@ if __name__ == '__main__':
         pons_searchstr = '%s/ref_region/pons_tu.nii*' % tracerdir
         pons =  pp.find_single_file(pons_searchstr)
         if 'gz' in pons:
-            pons = bg.unzip_file(pons)
+            pons = pp.unzip_file(pons)
         if pons is None:
             logging.warning('no pons_tu found for %s'%(subid))
             continue
@@ -144,7 +144,7 @@ if __name__ == '__main__':
         if aparc is None:
             logging.warning('%s not found'%(searchstring))
             continue
-        aparc = bg.unzip_file(aparc)
+        aparc = pp.unzip_file(aparc)
         
         # find PET
         pet = movedmean # use previously made summed image

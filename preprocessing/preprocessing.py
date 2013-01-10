@@ -23,6 +23,28 @@ import pyGraphicalAnalysis as pyga
 import csv
 #made non writeable by lab
 
+def unzip_file(infile):
+    """ looks for gz  at end of file,
+    unzips and returns unzipped filename"""
+    base, ext = os.path.splitext(infile)
+    if not ext == '.gz':
+        return infile
+    else:
+        cmd = CommandLine('gunzip %s' % infile)
+        cout = cmd.run()
+        if not cout.runtime.returncode == 0:
+            print 'Failed to unzip %s'%(infile)
+            return None
+        else:
+            return base
+
+def unzip_files(inlist):
+    result = []
+    for f in inlist:
+        unzipped = unzip_file(f)
+        result.append(unzipped)
+    return result
+
 def copy_dir(dir, dest, pattern='*'):
       """copies files matching pattern in dir to dest
       returns list of abspath to new copied items """

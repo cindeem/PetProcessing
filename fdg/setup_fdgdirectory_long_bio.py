@@ -114,7 +114,7 @@ if __name__ == '__main__':
             try:
                 caparcnii = pp.copy_file(aparcnii, refdir)
                 bg.make_brainstem(caparcnii)
-                brainstem = bg.unzip_file(brainstem)
+                brainstem = pp.unzip_file(brainstem)
                 pp.remove_files([caparcnii.replace('.gz','')])
             except:
                 logging.warning('Check  %s'%(brainstem))

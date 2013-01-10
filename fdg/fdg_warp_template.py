@@ -74,7 +74,7 @@ if __name__ == '__main__':
             logging.error('%s not found. skipping'%globstr)
             shutil.rmtree(warpdir)
             continue
-        pnfdg = bg.unzip_file(pnfdg)
+        pnfdg = pp.unzip_file(pnfdg)
         # get summed fdg
         globstr = os.path.join(tracerdir,  'sum_rB*.nii*')
         sumfdg = pp.find_single_file(globstr)
@@ -82,7 +82,7 @@ if __name__ == '__main__':
             logging.error('%s not found. skipping'%globstr)
             shutil.rmtree(warpdir)
             continue
-        sumfdg = bg.unzip_file(sumfdg)        
+        sumfdg = pp.unzip_file(sumfdg)        
         # brainmask
         globstr = os.path.join(anatdir, 'brainmask.nii*')
         brainmask = pp.find_single_file(globstr)
@@ -90,7 +90,7 @@ if __name__ == '__main__':
             logging.error('%s not found. skipping'%globstr)
             shutil.rmtree(warpdir)
             continue
-        brainmask = bg.unzip_file(brainmask)
+        brainmask = pp.unzip_file(brainmask)
         # copy to warp dir
         csumfdg = pp.copy_file(sumfdg, warpdir)
         cpnfdg = pp.copy_file(pnfdg, warpdir)

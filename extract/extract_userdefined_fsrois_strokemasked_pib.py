@@ -13,9 +13,9 @@ from time import asctime
 
 
 def transform_vol(invol, xfm, space_defining):
-    invol = bg.unzip_file(invol)# in case zipped
-    xfm =  bg.unzip_file(xfm)# in case zipped
-    space_defining = bg.unzip_file(space_defining)# in case zipped
+    invol = pp.unzip_file(invol)# in case zipped
+    xfm =  pp.unzip_file(xfm)# in case zipped
+    space_defining = pp.unzip_file(space_defining)# in case zipped
     pp.apply_transform_onefile(xfm, invol)
     pp.reslice(space_defining, invol)
     rinvol = pp.prefix_filename(invol, prefix='r')

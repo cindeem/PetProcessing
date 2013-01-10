@@ -112,7 +112,7 @@ if __name__ == '__main__':
             shutil.rmtree(coregdir)
             continue
         cbrainmask = pp.copy_file(brainmask, coregdir)
-        cbrainmask = bg.unzip_file(cbrainmask)
+        cbrainmask = pp.unzip_file(cbrainmask)
         # aparc aseg
         globstr = os.path.join(basedir, 'anatomy', '*aparc_aseg.nii*')
         aparc = pp.find_single_file(globstr)
@@ -121,7 +121,7 @@ if __name__ == '__main__':
             shutil.rmtree(coregdir)
             continue
         caparc = pp.copy_file(aparc, coregdir)
-        caparc = bg.unzip_file(caparc)
+        caparc = pp.unzip_file(caparc)
         # cerebellum
         globstr = os.path.join(pth, 'ref_region', 'grey_cerebellum.nii*')
         cere = pp.find_single_file(globstr)
@@ -130,7 +130,7 @@ if __name__ == '__main__':
             shutil.rmtree(coregdir)
             continue
         ccere = pp.copy_file(cere, coregdir)
-        ccere = bg.unzip_file(ccere)
+        ccere = pp.unzip_file(ccere)
         # have all out files, coreg
         xfm = os.path.join(coregdir, 'mri_to_pet.mat')
         corgout = pp.invert_coreg(cbrainmask, mean_20min,xfm)
