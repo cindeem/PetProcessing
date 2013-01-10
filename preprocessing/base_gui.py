@@ -181,17 +181,6 @@ class MyRadioChoices(wx.Dialog):
 
     
 
-def move_and_convert(mgz, dest, newname):
-      """takes a mgz file, moves it,
-      converts it to nifti and then removes
-      the original mgz file"""
-      cwd = os.getcwd()
-      new_mgz = copy_file(mgz, dest)
-      os.chdir(dest)
-      nii = convert(new_mgz, newname)
-      os.chdir(cwd)
-      os.remove(new_mgz)
-      return nii
 
 def make_brainstem(aseg):
 

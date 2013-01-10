@@ -115,7 +115,7 @@ if __name__ == '__main__':
             # copy aseg+aparc to refdir
             try:
                 caparcnii = pp.copy_file(aparcnii, refdir)                        
-                bg.make_brainstem(caparcnii)
+                pp.make_brainstem(caparcnii)
                 pp.remove_files([caparcnii])
             except:
                 logging.warning('Fail: unable to make %s'%(pons))

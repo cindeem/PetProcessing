@@ -22,6 +22,33 @@ import pyGraphicalAnalysis as pyga
 
 import csv
 #made non writeable by lab
+def make_brainstem(aseg):
+
+      cwd = os.getcwd()
+      pth, nme = os.path.split(aseg)
+      os.chdir(pth)
+      cl = CommandLine('fslmaths %s -thr 16 -uthr 16 brainstem'% (aseg))
+      cout = cl.run()
+      os.chdir(cwd)
+      if not cout.runtime.returncode == 0:
+            print 'Unable to create brainstem for %s'%(aseg)
+            return None
+      else:
+            os.remove(aseg)
+            return 'brainstem'
+
+
+def move_and_convert(mgz, dest, newname):
+      """takes a mgz file, moves it,
+      converts it to nifti and then removes
+      the original mgz file"""
+      cwd = os.getcwd()
+      new_mgz = copy_file(mgz, dest)
+      os.chdir(dest)
+      nii = convert(new_mgz, newname)
+      os.chdir(cwd)
+      os.remove(new_mgz)
+      return nii
 
 def biograph_dicom_convert(input, dest, subid, tracer):
     """ given a tgz file holding dicoms,
