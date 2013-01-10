@@ -173,38 +173,6 @@ class MyRadioChoices(wx.Dialog):
 
 
 
-
-    
-
-
-
-
-
-
-          
-      
-
-
-
-def find_dicoms(pth):
-    """looks in pth to find files, sorts and returns list
-    of lists (to handle multiple directories)"""
-    toplevel = [os.path.join(pth, x) for x in os.listdir(pth)]
-    alldir = [x for x in toplevel if os.path.isdir(x)]
-
-    if len(alldir) < 1:
-        alldir = [pth]
-    results = {}
-    for item in alldir:
-        if '.tgz' in item:
-            continue
-        tmpfiles = glob('%s/*'%(item))
-        tmpfiles.sort()
-        cleanfiles = clean_dicom_filenames(tmpfiles)
-        results.update({item:cleanfiles})
-    return results
-
-
 def clean_dicom_filenames(dcms):
     """remove parenthesis from all dicom filenames"""
     newfiles = []

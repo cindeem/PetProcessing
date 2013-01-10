@@ -6,7 +6,7 @@ import base_gui as bg
 import argparse
 
 #  pth = pp.tar_cmd(intgz)
-#  dcms = bg.find_dicoms(pth)
+#  dcms = pp.find_dicoms(pth)
 
 
 # for each dicom in unzipped untarr'd archive
@@ -29,7 +29,7 @@ def main(tgz, newid, outdir=None):
     newdir, exists = pp.make_dir(pth, dirname='dicomfiles')
     startdir = os.getcwd()
     os.chdir(pth)
-    dcms = bg.find_dicoms(pth)
+    dcms = pp.find_dicoms(pth)
     keys = dcms.keys()
     keys = [x for x in keys if not newdir in x]
     for k in keys:
