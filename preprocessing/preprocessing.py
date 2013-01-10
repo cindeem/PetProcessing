@@ -22,6 +22,13 @@ import pyGraphicalAnalysis as pyga
 
 import csv
 #made non writeable by lab
+
+def convertallecat(ecats, newname):
+      """ converts all ecat files and removes .v files"""
+      for f in ecats:
+            ecat2nifti(f, newname)
+            os.remove(f)
+
 def zip_files(files):
     if not hasattr(files, '__iter__'):
         files = [files]

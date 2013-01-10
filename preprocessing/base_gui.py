@@ -184,11 +184,6 @@ class MyRadioChoices(wx.Dialog):
           
       
 
-def convertallecat(ecats, newname):
-      """ converts all ecat files and removes .v files"""
-      for f in ecats:
-            ecat2nifti(f, newname)
-            os.remove(f)
 
 def tar_cmd(infile):
     """ given a ipped tar archive, untars"""
