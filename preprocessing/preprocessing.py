@@ -22,6 +22,100 @@ import pyGraphicalAnalysis as pyga
 
 import csv
 #made non writeable by lab
+
+def make_cerebellum_nibabel(aseg):
+      """ use nibabel to make cerebellum"""
+      #cwd = os.getcwd()
+      pth, nme = os.path.split(aseg)
+      #os.chdir(pth)
+      img = ni.load(aseg)
+      newdat = np.zeros(img.get_shape())
+      dat = img.get_data()
+      newdat[dat == 8] = 1
+      newdat[dat == 47] = 1
+      newimg = ni.Nifti1Image(newdat, img.get_affine())
+      newfile = os.path.join(pth, 'grey_cerebellum.nii')
+      newimg.to_filename(newfile)
+      return newfile
+
+def make_cerebellum(aseg):
+      cwd = os.getcwd()
+      pth, nme = os.path.split(aseg)
+      os.chdir(pth)
+      cl = CommandLine('fslmaths %s -thr 47 -uthr 47 right_cerebellum'% (aseg))
+      cout = cl.run()
+      
+      if not cout.runtime.returncode == 0:
+            os.chdir(cwd)
+            print 'Unable to create  right cerebellum for %s'%(aseg)
+            return None
+
+      cl2 = CommandLine('fslmaths %s -thr 8 -uthr 8 left_cerebellum'% (aseg))
+      cout2 = cl2.run()
+
+      if not cout2.runtime.returncode == 0:
+            os.chdir(cwd)
+            print 'Unable to create  left cerebellum for %s'%(aseg)
+            return None
+
+      cl3 = CommandLine('fslmaths left_cerebellum -add right_cerebellum -bin grey_cerebellum')
+      cout3 = cl3.run()
+      if not cout3.runtime.returncode == 0:
+            print 'Unable to create whole cerebellum for %s'%(aseg)
+            print cout3.runtime.stderr
+            print cout3.runtime.stdout
+            return None
+      
+      cmd = 'rm right_cerebellum.* left_cerebellum.*'
+      cl4 = CommandLine(cmd)
+      cout4 = cl4.run()
+      os.chdir(cwd)
+      cerebellum = glob('%s/grey_cerebellum.*'%(pth))
+      return cerebellum[0]
+
+def make_whole_cerebellume(aseg):
+      """
+      os.system('fslmaths rad_aseg -thr 46 -uthr 47 whole_right_cerebellum')
+      os.system('fslmaths rad_aseg -thr 7 -uthr 8 whole_left_cerebellum')
+      os.system('fslmaths whole_left_cerebellum -add whole_right_cerebellum -bin whole_cerebellum')
+      """
+      cwd = os.getcwd()
+      pth, nme = os.path.split(aseg)
+      os.chdir(pth)
+      cmd = 'fslmaths %s -thr 46 -uthr 47 whole_right_cerebellum'%(aseg)
+      cl = CommandLine(cmd)
+      cout = cl.run()
+      if not cout.runtime.returncode == 0:
+            os.chdir(cwd)
+            print 'Unable to create  right whole cerebellum for %s'%(aseg)
+            return None
+      
+      cmd = 'fslmaths %s -thr 7 -uthr 8 whole_left_cerebellum'%(aseg)
+      cl2 = CommandLine(cmd)
+      cout2 = cl2.run()
+      if not cout2.runtime.returncode == 0:
+            os.chdir(cwd)
+            print 'Unable to create  whole left cerebellum for %s'%(aseg)
+            return None     
+
+      cmd = 'fslmaths whole_left_cerebellum -add whole_right_cerebellum' + \
+            ' -bin whole_cerebellum'
+      cl3 = CommandLine(cmd)
+      cout3 = cl3.run()
+      if not cout3.runtime.returncode == 0:
+            os.chdir(cwd)
+            print 'Unable to create  whole cerebellum for %s'%(aseg)
+            print cout3.runtime.stderr
+            print cout3.runtime.stdout
+            return None     
+      cmd = 'rm whole_right_cerebellum.* whole_left_cerebellum.*'
+      cl4 = CommandLine(cmd)
+      cout4 = cl4.run()      
+      whole_cerebellum = glob('%s/whole_cerebellum.*'%(pth))
+      os.chdir(cwd)
+      return whole_cerebellum[0]
+
+
 def make_brainstem(aseg):
 
       cwd = os.getcwd()
