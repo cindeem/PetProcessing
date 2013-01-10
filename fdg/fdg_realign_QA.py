@@ -112,7 +112,7 @@ if __name__ == '__main__':
             no_nanfiles = pp.clean_nan(tmprealigned)
             #make 4d volume to visualize movement
             img4d = qa.make_4d_nibabel(no_nanfiles)
-            bg.zip_files(tmprealigned)
+            pp.zip_files(tmprealigned)
             #save qa image
             #qa.save_qa_img(img4d)
             qa.plot_movement(tmpparameterfile, subid)
@@ -195,8 +195,8 @@ if __name__ == '__main__':
             logging.warning(rout_aparc.runtime.stderr)
         pp.remove_files(cpet)
         pp.remove_files(caparc)
-        bg.zip_files(aparc)
-        bg.zip_files(nifti)
+        pp.zip_files(aparc)
+        pp.zip_files(nifti)
 
         # pons norm
         outfname = os.path.join(tracerdir,

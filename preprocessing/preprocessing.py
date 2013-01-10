@@ -22,6 +22,18 @@ import pyGraphicalAnalysis as pyga
 
 import csv
 #made non writeable by lab
+def zip_files(files):
+    if not hasattr(files, '__iter__'):
+        files = [files]
+    for f in files:
+        base, ext = os.path.splitext(f)
+        if 'gz' in ext:
+            # file already gzipped
+            continue
+        cmd = CommandLine('gzip %s' % f)
+        cout = cmd.run()
+        if not cout.runtime.returncode == 0:
+            logging.error('Failed to zip %s'%(f))
 
 def unzip_file(infile):
     """ looks for gz  at end of file,
