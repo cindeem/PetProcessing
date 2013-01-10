@@ -177,12 +177,6 @@ class MyRadioChoices(wx.Dialog):
 
 
 
-def copy_tmpdir(infile):
-    """copies file to tempdir, returns path
-    to file copied into tmpdir"""
-    tmpdir = tempfile.mkdtemp()
-    newfile = copy_file(infile, tmpdir)
-    return newfile
 
 def concat_images(img_list):
     alldat = np.concatenate([ni.load(x).get_data() for x in img_list],

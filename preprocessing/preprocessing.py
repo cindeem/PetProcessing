@@ -22,6 +22,15 @@ import pyGraphicalAnalysis as pyga
 
 import csv
 #made non writeable by lab
+
+def copy_tmpdir(infile):
+    """copies file to tempdir, returns path
+    to file copied into tmpdir"""
+    tmpdir = tempfile.mkdtemp()
+    newfile = copy_file(infile, tmpdir)
+    return newfile
+
+
 def fsl_split4d(in4d, basenme = None):
     cwd = os.getcwd()
     pth, nme, ext = nipype.utils.filemanip.split_filename(in4d)

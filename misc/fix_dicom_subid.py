@@ -23,7 +23,7 @@ def main(tgz, newid, outdir=None):
     # mv dicom to tmp directory
     tgz = os.path.abspath(tgz)
     origdir, orignme = os.path.split(tgz)
-    tmptgz = bg.copy_tmpdir(tgz)
+    tmptgz = pp.copy_tmpdir(tgz)
     # un-archive
     pth = pp.tar_cmd(tmptgz)
     newdir, exists = pp.make_dir(pth, dirname='dicomfiles')
