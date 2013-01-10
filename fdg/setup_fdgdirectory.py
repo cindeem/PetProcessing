@@ -88,7 +88,7 @@ if __name__ == '__main__':
         else:
             fsmri = bg.copy_file(fsmri, outdirs['anatomydir'][0])
             brainmask = bg.convert(fsmri, brainmask)
-            bg.remove_files([fsmri])
+            pp.remove_files([fsmri])
             # copy aseg+aparc
         aparcnii = os.path.join(outdirs['anatomydir'][0],
                                 '%s_aparc_aseg.nii.gz'%subid) 
@@ -104,7 +104,7 @@ if __name__ == '__main__':
         else:
             aparc = bg.copy_file(aparc, outdirs['anatomydir'][0])
             aparcnii = bg.convert(aparc, aparcnii)     
-            bg.remove_files([aparc])
+            pp.remove_files([aparc])
         # make brainstem, find pons
         refdir,_ = outdirs['refdir']
         pons = os.path.join(refdir, 'pons_tu.nii')
@@ -116,7 +116,7 @@ if __name__ == '__main__':
             try:
                 caparcnii = bg.copy_file(aparcnii, refdir)                        
                 bg.make_brainstem(caparcnii)
-                bg.remove_files([caparcnii])
+                pp.remove_files([caparcnii])
             except:
                 logging.warning('Fail: unable to make %s'%(pons))
         

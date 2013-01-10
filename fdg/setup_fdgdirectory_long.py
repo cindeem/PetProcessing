@@ -84,7 +84,7 @@ if __name__ == '__main__':
         else:
             fsmri = bg.copy_file(fsmri, outdirs['anatomydir'][0])
             brainmask = bg.convert(fsmri, brainmask)
-            bg.remove_files([fsmri])
+            pp.remove_files([fsmri])
             # copy aseg+aparc
         aparcnii = os.path.join(outdirs['anatomydir'][0],
                                 '%s_aparc_aseg.nii.gz'%subid) 
@@ -100,7 +100,7 @@ if __name__ == '__main__':
         else:
             aparc = bg.copy_file(aparc, outdirs['anatomydir'][0])
             aparcnii = bg.convert(aparc, aparcnii)     
-            bg.remove_files([aparc])
+            pp.remove_files([aparc])
         # make pons
         refdir,_ = outdirs['refdir']
         brainstem = os.path.join(refdir, 'brainstem.nii.gz')
@@ -113,7 +113,7 @@ if __name__ == '__main__':
                 caparcnii = bg.copy_file(aparcnii, refdir)                        
                 bg.make_brainstem(caparcnii)
                 brainstem = bg.unzip_file(brainstem)
-                bg.remove_files([caparcnii.replace('.gz','')])
+                pp.remove_files([caparcnii.replace('.gz','')])
             except:
                 logging.warning('Check  %s'%(brainstem))
         

@@ -23,6 +23,23 @@ import pyGraphicalAnalysis as pyga
 import csv
 #made non writeable by lab
 
+def remove_files(files):
+    """removes files """
+    if not hasattr(files, '__iter__'):
+        cl = CommandLine('rm %s'% files)
+        out = cl.run()
+        if not out.runtime.returncode == 0:
+            print 'failed to delete %s' % files
+            print out.runtime.stderr
+        return
+    for f in files:
+        cl = CommandLine('rm %s'% f)
+        out = cl.run()
+        if not out.runtime.returncode == 0:
+            print 'failed to delete %s' % f
+            print out.runtime.stderr
+
+            
 def make_subject_dict(dirs, outdict):
       """given a set of directories
       initialize a dictionary to hold

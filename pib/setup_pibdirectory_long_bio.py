@@ -86,7 +86,7 @@ if __name__ == '__main__':
         else:
             fsmri = bg.copy_file(fsmri, outdirs['anatomydir'][0])
             brainmask = bg.convert(fsmri, brainmask)
-            bg.remove_files([fsmri])
+            pp.remove_files([fsmri])
             # copy aseg+aparc
         aparcnii = os.path.join(outdirs['anatomydir'][0],
                                 '%s_aparc_aseg.nii.gz'%subid) 
@@ -102,7 +102,7 @@ if __name__ == '__main__':
         else:
             aparc = bg.copy_file(aparc, outdirs['anatomydir'][0])
             aparcnii = bg.convert(aparc, aparcnii)     
-            bg.remove_files([aparc])
+            pp.remove_files([aparc])
         # make cerebellum
         refdir,_ = outdirs['refdir']
         cerebellum = os.path.join(refdir, 'grey_cerebellum.nii')
@@ -114,7 +114,7 @@ if __name__ == '__main__':
             try:
                 caparcnii = bg.copy_file(aparcnii, refdir)                        
                 bg.make_cerebellum_nibabel(caparcnii)
-                bg.remove_files([caparcnii])
+                pp.remove_files([caparcnii])
             except:
                 logging.warning('Fail: unable to make %s'%(cerebellum))
         
@@ -127,7 +127,7 @@ if __name__ == '__main__':
         ## center new nifti files
         orig_dir, _ = pp.make_dir(tracerdir, dirname='orig')
         copied_orig = bg.copy_files(niftis, orig_dir)
-        bg.remove_files(niftis)
+        pp.remove_files(niftis)
         for f,nf  in zip(copied_orig, niftis):
             print f, nf
             nicm.CMTransform(f).fix(new_file = nf)

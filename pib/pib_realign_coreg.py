@@ -81,7 +81,7 @@ if __name__ == '__main__':
 
         # clean up
         # remove copied unrealigned frames
-        bg.remove_files(newnifti)
+        pp.remove_files(newnifti)
         
 
         # QA

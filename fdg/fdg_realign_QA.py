@@ -120,8 +120,8 @@ if __name__ == '__main__':
             qa.screen_pet(img4d) 
             #remove tmpfiles
 
-            bg.remove_files(no_nanfiles)
-            bg.remove_files(newnifti)
+            pp.remove_files(no_nanfiles)
+            pp.remove_files(newnifti)
 
         # coreg pons to pet
         # find PONS
@@ -181,7 +181,7 @@ if __name__ == '__main__':
             new_rmri = rmri_nme.replace('rbr', 'rfdg_br')
             newmri = bg.copy_file(rmri, '%s/anatomy/%s'%(sub,new_rmri))
             if newmri:
-                bg.remove_files([cmri,rmri])
+                pp.remove_files([cmri,rmri])
         rout_pons = pp.reslice(cpet, cpons)
         if not rout_pons.runtime.returncode == 0:
             logging.warning(rout_pons.runtime.stderr)
@@ -189,12 +189,12 @@ if __name__ == '__main__':
             rpons = pp.prefix_filename(cpons, prefix='r')
             newpons = bg.copy_file(rpons, '%s/ref_region'%(tracerdir))
             if newpons:
-                bg.remove_files([cpons,rpons])
+                pp.remove_files([cpons,rpons])
         rout_aparc = pp.reslice(cpet, caparc)
         if not rout_aparc.runtime.returncode == 0:
             logging.warning(rout_aparc.runtime.stderr)
-        bg.remove_files(cpet)
-        bg.remove_files(caparc)
+        pp.remove_files(cpet)
+        pp.remove_files(caparc)
         bg.zip_files(aparc)
         bg.zip_files(nifti)
 

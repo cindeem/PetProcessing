@@ -19,7 +19,7 @@ def transform_vol(invol, xfm, space_defining):
     pp.apply_transform_onefile(xfm, invol)
     pp.reslice(space_defining, invol)
     rinvol = pp.prefix_filename(invol, prefix='r')
-    bg.remove_files([invol])
+    pp.remove_files([invol])
     bg.zip_files([space_defining])
     return rinvol
     
