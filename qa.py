@@ -113,6 +113,8 @@ def run_artdetect(file4d, param_file):
     ad.inputs.norm_threshold = 3
     ad.inputs.use_differences = [True, False]
     ad.inputs.zintensity_threshold = 5
+    ad.inputs.mask_type = 'thresh'
+    ad.inputs.mask_threshold = -100 
     ad.inputs.save_plot = False
     adout = ad.run()
     os.chdir(startdir)
@@ -205,20 +207,26 @@ if __name__ == '__main__':
     startdir = os.getcwd()
 
     mean = '/home/jagust/pib_bac/ica/data/templates/MNI152_T1_2mm_brain.nii.gz'
-    allsubids = glob('/home/jagust/pib_bac/ica/data/spm_*/B*')
+    allsubids = glob('/home/jagust/graph/data/spm_220/B*')
     allsubids.sort()
     for sub in allsubids[:]:
-        if 'B11-216' in sub:
-            continue
         _, subid = os.path.split(sub)
-        merged = '%s/%s_resid.nii.gz'%(sub, subid)
-        param_file = '%s/func/realign_unwarp/rp_%s0000.txt'%(sub, subid)
-
+        # get slicetimes make 4d
+        globstr = os.path.join(sub, 'func', 'slicetime', 'auB*.nii')
+        frames = glob(globstr)
+        frames.sort()
+        
         qadir, exists = make_qa_dir(sub)
+        if exists:
+            print qadir, 'exists, skipping'
+            continue
+        merged = make_4d_nibabel(frames, outdir = qadir)
+        param_file = '%s/func/realign_unwarp/rp_%s0000.txt'%(sub, subid)
+        
         os.chdir(qadir)
         artout = run_artdetect(merged, param_file)
         vox_outliers =  artout.outputs.outlier_files
-        tsnr_file = gen_sig2noise_img(merged)
+        tsnr_file = gen_sig2noise_img(merged, qadir)
         outlier_vol_fromfile(mean, vox_outliers,
                              fname='%s_outliers.nii.gz'%(subid))
         statd = json.load(open(artout.outputs.statistic_files))
@@ -230,39 +238,3 @@ if __name__ == '__main__':
         np.array([mot,intensity]).tofile('motion_intensity_outliers',
                                          sep = '\n')
         
-
-        print subid
-        ## get slice time unwar realigned files
-        sufiles = glob('%s/func/slicetime/auB*')
-        sufiles.sort()
-        merged_su = make_4d(sufiles)
-        screen_data_dirnme(merged_su, qadir)
-        os.chdir(startdir)
-"""
-    ## detect bad scans
-    allstats = glob('stats.*')
-    for statf in allstats:
-        m = re.search('B[0-9]{2}-[0-9]{3}',statf)
-        subid = m.group()
-        tmpd = json.load(open(statf))
-        motion_outliers = tmpd[1]['motion_outliers']
-        intensity_out = tmpd[1]['intensity_outliers']
-        print subid, motion_outliers, intensity_out
-        if motion_outliers > 0:
-            artifacts = glob('art.*%s*'%(subid))[0]            
-            tmp = np.loadtxt(artifacts)
-            badframes = tmp[:motion_outliers]
-            print 'bad frames', badframes
-
-
-    
-            # compute normalized intensity values
-            gz = signal.detrend(g,axis=0)       # detrend the signal
-            if self.inputs.use_differences[1]:
-                gz = np.concatenate( (np.zeros((1,1)),np.diff(gz,n=1,axis=0)) , axis=0)
-            gz = (gz-np.mean(gz))/np.std(gz)    # normalize the detrended signal
-            iidx = find_indices(abs(gz)>self.inputs.zintensity_threshold)
-
-            outliers = np.unique(np.union1d(iidx,np.union1d(tidx,ridx)))
-            artifactfile,intensityfile,statsfile,normfile,plotfile = self._get_output_filenames(imgfile,cwd)
-"""
