@@ -8,6 +8,7 @@ from glob import glob
 sys.path.insert(0, '/home/jagust/cindeem/CODE/PetProcessing')
 import preprocessing as pp
 import base_gui as bg
+import dicom_tools
 sys.path.insert(0, '/home/jagust/cindeem/src/nicm/nicm')
 import nicm
 
