@@ -71,7 +71,7 @@ if __name__ == '__main__':
         if dat is None:
             logging.error('%s missing, skipping'%(globstr))
             continue
-        dat = pp.unzip_file(dat)# in case zipped
+        dat = utils.unzip_file(dat)# in case zipped
         # get raparc
         globstr = '%s/coreg/rB*aparc_aseg.nii*'%(pth)
         raparc = pp.find_single_file(globstr)

@@ -81,7 +81,7 @@ if __name__ == '__main__':
 
         # clean up
         # remove copied unrealigned frames
-        pp.remove_files(newnifti)
+        utils.remove_files(newnifti)
         
 
         # QA
@@ -111,8 +111,8 @@ if __name__ == '__main__':
             logging.error('%s not found. skipping'%globstr)
             shutil.rmtree(coregdir)
             continue
-        cbrainmask = pp.copy_file(brainmask, coregdir)
-        cbrainmask = pp.unzip_file(cbrainmask)
+        cbrainmask = utils.copy_file(brainmask, coregdir)
+        cbrainmask = utils.unzip_file(cbrainmask)
         # aparc aseg
         globstr = os.path.join(basedir, 'anatomy', '*aparc_aseg.nii*')
         aparc = pp.find_single_file(globstr)
@@ -120,8 +120,8 @@ if __name__ == '__main__':
             logging.error('%s not found. skipping'%globstr)
             shutil.rmtree(coregdir)
             continue
-        caparc = pp.copy_file(aparc, coregdir)
-        caparc = pp.unzip_file(caparc)
+        caparc = utils.copy_file(aparc, coregdir)
+        caparc = utils.unzip_file(caparc)
         # cerebellum
         globstr = os.path.join(pth, 'ref_region', 'grey_cerebellum.nii*')
         cere = pp.find_single_file(globstr)
@@ -129,8 +129,8 @@ if __name__ == '__main__':
             logging.error('%s not found. skipping'%globstr)
             shutil.rmtree(coregdir)
             continue
-        ccere = pp.copy_file(cere, coregdir)
-        ccere = pp.unzip_file(ccere)
+        ccere = utils.copy_file(cere, coregdir)
+        ccere = utils.unzip_file(ccere)
         # have all out files, coreg
         xfm = os.path.join(coregdir, 'mri_to_pet.mat')
         corgout = pp.invert_coreg(cbrainmask, mean_20min,xfm)

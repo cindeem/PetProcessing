@@ -140,7 +140,7 @@ def main(infile, param_file, param_source, thresh, outdir=None):
         if exists:
             print '%s exists, remove to re-run'%qadir
             return None
-    param_file = pp.copy_file(param_file, qadir)
+    param_file = utils.copy_file(param_file, qadir)
     artout = run_artdetect(merged, param_file, thresh, param_source)
 
     vox_outliers =  artout.outputs.outlier_files

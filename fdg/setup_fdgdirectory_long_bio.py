@@ -86,9 +86,9 @@ if __name__ == '__main__':
             logging.error('%s NO MRI: %s'%(subid,fsmri)) 
             
         else:
-            fsmri = pp.copy_file(fsmri, outdirs['anatomydir'][0])
+            fsmri = utils.copy_file(fsmri, outdirs['anatomydir'][0])
             brainmask = pp.convert(fsmri, brainmask)
-            pp.remove_files([fsmri])
+            utils.remove_files([fsmri])
             # copy aseg+aparc
         aparcnii = os.path.join(outdirs['anatomydir'][0],
                                 '%s_aparc_aseg.nii.gz'%subid) 
@@ -102,9 +102,9 @@ if __name__ == '__main__':
             logging.error('%s NO APARC ASEG: %s'%(subid, aparc))
 
         else:
-            aparc = pp.copy_file(aparc, outdirs['anatomydir'][0])
+            aparc = utils.copy_file(aparc, outdirs['anatomydir'][0])
             aparcnii = pp.convert(aparc, aparcnii)     
-            pp.remove_files([aparc])
+            utils.remove_files([aparc])
         # make cpons
         refdir,_ = outdirs['refdir']
         brainstem = os.path.join(refdir, 'brainstem.nii.gz')
@@ -112,10 +112,10 @@ if __name__ == '__main__':
             logging.warning('brainstem %s exists, skipping'%(brainstem))
         else: # copy aseg+aparc to refdir
             try:
-                caparcnii = pp.copy_file(aparcnii, refdir)
+                caparcnii = utils.copy_file(aparcnii, refdir)
                 pp.make_brainstem(caparcnii)
-                brainstem = pp.unzip_file(brainstem)
-                pp.remove_files([caparcnii.replace('.gz','')])
+                brainstem = utils.unzip_file(brainstem)
+                utils.remove_files([caparcnii.replace('.gz','')])
             except:
                 logging.warning('Check  %s'%(brainstem))
         
@@ -127,8 +127,8 @@ if __name__ == '__main__':
         niftis = pp.biograph_dicom_convert(tgz[0], tracerdir, subid, tracer)
         ## center new nifti files
         orig_dir, _ = utils.make_dir(tracerdir, dirname='orig')
-        copied_orig = pp.copy_files(niftis, orig_dir)
-        pp.remove_files(niftis)
+        copied_orig = utils.copy_files(niftis, orig_dir)
+        utils.remove_files(niftis)
         for f,nf  in zip(copied_orig, niftis):
             print f, nf
             nicm.CMTransform(f).fix(new_file = nf)

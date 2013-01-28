@@ -73,7 +73,7 @@ if __name__ == '__main__':
             logging.warning('fdg frames not found or too few for %s  skipping'%(subid))
             continue
         nifti.sort()
-        nifti = pp.unzip_files(nifti)
+        nifti = utils.unzip_files(nifti)
         hasqa = False
         rlgnout, newnifti = pp.realigntoframe1(nifti)
         if rlgnout is None and newnifti is None:
@@ -83,8 +83,8 @@ if __name__ == '__main__':
                 logging.warning('%s :missing realigned, skipping '%(subid))
                 continue
             logging.info('found %s %s'%(tmprealigned, tmpparameterfile))
-            tmpparameterfile = pp.unzip_file(tmpparameterfile)
-            tmprealigned = [pp.unzip_file(x) for x in tmprealigned]
+            tmpparameterfile = utils.unzip_file(tmpparameterfile)
+            tmprealigned = [utils.unzip_file(x) for x in tmprealigned]
             hasqa = True
                          
         elif rlgnout.runtime.returncode is not 0:
@@ -102,7 +102,7 @@ if __name__ == '__main__':
             
         # move data back to main directory
         nifti_dir,_ = os.path.split(nifti[0])
-        movedmean = pp.copy_file(meanimg, nifti_dir)
+        movedmean = utils.copy_file(meanimg, nifti_dir)
 
         #QA
         if not hasqa:
@@ -112,7 +112,7 @@ if __name__ == '__main__':
             no_nanfiles = pp.clean_nan(tmprealigned)
             #make 4d volume to visualize movement
             img4d = qa.make_4d_nibabel(no_nanfiles)
-            pp.zip_files(tmprealigned)
+            utils.zip_files(tmprealigned)
             #save qa image
             #qa.save_qa_img(img4d)
             qa.plot_movement(tmpparameterfile, subid)
@@ -120,15 +120,15 @@ if __name__ == '__main__':
             qa.screen_pet(img4d) 
             #remove tmpfiles
 
-            pp.remove_files(no_nanfiles)
-            pp.remove_files(newnifti)
+            utils.remove_files(no_nanfiles)
+            utils.remove_files(newnifti)
 
         # coreg pons to pet
         # find PONS
         pons_searchstr = '%s/ref_region/pons_tu.nii*' % tracerdir
         pons =  pp.find_single_file(pons_searchstr)
         if 'gz' in pons:
-            pons = pp.unzip_file(pons)
+            pons = utils.unzip_file(pons)
         if pons is None:
             logging.warning('no pons_tu found for %s'%(subid))
             continue
@@ -144,7 +144,7 @@ if __name__ == '__main__':
         if aparc is None:
             logging.warning('%s not found'%(searchstring))
             continue
-        aparc = pp.unzip_file(aparc)
+        aparc = utils.unzip_file(aparc)
         
         # find PET
         pet = movedmean # use previously made summed image
@@ -154,10 +154,10 @@ if __name__ == '__main__':
         if exists:
             logging.warning('existing dir %s remove to re-run'%(coreg_dir))
             continue
-        cmri = pp.copy_file(mri, coreg_dir)
-        cpons = pp.copy_file(pons, coreg_dir)
-        cpet = pp.copy_file(pet, coreg_dir)
-        caparc = pp.copy_file(aparc, coreg_dir)
+        cmri = utils.copy_file(mri, coreg_dir)
+        cpons = utils.copy_file(pons, coreg_dir)
+        cpet = utils.copy_file(pet, coreg_dir)
+        caparc = utils.copy_file(aparc, coreg_dir)
         xfm_file = pp.make_transform_name(cpet, cmri)
         logging.info( 'coreg %s'%(subid))
         corg_out = pp.invert_coreg(cmri, cpet, xfm_file)
@@ -179,24 +179,24 @@ if __name__ == '__main__':
             rmri = pp.prefix_filename(cmri, prefix='r')
             _, rmri_nme = os.path.split(rmri)
             new_rmri = rmri_nme.replace('rbr', 'rfdg_br')
-            newmri = pp.copy_file(rmri, '%s/anatomy/%s'%(sub,new_rmri))
+            newmri = utils.copy_file(rmri, '%s/anatomy/%s'%(sub,new_rmri))
             if newmri:
-                pp.remove_files([cmri,rmri])
+                utils.remove_files([cmri,rmri])
         rout_pons = pp.reslice(cpet, cpons)
         if not rout_pons.runtime.returncode == 0:
             logging.warning(rout_pons.runtime.stderr)
         else:
             rpons = pp.prefix_filename(cpons, prefix='r')
-            newpons = pp.copy_file(rpons, '%s/ref_region'%(tracerdir))
+            newpons = utils.copy_file(rpons, '%s/ref_region'%(tracerdir))
             if newpons:
-                pp.remove_files([cpons,rpons])
+                utils.remove_files([cpons,rpons])
         rout_aparc = pp.reslice(cpet, caparc)
         if not rout_aparc.runtime.returncode == 0:
             logging.warning(rout_aparc.runtime.stderr)
-        pp.remove_files(cpet)
-        pp.remove_files(caparc)
-        pp.zip_files(aparc)
-        pp.zip_files(nifti)
+        utils.remove_files(cpet)
+        utils.remove_files(caparc)
+        utils.zip_files(aparc)
+        utils.zip_files(nifti)
 
         # pons norm
         outfname = os.path.join(tracerdir,

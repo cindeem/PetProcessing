@@ -71,7 +71,7 @@ if __name__ == '__main__':
             logging.error('%s missing, skipping'%(globstr))
             continue
         # copy dvr to pvc directory
-        cdvr = pp.copy_file(dvr, pvcdir)
+        cdvr = utils.copy_file(dvr, pvcdir)
         # get raparc
         corgdir = os.path.join(pth, 'coreg')
         globstr = '%s/rB*aparc_aseg.nii'%(corgdir)
@@ -80,7 +80,7 @@ if __name__ == '__main__':
             logging.error('%s missing, skipping '%(globstr))
             continue
         #copy raparc_aseg to pvd dir
-        craparc = pp.copy_file(raparc, pvcdir)
+        craparc = utils.copy_file(raparc, pvcdir)
         # make brainamsk
         wm,gm,pibi = rousset.generate_pibindex_rois_fs(craparc)
         wmf = pp.fname_presuffix(craparc, prefix='wm_')

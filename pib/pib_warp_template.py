@@ -77,7 +77,7 @@ if __name__ == '__main__':
             logging.error('%s not found. skipping'%globstr)
             shutil.rmtree(warpdir)
             continue
-        dvr = pp.unzip_file(dvr)
+        dvr = utils.unzip_file(dvr)
         # get mean 20 minute pib
         globstr = os.path.join(sub,'pib','realign_QA', 'mean20min*.nii*')
         mean20 = pp.find_single_file(globstr)
@@ -85,7 +85,7 @@ if __name__ == '__main__':
             logging.error('%s not found. skipping'%globstr)
             shutil.rmtree(warpdir)
             continue
-        mean20 = pp.unzip_file(mean20)        
+        mean20 = utils.unzip_file(mean20)        
         # brainmask
         globstr = os.path.join(anatdir, 'brainmask.nii*')
         brainmask = pp.find_single_file(globstr)
@@ -93,11 +93,11 @@ if __name__ == '__main__':
             logging.error('%s not found. skipping'%globstr)
             shutil.rmtree(warpdir)
             continue
-        brainmask = pp.unzip_file(brainmask)
+        brainmask = utils.unzip_file(brainmask)
         # copy to warp dir
-        cmean20 = pp.copy_file(mean20, warpdir)
-        cdvr = pp.copy_file(dvr, warpdir)
-        cbm = pp.copy_file(brainmask, warpdir)
+        cmean20 = utils.copy_file(mean20, warpdir)
+        cdvr = utils.copy_file(dvr, warpdir)
+        cbm = utils.copy_file(brainmask, warpdir)
         # coreg pet to brainmask
         logging.info('Run coreg')
         # cast everything to string

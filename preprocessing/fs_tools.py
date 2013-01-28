@@ -361,7 +361,7 @@ def rousset_labellist(labeldir, hemi, outdir='rousset_labels'):
         tmpregions = [os.path.join(labeldir,
                                    '%s.%s.label'%(hemi, x)) for x in regions]
         if len(regions) == 1:
-            pp.copy_file(tmpregions[0], outlabel)
+            utils.copy_file(tmpregions[0], outlabel)
         else:
             generate_roilabels(tmpregions, outlabel)
         labelfiles.append(outlabel)

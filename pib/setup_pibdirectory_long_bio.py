@@ -84,9 +84,9 @@ if __name__ == '__main__':
             logging.error('%s NO MRI: %s'%(subid,fsmri)) 
             
         else:
-            fsmri = pp.copy_file(fsmri, outdirs['anatomydir'][0])
+            fsmri = utils.copy_file(fsmri, outdirs['anatomydir'][0])
             brainmask = pp.convert(fsmri, brainmask)
-            pp.remove_files([fsmri])
+            utils.remove_files([fsmri])
             # copy aseg+aparc
         aparcnii = os.path.join(outdirs['anatomydir'][0],
                                 '%s_aparc_aseg.nii.gz'%subid) 
@@ -100,9 +100,9 @@ if __name__ == '__main__':
             logging.error('%s NO APARC ASEG: %s'%(subid, aparc))
 
         else:
-            aparc = pp.copy_file(aparc, outdirs['anatomydir'][0])
+            aparc = utils.copy_file(aparc, outdirs['anatomydir'][0])
             aparcnii = pp.convert(aparc, aparcnii)     
-            pp.remove_files([aparc])
+            utils.remove_files([aparc])
         # make cerebellum
         refdir,_ = outdirs['refdir']
         cerebellum = os.path.join(refdir, 'grey_cerebellum.nii')
@@ -112,9 +112,9 @@ if __name__ == '__main__':
         else:
             # copy aseg+aparc to refdir
             try:
-                caparcnii = pp.copy_file(aparcnii, refdir)                        
+                caparcnii = utils.copy_file(aparcnii, refdir)                        
                 bg.make_cerebellum_nibabel(caparcnii)
-                pp.remove_files([caparcnii])
+                utils.remove_files([caparcnii])
             except:
                 logging.warning('Fail: unable to make %s'%(cerebellum))
         
@@ -126,8 +126,8 @@ if __name__ == '__main__':
         niftis = pp.biograph_dicom_convert(tgz[0], tracerdir, subid, tracer)
         ## center new nifti files
         orig_dir, _ = utils.make_dir(tracerdir, dirname='orig')
-        copied_orig = pp.copy_files(niftis, orig_dir)
-        pp.remove_files(niftis)
+        copied_orig = utils.copy_files(niftis, orig_dir)
+        utils.remove_files(niftis)
         for f,nf  in zip(copied_orig, niftis):
             print f, nf
             nicm.CMTransform(f).fix(new_file = nf)

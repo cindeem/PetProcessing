@@ -13,14 +13,14 @@ from time import asctime
 
 
 def transform_vol(invol, xfm, space_defining):
-    invol = pp.unzip_file(invol)# in case zipped
-    xfm =  pp.unzip_file(xfm)# in case zipped
-    space_defining = pp.unzip_file(space_defining)# in case zipped
+    invol = utils.unzip_file(invol)# in case zipped
+    xfm =  utils.unzip_file(xfm)# in case zipped
+    space_defining = utils.unzip_file(space_defining)# in case zipped
     pp.apply_transform_onefile(xfm, invol)
     pp.reslice(space_defining, invol)
     rinvol = pp.prefix_filename(invol, prefix='r')
-    pp.remove_files([invol])
-    pp.zip_files([space_defining])
+    utils.remove_files([invol])
+    utils.zip_files([space_defining])
     return rinvol
     
 if __name__ == '__main__':
@@ -88,7 +88,7 @@ if __name__ == '__main__':
         if dat is None:
             logging.error('%s missing, skipping'%(globstr))
             continue
-        dat = pp.unzip_file(dat)# in case zipped
+        dat = utils.unzip_file(dat)# in case zipped
         # get strokemask
         globstr = '%s/rfs_cortical_mask_tu.nii*'%roidir
         stroke_mask = pp.find_single_file(globstr)
@@ -98,7 +98,7 @@ if __name__ == '__main__':
             if strokem is None:
                 logging.error('%s missing, skipping'%(globstr))
                 continue
-            cstrokem = pp.copy_file(strokem, roidir)
+            cstrokem = utils.copy_file(strokem, roidir)
             globstr = '%s/coreg_mri2fdg/*.mat*'%pth
             xfm = pp.find_single_file(globstr)
             if xfm is None:
@@ -126,7 +126,7 @@ if __name__ == '__main__':
                 logging.error('NO aparcaseg for %s'%globstr)
                 continue
             aparc = aparc[0]
-            caparc = pp.copy_file(aparc, roidir)
+            caparc = utils.copy_file(aparc, roidir)
             raparc = transform_vol(caparc, xfm, dat)
             
                 

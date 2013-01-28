@@ -81,9 +81,9 @@ if __name__ == '__main__':
             logging.error('%s NO MRI: %s'%(subid,fsmri)) 
             
         else:
-            fsmri = pp.copy_file(fsmri, outdirs['anatomydir'][0])
+            fsmri = utils.copy_file(fsmri, outdirs['anatomydir'][0])
             brainmask = pp.convert(fsmri, brainmask)
-            pp.remove_files([fsmri])
+            utils.remove_files([fsmri])
             # copy aseg+aparc
         aparcnii = os.path.join(outdirs['anatomydir'][0],
                                 '%s_aparc_aseg.nii.gz'%subid) 
@@ -97,9 +97,9 @@ if __name__ == '__main__':
             logging.error('%s NO APARC ASEG: %s'%(subid, aparc))
 
         else:
-            aparc = pp.copy_file(aparc, outdirs['anatomydir'][0])
+            aparc = utils.copy_file(aparc, outdirs['anatomydir'][0])
             aparcnii = pp.convert(aparc, aparcnii)     
-            pp.remove_files([aparc])
+            utils.remove_files([aparc])
         # make cerebellum
         refdir,_ = outdirs['refdir']
         cerebellum = os.path.join(refdir, 'grey_cerebellum.nii')
@@ -109,9 +109,9 @@ if __name__ == '__main__':
         else:
             # copy aseg+aparc to refdir
             try:
-                caparcnii = pp.copy_file(aparcnii, refdir)                        
+                caparcnii = utils.copy_file(aparcnii, refdir)                        
                 bg.make_cerebellum_nibabel(caparcnii)
-                pp.remove_files([caparcnii])
+                utils.remove_files([caparcnii])
             except:
                 logging.warning('Fail: unable to make %s'%(cerebellum))
         
@@ -120,7 +120,7 @@ if __name__ == '__main__':
         tracerdir, _ = outdirs['tracerdir']
         
         newname = '%s_%s' % (subid, tracer)
-        copied_ecats = pp.copy_files(ecats, tracerdir)
+        copied_ecats = utils.copy_files(ecats, tracerdir)
         pp.convertallecat(copied_ecats, newname)
         
         logging.info('ecats converted for %s ' % (subid))                
