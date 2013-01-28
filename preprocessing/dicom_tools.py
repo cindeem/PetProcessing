@@ -122,12 +122,6 @@ def biograph_dicom_convert(input, dest, subid, tracer):
     all4d = []
     for val, (name, files) in enumerate(sorted(results.items())):
         dcm0 = files[0]
-        #if not tracer.upper() in name.upper():
-        #    fname = os.path.join(pth,
-        #                         '%s_%s%d'%(subid, tracer,val) + '.nii.gz')
-        #else:
-        #    fname = os.path.join(pth, name + '.nii.gz')
-        #tmp4d = convert_dicom(dcm0, fname)
         tmp4d = biograph_to_nifti(dcm0)
         all4d.append(tmp4d)
 
@@ -173,3 +167,42 @@ def find_dicoms(pth):
         results.update({item:cleanfiles})
     return results
 
+def clean_dicom_filenames(dcms):
+    """remove parenthesis from all dicom filenames"""
+    newfiles = []
+    for dcm  in dcms:
+        # hanlde unix issue
+        tmpdcm = dcm.replace('(', '\(').replace(')', '\)')
+        # get rid of meaningless scans
+        if '._B' in dcm or '.tgz' in dcm:
+            continue
+        newname = dcm.replace('(','').replace(')','')
+        if not newname == tmpdcm:
+            cmd = 'mv %s %s'%(tmpdcm, newname)
+            out = CommandLine(cmd).run()
+        newfiles.append(newname)
+            
+    return newfiles
+
+def biograph_to_nifti(dicomf):
+    """ given a dicom file <dicomf> in a directory of dicoms
+    , use dcm2nii to convert
+    to a 4d.nii.gz file in a tempdir"""
+    tmp, _ = os.path.split(os.path.abspath(__file__))
+    default_file = os.path.join(tmp,
+                                'dcm2nii.ini')
+    tmpdir = tempfile.mkdtemp()
+    convert = dcm2nii.Dcm2nii()
+    convert.inputs.source_names = dicomf
+    convert.inputs.output_dir = tmpdir
+    convert.inputs.config_file = default_file
+    cout = convert.run()
+    if not cout.runtime.returncode == 0:
+        logging.error(cout.runtime.stderr)
+        return None
+    else:
+        ext = ''
+        if 'GZip' in cout.runtime.stdout:
+            ext = '.gz'
+        outf = cout.runtime.stdout.split('->')[-1].split('\n')[0]
+        return os.path.join(tmpdir,outf + ext)

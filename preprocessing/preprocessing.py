@@ -172,67 +172,6 @@ def fsl_split4d(in4d, basenme = None):
     return pth   
 
 
-def biograph_to_nifti(dicomf):
-    """ given a dicom file <dicomf> in a directory of dicoms
-    , use dcm2nii to convert
-    to a 4d.nii.gz file in a tempdir"""
-    tmp, _ = os.path.split(os.path.abspath(__file__))
-    default_file = os.path.join(tmp,
-                                'dcm2nii.ini')
-    tmpdir = tempfile.mkdtemp()
-    convert = dcm2nii.Dcm2nii()
-    convert.inputs.source_names = dicomf
-    convert.inputs.output_dir = tmpdir
-    convert.inputs.config_file = default_file
-    cout = convert.run()
-    if not cout.runtime.returncode == 0:
-        logging.error(cout.runtime.stderr)
-        return None
-    else:
-        ext = ''
-        if 'GZip' in cout.runtime.stdout:
-            ext = '.gz'
-        outf = cout.runtime.stdout.split('->')[-1].split('\n')[0]
-        return os.path.join(tmpdir,outf + ext)
-    
-
-
-def convert_dicom(dcm0, fname):
-    """given first dicom and fname uses mri_convert to convert
-    to a 4d nii.gz file"""
-    
-
-    cmd = '/usr/local/freesurfer_x86_64-5.1.0/bin/mri_convert '
-    cmd = cmd + ' --out_orientation LAS %s %s'%(dcm0, fname)
-    cl = CommandLine(cmd)
-    cout = cl.run()
-    if not cout.runtime.returncode == 0:
-        logging.error('DICOM Failed to convert %s'%(dcm0))
-        return None
-    else:
-        return fname
-
-def clean_dicom_filenames(dcms):
-    """remove parenthesis from all dicom filenames"""
-    newfiles = []
-    for dcm  in dcms:
-        # hanlde unix issue
-        tmpdcm = dcm.replace('(', '\(').replace(')', '\)')
-        # get rid of meaningless scans
-        if '._B' in dcm or '.tgz' in dcm:
-            continue
-        newname = dcm.replace('(','').replace(')','')
-        if not newname == tmpdcm:
-            cmd = 'mv %s %s'%(tmpdcm, newname)
-            out = CommandLine(cmd).run()
-        newfiles.append(newname)
-            
-    return newfiles
-
-
-
-
-
 def convertallecat(ecats, newname):
       """ converts all ecat files and removes .v files"""
       for f in ecats:
