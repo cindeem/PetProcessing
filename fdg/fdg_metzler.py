@@ -60,7 +60,7 @@ if __name__ == '__main__':
         if not os.path.exists(pth):
             logging.error('SKIP: missing %s'%pth)
             continue
-        pvcdir, exists = pp.make_dir(pth, 'pvc_metzler')
+        pvcdir, exists = utils.make_dir(pth, 'pvc_metzler')
         if exists:
             logging.error('%s exists, remove to re-run'%(pvcdir))
             continue

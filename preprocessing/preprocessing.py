@@ -21,6 +21,7 @@ sys.path.insert(0, '/home/jagust/cindeem/CODE/GraphicalAnalysis/pyGA')
 import pyGraphicalAnalysis as pyga
 
 import csv
+from utils import make_rec_dir
 #made non writeable by lab
 
 def make_cerebellum_nibabel(aseg):
@@ -294,15 +295,7 @@ def find_dicoms(pth):
     return results
 
 
-def tar_cmd(infile):
-    """ given a ipped tar archive, untars"""
-    cwd = os.getcwd()
-    pth, nme = os.path.split(infile)
-    os.chdir(pth)
-    cl = CommandLine('tar xfvz %s'%(infile))
-    cout = cl.run()
-    os.chdir(cwd)
-    return pth
+
 
 
 def convertallecat(ecats, newname):
@@ -311,40 +304,7 @@ def convertallecat(ecats, newname):
             ecat2nifti(f, newname)
             os.remove(f)
 
-def zip_files(files):
-    if not hasattr(files, '__iter__'):
-        files = [files]
-    for f in files:
-        base, ext = os.path.splitext(f)
-        if 'gz' in ext:
-            # file already gzipped
-            continue
-        cmd = CommandLine('gzip %s' % f)
-        cout = cmd.run()
-        if not cout.runtime.returncode == 0:
-            logging.error('Failed to zip %s'%(f))
 
-def unzip_file(infile):
-    """ looks for gz  at end of file,
-    unzips and returns unzipped filename"""
-    base, ext = os.path.splitext(infile)
-    if not ext == '.gz':
-        return infile
-    else:
-        cmd = CommandLine('gunzip %s' % infile)
-        cout = cmd.run()
-        if not cout.runtime.returncode == 0:
-            print 'Failed to unzip %s'%(infile)
-            return None
-        else:
-            return base
-
-def unzip_files(inlist):
-    result = []
-    for f in inlist:
-        unzipped = unzip_file(f)
-        result.append(unzipped)
-    return result
 
 def copy_dir(dir, dest, pattern='*'):
       """copies files matching pattern in dir to dest
@@ -385,47 +345,8 @@ def convert(infile, outfile):
         niifile = os.path.join(path,outfile)
         return niifile
 
-def copy_files(infiles, newdir):
-    """wraps copy file to run across multiple files
-    returns list"""
-    newfiles = []
-    for f in infiles:
-        newf = copy_file(f, newdir)
-        newfiles.append(newf)
-    return newfiles
 
-def copy_file(infile, newdir):
-    """ copy infile to new directory
-    return full path of new file
-    """
-    cl = CommandLine('cp %s %s'%(infile, newdir))
-    out = cl.run()
-    if not out.runtime.returncode == 0:
-        print 'failed to copy %s' % infile
-        print out.runtime.stderr
-        return None
-    else:
-        basenme = os.path.split(infile)[1]
-        newfile = os.path.join(newdir, basenme)
-        return newfile
 
-def remove_files(files):
-    """removes files """
-    if not hasattr(files, '__iter__'):
-        cl = CommandLine('rm %s'% files)
-        out = cl.run()
-        if not out.runtime.returncode == 0:
-            print 'failed to delete %s' % files
-            print out.runtime.stderr
-        return
-    for f in files:
-        cl = CommandLine('rm %s'% f)
-        out = cl.run()
-        if not out.runtime.returncode == 0:
-            print 'failed to delete %s' % f
-            print out.runtime.stderr
-
-            
 def make_subject_dict(dirs, outdict):
       """given a set of directories
       initialize a dictionary to hold
@@ -438,62 +359,6 @@ def make_subject_dict(dirs, outdict):
           scanid = item.strip('/home/jagust/arda/lblid')
           outdict.update({scanid:[item,None]})
       
-def make_dir(base_dir, dirname='fdg_nifti'):
-    """ makes a new directory if it doesnt alread exist
-    returns full path
-    
-    Parameters
-    ----------
-    base_dir : str
-    the root directory
-    dirname  : str (default pib_nifti)
-    new directory name
-    
-    Returns
-    -------
-    newdir  : str
-    full path of new directory
-    """
-    newdir = os.path.join(base_dir,dirname)
-    if not os.path.isdir(base_dir):
-        raise IOError('ERROR: base dir %s DOES NOT EXIST'%(base_dir))
-    directory_exists = os.path.isdir(newdir)
-    if not directory_exists:
-        os.mkdir(newdir)
-    return newdir, directory_exists
-
-def make_rec_dir(base_dir, dirname='fdg_nifti'):
-    """ makes a new directories recursively if it doesnt already exist
-    returns full path
-    
-    Parameters
-    ----------
-    base_dir : str
-    the root directory
-    dirname  : str (default pib_nifti)
-    new directory name
-    
-    Returns
-    -------
-    newdir  : str
-    full path of new directory
-    """
-    newdir = os.path.join(base_dir,dirname)
-    directory_exists = os.path.isdir(newdir)
-    if not directory_exists:
-        os.makedirs(newdir)
-    return newdir, directory_exists
-
-
-
-def get_subid(instr):
-    """ given input string searches for lblid pattern
-    Bxx-xxx and returns if found, otherwise raises exception"""
-    m = re.search('B[0-9]{2}-[0-9]{3}', instr)
-    try:
-        return m.group()
-    except:
-        raise IOError('no valid ID found in %s'%(instr))
 
 def get_logging_configdict(logfile):
         log_settings = {
@@ -781,12 +646,7 @@ def prefix_filename(infile, prefix=''):
     newfile = os.path.join(pth, '%s%s'%(prefix,nme))
     return newfile
 
-def touch_file(file):
-    """ uses CommandLine to 'touch' a file,
-    creating an empty exsisting file"""
-    cmd = CommandLine('touch %s' % file)
-    cout = cmd.run()
-    return cout
+
 
 def clean_nan(niftilist):
     """replaces nan in a file with zeros"""

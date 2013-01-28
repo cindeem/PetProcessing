@@ -125,7 +125,7 @@ if __name__ == '__main__':
         newname = '%s_%s' % (subid, tracer)
         niftis = pp.biograph_dicom_convert(tgz[0], tracerdir, subid, tracer)
         ## center new nifti files
-        orig_dir, _ = pp.make_dir(tracerdir, dirname='orig')
+        orig_dir, _ = utils.make_dir(tracerdir, dirname='orig')
         copied_orig = pp.copy_files(niftis, orig_dir)
         pp.remove_files(niftis)
         for f,nf  in zip(copied_orig, niftis):

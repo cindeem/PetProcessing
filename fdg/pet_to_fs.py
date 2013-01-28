@@ -53,7 +53,7 @@ if __name__ == '__main__':
         if not os.path.isdir(fsdir):
              logging.warning('%s missing, skipping'%fsdir)
              continue
-        petdir, exists = pp.make_dir(fsdir, dirname = 'fdg')
+        petdir, exists = utils.make_dir(fsdir, dirname = 'fdg')
         if exists:
             logging.warning('%s exists, skipping'%(petdir))
             continue
@@ -62,7 +62,7 @@ if __name__ == '__main__':
         if ponsnormed is None:
             logging.warning('%s missing, skipping'%(globstr))
             continue
-        coregdir,exists = pp.make_dir('%s/fdg'%s, 'pet2mri')
+        coregdir,exists = utils.make_dir('%s/fdg'%s, 'pet2mri')
         if exists:
             continue
         ## find brainmask

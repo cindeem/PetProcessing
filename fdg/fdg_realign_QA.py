@@ -150,7 +150,7 @@ if __name__ == '__main__':
         pet = movedmean # use previously made summed image
         # copy files to tmp dir
         logging.info('coreg ref region to %s'%pet)
-        coreg_dir,exists = pp.make_dir(tracerdir, dirname='coreg_mri2fdg')
+        coreg_dir,exists = utils.make_dir(tracerdir, dirname='coreg_mri2fdg')
         if exists:
             logging.warning('existing dir %s remove to re-run'%(coreg_dir))
             continue

@@ -352,7 +352,7 @@ def rousset_labellist(labeldir, hemi, outdir='rousset_labels'):
                       'cingulate' : ['posteriorcingulate', 'isthmuscingulate']
                       }
     pth, _ = os.path.split(labeldir)
-    outdir, exists = pp.make_dir(pth, outdir)
+    outdir, exists = utils.make_dir(pth, outdir)
     
     # for each rousset label make or copy
     labelfiles = []

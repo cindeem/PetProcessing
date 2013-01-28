@@ -60,7 +60,7 @@ if __name__ == '__main__':
         if not os.path.isdir(dvrdir):
             logging.error('%s missing. skipping'%(dvrdir))
             continue
-        pvcdir, exists = pp.make_dir(dvrdir, 'pvc_rousset')
+        pvcdir, exists = utils.make_dir(dvrdir, 'pvc_rousset')
         if exists:
             logging.error('%s exists, remove to re-run'%(pvcdir))
             continue

@@ -58,7 +58,7 @@ if __name__ == '__main__':
         # subjects tracer specific path
         pth = os.path.join(sub, tracer.lower())
         
-        pvcdir, exists = pp.make_dir(dvrdir, 'pvc_rousset')
+        pvcdir, exists = utils.make_dir(dvrdir, 'pvc_rousset')
         if exists:
             logging.error('%s exists, remove to re-run'%(pvcdir))
             continue

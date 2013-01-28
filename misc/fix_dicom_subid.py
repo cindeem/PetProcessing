@@ -26,7 +26,7 @@ def main(tgz, newid, outdir=None):
     tmptgz = pp.copy_tmpdir(tgz)
     # un-archive
     pth = pp.tar_cmd(tmptgz)
-    newdir, exists = pp.make_dir(pth, dirname='dicomfiles')
+    newdir, exists = utils.make_dir(pth, dirname='dicomfiles')
     startdir = os.getcwd()
     os.chdir(pth)
     dcms = pp.find_dicoms(pth)
@@ -42,7 +42,7 @@ def main(tgz, newid, outdir=None):
             dicom.write_file(newdcm, plan)
     # create tar archive of updated dicoms
     if outdir is None:
-        outdir, _ = pp.make_dir(origdir, dirname="newtgz")
+        outdir, _ = utils.make_dir(origdir, dirname="newtgz")
     newtgz = os.path.join(outdir, orignme)
     cmd = 'tar cfvz %s  dicomfiles'%(newtgz)
     os.system(cmd)
