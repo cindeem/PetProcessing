@@ -21,7 +21,9 @@ sys.path.insert(0, '/home/jagust/cindeem/CODE/GraphicalAnalysis/pyGA')
 import pyGraphicalAnalysis as pyga
 
 import csv
-from utils import make_rec_dir
+from utils import (make_rec_dir,make_dir, copy_file,
+                   copy_files, tar_cmd, copy_tmpdir)
+import utils
 #made non writeable by lab
 
 def make_cerebellum_nibabel(aseg):
@@ -189,13 +191,6 @@ def concat_images(img_list):
         pth, _ = os.path.split(item)
         os.system('rm -rf %s'%pth)
     return newf
-
-def copy_tmpdir(infile):
-    """copies file to tempdir, returns path
-    to file copied into tmpdir"""
-    tmpdir = tempfile.mkdtemp()
-    newfile = copy_file(infile, tmpdir)
-    return newfile
 
 
 def fsl_split4d(in4d, basenme = None):

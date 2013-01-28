@@ -152,3 +152,11 @@ def touch_file(file):
     cmd = CommandLine('touch %s' % file)
     cout = cmd.run()
     return cout
+
+
+def copy_tmpdir(infile):
+    """copies file to tempdir, returns path
+    to file copied into tmpdir"""
+    tmpdir = tempfile.mkdtemp()
+    newfile = copy_file(infile, tmpdir)
+    return newfile
