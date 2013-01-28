@@ -165,3 +165,14 @@ def copy_tmpdir(infile):
     tmpdir = tempfile.mkdtemp()
     newfile = copy_file(infile, tmpdir)
     return newfile
+
+
+def copy_dir(dir, dest, pattern='*'):
+      """copies files matching pattern in dir to dest
+      returns list of abspath to new copied items """
+      items = glob('%s/%s'%(dir,pattern))
+      newitems = []
+      for item in items:
+            newitem = copy_file(item, dest)
+            newitems.append(newitem)
+      return newitems

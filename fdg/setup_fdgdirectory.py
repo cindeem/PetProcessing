@@ -128,9 +128,9 @@ if __name__ == '__main__':
             continue
         else:        
             # Copy PET data, convert to nifti
-            newraw = pp.copy_dir(petdir, rawtracer)
+            newraw = utils.copy_dir(petdir, rawtracer)
             
-            ecats = pp.copy_dir(rawtracer, tracerdir, pattern='*.v')
+            ecats = utils.copy_dir(rawtracer, tracerdir, pattern='*.v')
             newname = '%s_%s' % (subid, tracer)
             pp.convertallecat(ecats, newname)
             logging.info('ecats converted for %s ' % (subid))                

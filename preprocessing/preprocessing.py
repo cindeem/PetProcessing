@@ -147,50 +147,8 @@ def move_and_convert(mgz, dest, newname):
       os.remove(new_mgz)
       return nii
 
-def biograph_dicom_convert(input, dest, subid, tracer):
-    """ given a tgz file holding dicoms,
-    expands in temdir, uses mri_convert to convert
-    file to nifti (4D) in tmpdir
-    copies single frames to dest"""
-    newfile = copy_tmpdir(input)
-    pth = tar_cmd(newfile)
-    results = find_dicoms(pth)
-    all4d = []
-    for val, (name, files) in enumerate(sorted(results.items())):
-        dcm0 = files[0]
-        #if not tracer.upper() in name.upper():
-        #    fname = os.path.join(pth,
-        #                         '%s_%s%d'%(subid, tracer,val) + '.nii.gz')
-        #else:
-        #    fname = os.path.join(pth, name + '.nii.gz')
-        #tmp4d = convert_dicom(dcm0, fname)
-        tmp4d = biograph_to_nifti(dcm0)
-        all4d.append(tmp4d)
-
-    if len(all4d) > 1:
-        final4d = concat_images(all4d)
-    else:
-        final4d = all4d[0]
-    basename = '%s_%s_frame'%(subid, tracer.upper())    
-    tmpsplit = fsl_split4d(final4d, basenme = basename)    
-    newfiles = copy_files(tmpsplit, dest)
-    pth, _ = os.path.split(final4d)
-    os.system('rm -rf %s'%(pth)) 
-    return newfiles
     
 
-def concat_images(img_list):
-    alldat = np.concatenate([ni.load(x).get_data() for x in img_list],
-                            axis=3)
-    pth, _ = os.path.split(img_list[0])
-    newf = os.path.join(pth, 'full4d.nii.gz')
-    allimg = ni.Nifti1Image(alldat, ni.load(img_list[0]).get_affine())
-    allimg.to_filename(newf)
-    for item in img_list[1:]:
-        # clean tmp directories
-        pth, _ = os.path.split(item)
-        os.system('rm -rf %s'%pth)
-    return newf
 
 
 def fsl_split4d(in4d, basenme = None):
@@ -271,24 +229,6 @@ def clean_dicom_filenames(dcms):
             
     return newfiles
 
-def find_dicoms(pth):
-    """looks in pth to find files, sorts and returns list
-    of lists (to handle multiple directories)"""
-    toplevel = [os.path.join(pth, x) for x in os.listdir(pth)]
-    alldir = [x for x in toplevel if os.path.isdir(x)]
-
-    if len(alldir) < 1:
-        alldir = [pth]
-    results = {}
-    for item in alldir:
-        if '.tgz' in item:
-            continue
-        tmpfiles = glob('%s/*'%(item))
-        tmpfiles.sort()
-        cleanfiles = clean_dicom_filenames(tmpfiles)
-        results.update({item:cleanfiles})
-    return results
-
 
 
 
@@ -301,15 +241,6 @@ def convertallecat(ecats, newname):
 
 
 
-def copy_dir(dir, dest, pattern='*'):
-      """copies files matching pattern in dir to dest
-      returns list of abspath to new copied items """
-      items = glob('%s/%s'%(dir,pattern))
-      newitems = []
-      for item in items:
-            newitem = copy_file(item, dest)
-            newitems.append(newitem)
-      return newitems
 
 
 def ecat2nifti(ecat, newname):
