@@ -123,7 +123,7 @@ if __name__ == '__main__':
         tracerdir, _ = outdirs['tracerdir']
         
         newname = '%s_%s' % (subid, tracer)
-        niftis = pp.biograph_dicom_convert(tgz[0], tracerdir, subid, tracer)
+        niftis = dicom_tools.biograph_dicom_convert(tgz[0], tracerdir, subid, tracer)
         ## center new nifti files
         orig_dir, _ = utils.make_dir(tracerdir, dirname='orig')
         copied_orig = utils.copy_files(niftis, orig_dir)
