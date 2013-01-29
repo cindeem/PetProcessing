@@ -150,28 +150,6 @@ def move_and_convert(mgz, dest, newname):
     
 
 
-
-def fsl_split4d(in4d, basenme = None):
-    cwd = os.getcwd()
-    pth, nme, ext = nipype.utils.filemanip.split_filename(in4d)
-    if basenme is None:
-        basenme = nme
-    os.chdir(pth)
-    split = fsl_split()
-    split.inputs.in_file = in4d
-    split.inputs.dimension = 't'
-    split.inputs.out_base_name = basenme
-    split_out = split.run()
-    os.chdir(cwd)
-    if not split_out.runtime.returncode == 0:
-        logging.error('Failed to split 4d file %s'%in4d)
-        return None
-    else:
-        return split_out.outputs.out_files
-    
-    return pth   
-
-
 def convertallecat(ecats, newname):
       """ converts all ecat files and removes .v files"""
       for f in ecats:
@@ -793,16 +771,7 @@ def reslice(space_define, infile):
     return mout
 
 
-def find_single_file(searchstring):
-    """ glob for single file using searchstring
-    if found returns full file path """
-    file = glob(searchstring)
-    if len(file) < 1:
-        print '%s not found' % searchstring
-        return None
-    else:
-        outfile = file[0]
-        return outfile
+
 
 
 def run_logan(subid, nifti, ecat, refroi, outdir):
@@ -832,74 +801,6 @@ def run_logan(subid, nifti, ecat, refroi, outdir):
     data.close()
     return outfile
 
-def fsl_mask(infile, mask, outname='grey_cerebellum_tu.nii'):
-    """use fslmaths to mask img with mask"""
-
-    pth, nme = os.path.split(infile)
-    outfile = os.path.join(pth, outname)
-    c1 = CommandLine('fslmaths %s -mas %s %s'%(infile, mask, outfile))
-    out = c1.run()
-    
-    if not out.runtime.returncode == 0:
-        print 'failed to mask %s'%(infile)
-        print out.runtime.stderr
-        return None
-    else:
-        return outfile
-
-def fsl_theshold_mask(infile, gmmask, threshold, outname='gmaskd_mask.nii.gz'):
-    """ use fslmaths to mask infile with gmmask which will be thresholded
-    at threshold and saved into outname"""
-    pth, nme = os.path.split(infile)
-    outfile = os.path.join(pth, outname)
-    c1 = CommandLine('fslmaths %s -thr %2.2f -mul %s %s'%(gmmask,
-                                                          threshold,
-                                                          infile,
-                                                          outnfile)
-                     )
-    if not c1.runtime.returncode == 0:
-        print 'gm masking of mask failed for %s'%(infile)
-        return None
-    return outfile
-    
-def extract_stats_fsl(data, mask, gmmask, threshold=0.3):
-    """ uses fsl tools to extract data values in mask,
-    masks 'mask' with gmmask thresholded at 'threshold' (default 0.3)
-    returns mean, std, nvoxels
-    NOTE: generates some tmp files in tempdir, but also removes them"""
-    tmpdir = tempfile.mkdtemp()
-    startdir = os.getcwd()
-    os.chdir(tmpdir)
-    # first mask mask with thresholded gmmask
-    pth, nme = os.path.split(mask)
-    outfile = fname_presuffix(mask, prefix = 'gmask_', newpath=tmpdir )
-    c1 = CommandLine('fslmaths %s -thr %2.2f -nan -mul %s %s'%(gmmask,
-                                                               threshold,
-                                                               mask,
-                                                               outfile)
-                     ).run()
-    if not c1.runtime.returncode == 0:
-        print 'gm masking of mask failed for %s'%(mask)
-        print 'tmp dir', tmpdir
-        print c1.runtime.stderr
-        return None   
-    #first mask data
-    cmd = 'fslmaths %s -nan -mas %s masked_data'%(data, outfile)
-    mask_out = CommandLine(cmd).run()
-    if not mask_out.runtime.returncode == 0:
-        print 'masking failed for %s'%(data)
-        return None, None, None
-    masked = find_single_file('masked*')
-    # get stats
-    mean_out = CommandLine('fslstats %s -M'%(masked)).run()
-    mean = mean_out.runtime.stdout.strip('\n').strip()
-    std_out = CommandLine('fslstats %s -S'%(masked)).run()
-    std = std_out.runtime.stdout.strip('\n').strip()
-    vox_out = CommandLine('fslstats %s -V'%(masked)).run()
-    vox = vox_out.runtime.stdout.split()[0]
-    os.chdir(startdir)
-    rmtree(tmpdir)
-    return mean, std, vox
 
 
 def fs_generate_dat(pet, subdir):

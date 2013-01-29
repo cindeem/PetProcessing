@@ -2,6 +2,7 @@
 # vi: set ft=python sts=4 ts=4 sw=4 et:
 import os, sys
 import re
+from glob import glob
 import tempfile
 from nipype.interfaces.base import CommandLine
 from nipype.utils.filemanip import split_filename, fname_presuffix
@@ -176,3 +177,16 @@ def copy_dir(dir, dest, pattern='*'):
             newitem = copy_file(item, dest)
             newitems.append(newitem)
       return newitems
+
+
+def find_single_file(searchstring):
+    """ glob for single file using searchstring
+    if found returns full file path """
+    file = glob(searchstring)
+    if len(file) < 1:
+        print '%s not found' % searchstring
+        return None
+    else:
+        outfile = file[0]
+        return outfile
+

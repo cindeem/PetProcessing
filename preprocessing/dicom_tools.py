@@ -6,6 +6,7 @@ import nibabel as ni
 from glob import glob
 from utils import (get_subid, make_rec_dir,make_dir, copy_file,
                    copy_files, tar_cmd, copy_tmpdir)
+from fsl_tools import fsl_split4d
 
 def get_dicoms(indir):
     """ given an indir (dicomdirectory)
