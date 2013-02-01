@@ -16,8 +16,8 @@ def transform_vol(invol, xfm, space_defining):
     invol = utils.unzip_file(invol)# in case zipped
     xfm =  utils.unzip_file(xfm)# in case zipped
     space_defining = utils.unzip_file(space_defining)# in case zipped
-    pp.apply_transform_onefile(xfm, invol)
-    pp.reslice(space_defining, invol)
+    spm_tools.apply_transform_onefile(xfm, invol)
+    spm_tools.reslice(space_defining, invol)
     rinvol = pp.prefix_filename(invol, prefix='r')
     utils.remove_files([invol])
     utils.zip_files([space_defining])

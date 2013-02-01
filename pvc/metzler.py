@@ -11,6 +11,7 @@ import nibabel as ni
 import nipype.interfaces.freesurfer as freesurfer
 import nipy
 import nipy.algorithms
+import ..preprocessing.spm_tools as spm_tools
 
 def make_pvc(pet, psf_brainmask, brainmask, prefix = 'pvc_'):
     """ uses the given per psf brain mask to correct the data in pet
@@ -64,7 +65,7 @@ def make_aseg_brainmask(infile):
     return outfile
 
 def smooth_mask_spm(mask, fwhm = 7):
-    sout = pp.spm_smooth([mask] , fwhm=fwhm)
+    sout = spm_tools.spm_smooth([mask] , fwhm=fwhm)
     
     if not sout.runtime.returncode ==0:
         print sout.runtime.stderr # changed from sout.runtime.stderr

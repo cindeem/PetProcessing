@@ -101,7 +101,7 @@ if __name__ == '__main__':
         cbm = str(cbm)
         csumfdg = str(csumfdg)
         cpnfdg = str(cpnfdg)
-        corgout = pp.simple_coregister(cbm, csumfdg, other=cpnfdg)
+        corgout = spm_tools.simple_coregister(cbm, csumfdg, other=cpnfdg)
         if not corgout.runtime.returncode == 0:
             logging.error('coreg pet to mri failed %s'%subid)
             shutil.rmtree(warpdir)
@@ -110,7 +110,7 @@ if __name__ == '__main__':
         rpnfdg = corgout.outputs.coregistered_files
         # warp brainmask to template, apply to pnfdg
         logging.info('Run warp')
-        wout = pp.simple_warp(template, cbm, other=rpnfdg)
+        wout = spm_tools.simple_warp(template, cbm, other=rpnfdg)
         if not wout.runtime.returncode == 0:
             logging.error('warp to template failed %s'%subid)
             shutil.rmtree(warpdir)

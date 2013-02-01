@@ -104,7 +104,7 @@ if __name__ == '__main__':
         cbm = str(cbm)
         cmean20 = str(cmean20)
         cdvr = str(cdvr)
-        corgout = pp.simple_coregister(cbm, cmean20, other=cdvr)
+        corgout = spm_tools.simple_coregister(cbm, cmean20, other=cdvr)
         if not corgout.runtime.returncode == 0:
             logging.error('coreg pet to mri failed %s'%subid)
             shutil.rmtree(warpdir)
@@ -113,7 +113,7 @@ if __name__ == '__main__':
         rdvr = corgout.outputs.coregistered_files
         # warp brainmask to template, apply to dvr
         logging.info('Run warp')
-        wout = pp.simple_warp(template, cbm, other=rdvr)
+        wout = spm_tools.simple_warp(template, cbm, other=rdvr)
         if not wout.runtime.returncode == 0:
             logging.error('warp to template failed %s'%subid)
             shutil.rmtree(warpdir)

@@ -75,7 +75,7 @@ if __name__ == '__main__':
         nifti.sort()
         nifti = utils.unzip_files(nifti)
         hasqa = False
-        rlgnout, newnifti = pp.realigntoframe1(nifti)
+        rlgnout, newnifti = spm_tools.realigntoframe1(nifti)
         if rlgnout is None and newnifti is None:
             logging.warning('%s :existing realign_QA '%(subid))
             tmprealigned, tmpparameterfile = find_realigned(tracerdir)
@@ -158,21 +158,21 @@ if __name__ == '__main__':
         cpons = utils.copy_file(pons, coreg_dir)
         cpet = utils.copy_file(pet, coreg_dir)
         caparc = utils.copy_file(aparc, coreg_dir)
-        xfm_file = pp.make_transform_name(cpet, cmri)
+        xfm_file = spm_tools.make_transform_name(cpet, cmri)
         logging.info( 'coreg %s'%(subid))
-        corg_out = pp.invert_coreg(cmri, cpet, xfm_file)
+        corg_out = spm_tools.invert_coreg(cmri, cpet, xfm_file)
         if not corg_out.runtime.returncode == 0:
             logging.warning(corg_out.runtime.stderr)
             continue
-        apply_out = pp.apply_transform_onefile(xfm_file,cpons)
+        apply_out = spm_tools.apply_transform_onefile(xfm_file,cpons)
         if not apply_out.runtime.returncode == 0:
             logging.warning(apply_out.runtime.stderr)
             continue
-        apply_out = pp.apply_transform_onefile(xfm_file,caparc)
+        apply_out = spm_tools.apply_transform_onefile(xfm_file,caparc)
         if not apply_out.runtime.returncode == 0:
             logging.warning(apply_out.runtime.stderr)
             continue
-        rout_mri = pp.reslice(cpet, cmri)
+        rout_mri = spm_tools.reslice(cpet, cmri)
         if not rout_mri.runtime.returncode == 0:
             logging.warning(rout_mri.runtime.stderr)
         else:
@@ -182,7 +182,7 @@ if __name__ == '__main__':
             newmri = utils.copy_file(rmri, '%s/anatomy/%s'%(sub,new_rmri))
             if newmri:
                 utils.remove_files([cmri,rmri])
-        rout_pons = pp.reslice(cpet, cpons)
+        rout_pons = spm_tools.reslice(cpet, cpons)
         if not rout_pons.runtime.returncode == 0:
             logging.warning(rout_pons.runtime.stderr)
         else:
@@ -190,7 +190,7 @@ if __name__ == '__main__':
             newpons = utils.copy_file(rpons, '%s/ref_region'%(tracerdir))
             if newpons:
                 utils.remove_files([cpons,rpons])
-        rout_aparc = pp.reslice(cpet, caparc)
+        rout_aparc = spm_tools.reslice(cpet, caparc)
         if not rout_aparc.runtime.returncode == 0:
             logging.warning(rout_aparc.runtime.stderr)
         utils.remove_files(cpet)

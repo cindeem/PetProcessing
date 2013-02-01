@@ -59,14 +59,14 @@ if __name__ == '__main__':
         if os.path.isdir(realigndir):
             logging.error('%s exists, remove to rerun'%(realigndir))
             continue
-        rlgnout, newnifti = pp.realigntoframe17(nifti)
+        rlgnout, newnifti = spm_tools.realigntoframe17(nifti)
         tmpparameterfile = rlgnout.outputs.realignment_parameters
         realigndir, _ = os.path.split(tmpparameterfile)
         sum1_5 = pp.make_summed_image(newnifti[:5],
                                       prefix='sum1_5_')
         mean_img = rlgnout.outputs.mean_image
         #coregister 1-5 to mean
-        crg_out = pp.simple_coregister(mean_img, sum1_5, newnifti[:5])
+        crg_out = spm_tools.simple_coregister(mean_img, sum1_5, newnifti[:5])
         if crg_out.runtime.returncode is not 0:
             logging.error('Failed to coreg 1-5 to mean for  %s' % subid)
             continue
@@ -133,12 +133,12 @@ if __name__ == '__main__':
         ccere = utils.unzip_file(ccere)
         # have all out files, coreg
         xfm = os.path.join(coregdir, 'mri_to_pet.mat')
-        corgout = pp.invert_coreg(cbrainmask, mean_20min,xfm)
-        pp.reslice(mean_20min, cbrainmask)
-        pp.apply_transform_onefile(xfm, ccere)
-        pp.reslice(mean_20min, ccere)
-        pp.apply_transform_onefile(xfm, caparc)
-        pp.reslice(mean_20min, caparc)
+        corgout = spm_tools.invert_coreg(cbrainmask, mean_20min,xfm)
+        spm_tools.reslice(mean_20min, cbrainmask)
+        spm_tools.apply_transform_onefile(xfm, ccere)
+        spm_tools.reslice(mean_20min, ccere)
+        spm_tools.apply_transform_onefile(xfm, caparc)
+        spm_tools.reslice(mean_20min, caparc)
         
         
         

@@ -105,8 +105,8 @@ if __name__ == '__main__':
                 continue
             cxfm = utils.copy_file(xfm, roidir)
             cxfm = utils.unzip_file(cxfm)# in case zipped
-            pp.apply_transform_onefile(cxfm, caparc)
-            pp.reslice(dat, caparc)
+            spm_tools.apply_transform_onefile(cxfm, caparc)
+            spm_tools.reslice(dat, caparc)
             raparc = pp.prefix_filename(caparc, prefix='r')
             
                 

@@ -79,7 +79,7 @@ if __name__ == '__main__':
         cpons = utils.copy_file(ponsnormed, coregdir)
         csum = utils.copy_file(sum, coregdir)
         
-        corg_out = pp.simple_coregister(str(brainmask),
+        corg_out = spm_tools.simple_coregister(str(brainmask),
                                         str(csum),
                                         other=str(cpons))
         if not corg_out.runtime.returncode == 0:
