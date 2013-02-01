@@ -272,6 +272,8 @@ def seg_pet(meanimg, mask):
 
 
 def apply_warp_fromseg(infiles, param_file):
+    """ applys a warp param file generated from segmentation
+    to infiles, (infiles should be a list of file names"""
     warp = spm.Normalize()
     warp.inputs.parameter_file = param_file
     warp.inputs.jobtype = 'write'
