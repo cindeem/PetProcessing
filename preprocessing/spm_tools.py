@@ -24,23 +24,27 @@ def spm_smooth(infiles, fwhm=8):
     return sout
 
 
-def realigntoframe1(niftilist):
+def realigntoframe1(niftilist, copied = False):
     """given list of nifti files
     copies relevent files to realign_QA
     realigns to the 1st frame
     """
     startdir = os.getcwd()
     niftilist.sort()
-    basepth, _ = os.path.split(niftilist[0])
-    tmpdir, exists = make_dir(basepth, 'realign_QA')
-    if exists:
-        return None, None
-    # copy files to tmp dir
-    copiednifti = []
-    for f in niftilist:
-        newf = copy_file(f, tmpdir)
-        copiednifti.append(str(newf))
-    print 'copied nifti', copiednifti
+    if not copied:
+        basepth, _ = os.path.split(niftilist[0])
+        tmpdir, exists = make_dir(basepth, 'realign_QA')
+        if exists:
+            return None, None
+        # copy files to tmp dir
+        copiednifti = []
+        for f in niftilist:
+            newf = copy_file(f, tmpdir)
+            copiednifti.append(str(newf))
+            print 'copied nifti', copiednifti
+    else:
+        tmpdir, _ = os.path.split(niftilist[0])
+        copiednifti = niftilist
     # realign to frame1
     os.chdir(tmpdir)
     rlgn = spm.Realign()
@@ -260,7 +264,10 @@ def seg_pet(meanimg, mask):
     and segment, this will create both direction
     warps for moving ref region and then warping to template space
     """
-    seg = spm.Segment()
+    startdir = os.getcwd()
+    pth, _ = os.path.split(meanimg)
+    os.chdir(pth)
+    seg = spm.Segment(matlab_cmd = 'matlab-spm8')
     seg.inputs.data = meanimg
     seg.inputs.affine_regularization = "none"
     seg.inputs.clean_masks ='no'
@@ -268,17 +275,25 @@ def seg_pet(meanimg, mask):
     seg.inputs.gm_output_type = [False, False, True]
     seg.inputs.wm_output_type = [False, False, True]
     seg.inputs.mask_image = mask
-    seg.inputs.save_bias_corrected = False
-
+    #seg.inputs.save_bias_corrected = False
+    segout = seg.run()
+    os.chdir(startdir)
+    return segout
+    
 
 def apply_warp_fromseg(infiles, param_file):
     """ applys a warp param file generated from segmentation
     to infiles, (infiles should be a list of file names"""
-    warp = spm.Normalize()
+    startdir = os.getcwd()
+    pth, _ = os.path.split(infiles[0])
+    os.chdir(pth)
+    warp = spm.Normalize(matlab_cmd = 'matlab-spm8')
     warp.inputs.parameter_file = param_file
     warp.inputs.jobtype = 'write'
     warp.inputs.apply_to_files = infiles
-    warp.inputs.write_bounding_box = [[-90 -126 -72],
-                                     [90 90 108]]
+    warp.inputs.write_bounding_box = [[-90, -126, -72],
+                                     [90, 90, 108]]
     warp.inputs.write_voxel_sizes = [2.0, 2.0, 2.0]
-    
+    warpout = warp.run()
+    os.chdir(startdir)
+    return warpout
