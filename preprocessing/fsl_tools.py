@@ -60,7 +60,7 @@ def flirt_coreg(infile, target):
         print fout.runtime.stderr
         return None
 
-def fsl_maths(infile, opstr, suffix='fslmath', outfile = None):
+def fsl_maths(infile, opstr, suffix='fslmaths', outfile = None):
     """ Run fslmaths on infile
     specify optional outfile
     returns outfile"""
