@@ -195,7 +195,7 @@ def forward_coreg(mri, pet, transform):
     mlab_cmd.inputs.nodesktop = True
     mlab_cmd.inputs.nosplash = True
     mlab_cmd.inputs.mfile = True
-    mlab_cmd.inputs.script_file = 'pyspm8_invert_coreg.m'
+    mlab_cmd.inputs.script_file = 'pyspm8_forward_coreg.m'
     script = """
     pet = \'%s\';
     mri = \'%s\';
