@@ -5,7 +5,7 @@ from glob import glob
 import tempfile
 import logging
 from shutil import rmtree
-sys.path.insert(0,'/home/jagust/cindeem/CODE/PetProcessing')
+#sys.path.insert(0,'/home/jagust/cindeem/CODE/PetProcessing')
 
 import nipype.interfaces.spm as spm
 from nipype.interfaces.base import CommandLine

@@ -199,3 +199,19 @@ def remove_dir(dir):
         return False
     else:
         return True
+
+def find_files(globstr, n=1):
+    """globs for globstr
+    if number of files is less than n
+    return None
+    else
+    return frames"""
+    
+    frames = glob(globstr)
+    frames.sort()
+    if len(frames) < n:
+        logging.error('%s only has %d frames, RUNBYHAND'%(globstr,
+                                                          len(frames)))
+        return None
+    else:
+        return frames
