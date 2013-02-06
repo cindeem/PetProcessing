@@ -299,7 +299,7 @@ def apply_warp_fromseg(infiles, param_file):
     warp = spm.Normalize(matlab_cmd = 'matlab-spm8')
     warp.inputs.parameter_file = param_file
     warp.inputs.jobtype = 'write'
-    warp.inputs.apply_to_files = infiles
+    warp.inputs.apply_to_files = [str(x) for x in infiles]
     warp.inputs.write_bounding_box = [[-90, -126, -72],
                                      [90, 90, 108]]
     warp.inputs.write_voxel_sizes = [2.0, 2.0, 2.0]
