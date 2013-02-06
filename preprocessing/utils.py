@@ -6,6 +6,7 @@ from glob import glob
 import tempfile
 from nipype.interfaces.base import CommandLine
 from nipype.utils.filemanip import split_filename, fname_presuffix
+import logging
 
 def tar_cmd(infile):
     """ given a ipped tar archive, untars"""

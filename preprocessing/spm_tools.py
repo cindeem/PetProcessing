@@ -47,7 +47,7 @@ def realigntoframe1(niftilist, copied = False):
             print 'copied nifti', copiednifti
     else:
         tmpdir, _ = os.path.split(niftilist[0])
-        copiednifti = niftilist
+        copiednifti = [str(x) for x in niftilist]
     # realign to frame1
     os.chdir(tmpdir)
     rlgn = spm.Realign()
@@ -102,11 +102,11 @@ def simple_coregister(target, moving, other=None):
     pth, _ = os.path.split(moving)
     os.chdir(pth)
     corg = spm.Coregister(matlab_cmd = 'matlab-spm8')
-    corg.inputs.target = target
-    corg.inputs.source = moving
+    corg.inputs.target = str(target)
+    corg.inputs.source = str(moving)
     corg.inputs.ignore_exception = True
     if other is not None:
-        corg.inputs.apply_to_files = other
+        corg.inputs.apply_to_files = [str(x) for x in other]
     corg_out = corg.run()
     os.chdir(startdir)
     return corg_out
