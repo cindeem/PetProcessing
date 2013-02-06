@@ -143,16 +143,22 @@ def simple_segment(mri):
     return segout
 
 
-def make_transform_name(inpet, inmri):
-    """ given pet filename and mrifilename, makes
-    the MRI_2_PET transform name"""
-    pth, petnme = os.path.split(inpet)
-    _, mrinme = os.path.split(inmri)
+def make_transform_name(inpet, inmri, inverse = True):
+    """ given pet filename and mrifilename,
+    if inverse, makes
+    the MRI_2_PET transform name
+    else
+    makes PET_2_MRI transform name"""
 
-    mribase = mrinme.split('.')[0]
-    petbase = petnme.split('.')[0]
-    newnme = '%s_TO_%s.mat'%(mribase, petbase)
-    newfile = os.path.join(pth, newnme)
+    petpth, petnme, petext = split_filename(inpet)
+    mripth, mrinme, ext  = split_filename(inmri)
+
+    if inverse:
+        newnme = '%s_TO_%s.mat'%(mribase, petbase)
+        newfile = os.path.join(petpth, newnme)
+    else:
+        newnme = '%s_TO_%s.mat'%(petbase, mribase)
+        newfile = os.path.join(mripth, newnme)
     return newfile
 
 def invert_coreg(mri, pet, transform):
