@@ -435,13 +435,15 @@ def clean_nan(niftilist):
 
 def make_summed_image(niftilist, prefix='sum_'):
     """given a list of nifti files
-    generates a summed image"""
+    generates a summed image
+    removes any nan"""
     newfile = prefix_filename(niftilist[0], prefix=prefix)
     affine = nibabel.load(niftilist[0]).get_affine()
     shape =  nibabel.load(niftilist[0]).get_shape()
     newdat = zeros(shape)
     for item in niftilist:
         newdat += nibabel.load(item).get_data().copy()
+    newdat = np.nan_to_num(newdat)
     newimg = nibabel.Nifti1Image(newdat, affine)
     newimg.to_filename(newfile)
     return newfile

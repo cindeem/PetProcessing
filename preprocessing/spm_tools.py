@@ -154,10 +154,10 @@ def make_transform_name(inpet, inmri, inverse = True):
     mripth, mrinme, ext  = split_filename(inmri)
 
     if inverse:
-        newnme = '%s_TO_%s.mat'%(mribase, petbase)
+        newnme = '%s_TO_%s.mat'%(mrinme, petnme)
         newfile = os.path.join(petpth, newnme)
     else:
-        newnme = '%s_TO_%s.mat'%(petbase, mribase)
+        newnme = '%s_TO_%s.mat'%(petnme, mrinme)
         newfile = os.path.join(mripth, newnme)
     return newfile
 
@@ -277,13 +277,13 @@ def seg_pet(meanimg, mask):
     pth, _ = os.path.split(meanimg)
     os.chdir(pth)
     seg = spm.Segment(matlab_cmd = 'matlab-spm8')
-    seg.inputs.data = meanimg
+    seg.inputs.data = str(meanimg)
     seg.inputs.affine_regularization = "none"
     seg.inputs.clean_masks ='no'
     seg.inputs.csf_output_type = [False, False, False]
     seg.inputs.gm_output_type = [False, False, True]
     seg.inputs.wm_output_type = [False, False, True]
-    seg.inputs.mask_image = mask
+    seg.inputs.mask_image = str(mask)
     #seg.inputs.save_bias_corrected = False
     segout = seg.run()
     os.chdir(startdir)
