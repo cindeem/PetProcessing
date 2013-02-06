@@ -86,7 +86,7 @@ def MyVisitDialog():
     return visit
     
 def MyTracerDialog():
-    choices = ['FDG', 'PIB']
+    choices = ['FDG', 'PIB', 'AV45']
     dialog = wx.SingleChoiceDialog(None,
                                    'Choose a Tracer',
                                    'TRACERS',
