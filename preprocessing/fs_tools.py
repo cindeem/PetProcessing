@@ -431,3 +431,14 @@ def annot_pet_stats(subid, annot, hemi, datafile, subjects_dir):
         print cout.runtime.stderr
         return None
     return outf    
+
+
+def seed_fs(subid, dicom, subjectdir):
+    
+    cmd = 'recon-all -i %s -sd %s -subjid %s'%(dicom,subjectdir, subid)
+    cout = CommandLine(cmd).run()
+    if not cout.runtime.returncode == 0:
+        print cout.runtime.stderr
+        return None
+    else:
+        return True

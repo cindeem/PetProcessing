@@ -190,3 +190,12 @@ def find_single_file(searchstring):
         outfile = file[0]
         return outfile
 
+def remove_dir(dir):
+    """removes direcotry and contents"""
+    cmd = 'rm -rf %s'%(dir)
+    out = CommandLine(cmd).run()
+    if not out.runtime.returncode == 0:
+        print out.runtime.stderr
+        return False
+    else:
+        return True

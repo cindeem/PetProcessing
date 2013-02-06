@@ -1,12 +1,15 @@
 from os.path import (abspath, join, split)
+import os
 import sys, re
 import dicom
 from dicom.dataset import Dataset, FileDataset
 import nibabel as ni
 from glob import glob
 from utils import (get_subid, make_rec_dir,make_dir, copy_file,
-                   copy_files, tar_cmd, copy_tmpdir)
+                   copy_files, tar_cmd, copy_tmpdir, remove_dir)
 from fsl_tools import fsl_split4d
+import tempfile
+from nipype.interfaces import dcm2nii
 
 def get_dicoms(indir):
     """ given an indir (dicomdirectory)
@@ -207,3 +210,49 @@ def biograph_to_nifti(dicomf):
             ext = '.gz'
         outf = cout.runtime.stdout.split('->')[-1].split('\n')[0]
         return os.path.join(tmpdir,outf + ext)
+
+def find_mri_dicoms(pth):
+    """ finds files nested in a directory"""
+    allfiles = []
+    for dirpth, dirs, files in os.walk(pth):
+        if len(files) > 0:
+            allfiles += [join(dirpth, f) for f in files if not '.tgz' in f]
+    return allfiles
+
+def dicom_to_nifti(tgz):
+    """ given a tgz archive containing dicoms
+    , use dcm2nii to convert
+    to a 4d.nii.gz file in a tempdir
+    Returns
+    -------
+    outfile : nii.gz file in tmpdir
+    pth : directory holding dicoms
+    dcms : list of dicom files found
+    """
+    ctgz = copy_tmpdir(tgz)
+    print ctgz
+    pth = tar_cmd(ctgz)
+    dcms = find_mri_dicoms(pth)
+    if len(dcms) < 1:
+        raise IOError('no dicoms found in %s'%(pth))
+    
+    tmp, _ = os.path.split(os.path.abspath(__file__))
+    default_file = os.path.join(tmp,
+                                'dcm2nii.ini')
+    tmpdir = tempfile.mkdtemp()
+    convert = dcm2nii.Dcm2nii()
+    convert.inputs.source_names = dcms[0]
+    convert.inputs.output_dir = tmpdir
+    convert.inputs.config_file = default_file
+    cout = convert.run()
+    if not cout.runtime.returncode == 0:
+        logging.error(cout.runtime.stderr)
+        
+        return None
+    else:
+        
+        ext = ''
+        if 'GZip' in cout.runtime.stdout:
+            ext = '.gz'
+        outf = cout.runtime.stdout.split('->')[-1].split('\n')[0]
+        return join(tmpdir,outf + ext), pth, dcms

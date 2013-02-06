@@ -26,7 +26,10 @@ def spm_smooth(infiles, fwhm=8):
 
 def realigntoframe1(niftilist, copied = False):
     """given list of nifti files
-    copies relevent files to realign_QA
+    if copied is False
+          copies relevent files to realign_QA
+    else:
+          works on input files
     realigns to the 1st frame
     """
     startdir = os.getcwd()
