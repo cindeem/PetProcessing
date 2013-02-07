@@ -59,7 +59,7 @@ def realigntoframe1(niftilist, copied = False):
     os.chdir(startdir)
     return rlgnout, copiednifti    
 
-def realigntoframe17(niftilist):
+def realigntoframe17(niftilist, copied = False):
     """given list of nifti files
     copies/creates realign_QA
     removes first 5 frames
@@ -68,14 +68,19 @@ def realigntoframe17(niftilist):
     startdir = os.getcwd()
     niftilist.sort()
     basepth, _ = os.path.split(niftilist[0])
-    tmpdir, exists = make_dir(basepth, 'realign_QA')
-    if exists:
-        return None, None    
-    # copy files to tmp dir
-    copiednifti = []
-    for f in niftilist:
-        newf = copy_file(f, tmpdir)
-        copiednifti.append(str(newf))
+    if not copied:
+        tmpdir, exists = make_dir(basepth, 'realign_QA')
+        if exists:
+            return None, None    
+        # copy files to tmp dir
+        copiednifti = []
+        for f in niftilist:
+            newf = copy_file(f, tmpdir)
+            copiednifti.append(str(newf))
+    else:
+        tmpdir, _ = os.path.split(niftilist[0])
+        copiednifti = [str(x) for x in niftilist]
+        
     # put files in correct order
     os.chdir(tmpdir)
     alteredlist =[x for x in  copiednifti]
@@ -83,13 +88,10 @@ def realigntoframe17(niftilist):
     alteredlist.remove(frame17)
     alteredlist = alteredlist[5:]
     alteredlist.insert(0, frame17)
-    #print 'alteredlist', alteredlist
     # realign
     rlgn = spm.Realign(matlab_cmd='matlab-spm8')
     rlgn.inputs.in_files = alteredlist
     rlgn.inputs.ignore_exception = True
-    #rlgn.inputs.write_which = [2,0]
-    #rlgn.register_to_mean = True
     rlgnout = rlgn.run()
     os.chdir(startdir)
     return rlgnout, copiednifti

@@ -16,6 +16,38 @@ from time import asctime
 import nicm.nicm as nicm
 
 
+def realign(frames, realigndir):
+    cframes = utils.copy_files(frames, realigndir)
+    cframes = utils.unzip_files(cframes)
+    rlgnout, newnifti = spm_tools.realigntoframe1(cframes, copied=True)
+    if not rlgnout.runtime.returncode == 0:
+        logging.error(rlgnout.runtime.stderr)
+        return None, None
+    tmpparameterfile = rlgnout.outputs.realignment_parameters
+    rframes = rlgnout.outputs.realigned_files
+    rmean = rlgnout.outputs.mean_image
+    utils.remove_files([cframes, rmean])
+    return rframes, tmpparameterfile
+
+def run_qa(rframes, qadir, subid, tmpparameterfile):
+    data4d = qa.make_4d_nibabel(rframes, outdir=qadir)
+    qa.plot_movement(tmpparameterfile, subid)
+    qa.calc_robust_median_diff(data4d)
+    qa.screen_pet(data4d)
+    utils.zip_files([data4d])
+    
+def make_centered_sum(rframes, tracerdir):
+    sum = pp.make_summed_image(rframes)
+    # check center of mass of SUM
+    cm, dist, warn = nicm.CenterMass(sum).run()
+    if dist > 40:
+        cmtrans = nicm.CMTransform(sum)
+        csum = utils.fname_presuffix(sum, newpath = tracerdir)
+        cmtrans.fix(new_file = csum)
+    else:
+        csum = utils.copy_file(sum, tracerdir)
+    utils.remove_files([sum])
+    return csum
 
 if __name__ == '__main__':
     
@@ -59,43 +91,18 @@ if __name__ == '__main__':
         if exists:
             logging.error('%s exists, using, remove to rerun'%(realigndir))
             continue
-        
-        cframes = utils.copy_files(frames, realigndir)
-        cframes = utils.unzip_files(cframes)
-        rlgnout, newnifti = spm_tools.realigntoframe1(cframes, copied=True)
-        if not rlgnout.runtime.returncode == 0:
-            logging.error(rlgnout.runtime.stderr)
+        rframes, tmpparameterfile = realign(frames, realigndir)
+        if rframes is None:
             continue
-        tmpparameterfile = rlgnout.outputs.realignment_parameters
-        rframes = rlgnout.outputs.realigned_files
-        rmean = rlgnout.outputs.mean_image
-
         # QA
         # make 4d for QA
         qadir, exists = qa.make_qa_dir(realigndir, name='data_QA')
-        data4d = qa.make_4d_nibabel(rframes, outdir=qadir)
-        qa.plot_movement(tmpparameterfile, subid)
-        qa.calc_robust_median_diff(data4d)
-        qa.screen_pet(data4d)
-        
+        run_qa(rframes, qadir, subid, tmpparameterfile)
 
         # make sum
-        sum = pp.make_summed_image(rframes)
-        # check center of mass of SUM
-        cm, dist, warn = nicm.CenterMass(sum).run()
-        if dist > 40:
-            cmtrans = nicm.CMTransform(sum)
-            csum = utils.fname_presuffix(sum, newpath = tracerdir)
-            cmtrans.fix(new_file = csum)
-        else:
-            csum = utils.copy_file(sum, tracerdir)
-        utils.remove_files([sum, rmean])
-        utils.zip_files([csum, data4d])
-        
+        csum = make_centered_sum(rframes, tracerdir)
         #clean up
-        # remove mean from realign
+        utils.zip_files([csum, rframes])
         
-        utils.zip_files(frames)
-        utils.zip_files(rframes) # zip realigned
-        utils.remove_files(cframes) # remove copied frames
+
         
