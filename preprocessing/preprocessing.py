@@ -5,7 +5,6 @@ from glob import glob
 import tempfile
 import logging
 from shutil import rmtree
-#sys.path.insert(0,'/home/jagust/cindeem/CODE/PetProcessing')
 
 import nipype.interfaces.spm as spm
 from nipype.interfaces.base import CommandLine
@@ -528,6 +527,7 @@ def make_mean(niftilist, prefix='mean_'):
     for item in niftilist:
         newdat += nibabel.load(item).get_data().copy()
     newdat = newdat / n_images
+    newdat = np.nan_to_num(newdat)
     newimg = nibabel.Nifti1Image(newdat, affine)
     newimg.to_filename(newfile)
     return newfile
