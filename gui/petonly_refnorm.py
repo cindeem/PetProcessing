@@ -15,6 +15,68 @@ import fsl_tools
 import logging, logging.config
 from time import asctime
 
+def get_sum(subid, tracerdir, tracer):
+    globstr = os.path.join(tracerdir, 'sum*%s*%s*.nii*'%(subid,
+                                                         tracer))
+    sum = utils.find_single_file(globstr)
+    if sum is None:
+        logging.error('%s not found'%globstr)
+        return None
+    sum = utils.unzip_file(sum)
+    return sum
+
+
+def corg_2_template(sum, corgdir):
+    csum = utils.copy_file(sum, corgdir)
+    utils.zip_files([sum])
+
+    xfm = spm_tools.make_transform_name( template, csum, inverse=False)
+    corgout = spm_tools.forward_coreg(template, csum, xfm)
+    if not corgout.runtime.returncode == 0:
+        logging.info('COREG FAIL: %s'%(corgout.runtime.stderr))
+        return None
+    reslice_out = spm_tools.reslice(template, csum)
+    if not reslice_out.runtime.returncode == 0:
+        logging.info('Reslice FAIL: %s'%(reslice_out.runtime.stderr))
+        return None
+    utils.remove_files([csum])
+    corgsum = utils.fname_presuffix(csum, prefix = 'r')
+    return corgsum
+
+def seg(corgsum, segdir):
+    ccorgsum = utils.copy_file(corgsum, segdir)
+        
+    ### Make mask using coreg petfile
+    petmaskf = os.path.join(segdir, 'petmask' + fsl_ext)
+    petmaskf = fsl_tools.fsl_maths(ccorgsum, opstr = '-thr 100',
+                                   outfile = petmaskf)
+    petmask = utils.unzip_file(petmaskf)
+    segout = spm_tools.seg_pet(ccorgsum, petmask)
+    utils.zip_files([petmask])
+    utils.remove_files([ccorgsum, segout.outputs.modulated_input_image])
+    if not segout.runtime.returncode == 0:
+        logging.info('SEG FAIL: %s'%(corgout.runtime.stderr))
+        return None    
+    return segout
+
+def warp_ref(ref, refdir, inv_xfm):
+    cref = utils.copy_file(ref, refdir)
+    cref = utils.unzip_file(cref)
+    wout = spm_tools.apply_warp_fromseg([cref], inv_xfm)
+    if not wout.runtime.returncode == 0:
+        logging.info(wout.runtime.returncode)
+        return None
+    wref = wout.outputs.normalized_files
+    binwref = utils.fname_presuffix(wref, prefix='bin_',
+                                    suffix = fsl_ext,
+                                    use_ext = False)
+                                        
+    binwref = fsl_tools.fsl_maths(wref, opstr = '-nan -thr .1 -bin',
+                                  outfile = binwref)
+    binwref = utils.unzip_file(binwref)
+    utils.remove_files([cref, wref])
+    
+    return binwref
     
 if __name__ == '__main__':
     """
@@ -65,48 +127,25 @@ if __name__ == '__main__':
         _, subid = os.path.split(sub)
         logging.info('%s'%subid)
         tracerdir = os.path.join(sub, tracer.lower())
-        globstr = os.path.join(tracerdir, 'sum*%s*%s*.nii*'%(subid,
-                                                             tracer))
-        sum = utils.find_single_file(globstr)
+        sum = get_sum(subid, tracerdir, tracer)
         if sum is None:
-            logging.error('%s not found'%globstr)
             continue
-        sum = utils.unzip_file(sum)
-        
         ### COREG TO TEMPLATE  ###
         corgdir, exists = utils.make_dir(tracerdir, 'petonly_pet2mri')
         if exists:
             logging.info('%s exists, remove to re-run'%(corgdir))
             continue
-        csum = utils.copy_file(sum, corgdir)
-        utils.zip_files([sum])
-
-        xfm = spm_tools.make_transform_name( template, csum, inverse=False)
-        corgout = spm_tools.forward_coreg(template, csum, xfm)
-        if not corgout.runtime.returncode == 0:
-            logging.info('COREG FAIL: %s'%(corgout.runtime.stderr))
-            continue            
-        reslice_out = spm_tools.reslice(template, csum)
-        if not reslice_out.runtime.returncode == 0:
-            logging.info('COREG FAIL: %s'%(reslice_out.runtime.stderr))
+        corgsum  = corg_2_template(sum, corgdir)
+        if corgsum is None:
             continue
-        corgsum = utils.fname_presuffix(csum, prefix = 'r')
         ###  SEGMENT coregistered sum ####
         segdir, exists = utils.make_dir(tracerdir, 'petonly_segment')
         if exists:
             logging.info('%s exists, remove to re-run'%(segdir))
             continue        
-        ccorgsum = utils.copy_file(corgsum, segdir)
-        
-        ### Make mask using coreg petfile
-        petmaskf = os.path.join(segdir, 'petmask' + fsl_ext)
-        petmaskf = fsl_tools.fsl_maths(ccorgsum, opstr = '-thr 100',
-                                       outfile = petmaskf)
-        petmask = utils.unzip_file(petmaskf)
-        segout = spm_tools.seg_pet(ccorgsum, petmask)
-        if not segout.runtime.returncode == 0:
-            logging.info('SEG FAIL: %s'%(corgout.runtime.stderr))
-            continue              
+        segout = seg(corgsum, segdir)
+        if segout is None:
+            continue
         gm = segout.outputs.native_gm_image
         wm = segout.outputs.native_wm_image
         inv_xfm = segout.outputs.inverse_transformation_mat
@@ -115,29 +154,14 @@ if __name__ == '__main__':
         if exists:
             logging.info('%s exists, remove to re-run'%(segdir))
             continue        
-        cref = utils.copy_file(ref, refdir)
-        cref = utils.unzip_file(cref)
-        wout = spm_tools.apply_warp_fromseg([cref], inv_xfm)
-        if not wout.runtime.returncode == 0:
-            logging.info(wout.runtime.returncode)
+        binwref = warp_ref(ref, refdir, inv_xfm)
+        if binwref is None:
             continue
-        wref = wout.outputs.normalized_files
-        binwref = utils.fname_presuffix(wref, prefix='bin_',
-                                        suffix = fsl_ext,
-                                        use_ext = False)
-                                        
-        binwref = fsl_tools.fsl_maths(wref, opstr = '-nan -thr .1 -bin',
-                                       outfile = binwref)
-        binwref = utils.unzip_file(binwref)
-        
+        ### Create ref normalized Image
         outf = os.path.join(tracerdir, '%s_%s_%s_normed.nii'%(subid,
                                                               tracer,
                                                               ref_name))
         pp.make_pons_normed(corgsum, binwref, outf)
         logging.info('wrote %s'%outf)
         ## Cleanup
-        utils.remove_files([csum, ccorgsum,
-                            segout.outputs.modulated_input_image,
-                            cref, wref])
-                            
-        utils.zip_files([corgsum, petmask, gm, wm, binwref])  
+        utils.zip_files([corgsum, gm, wm, binwref])  
