@@ -49,6 +49,20 @@ def make_centered_sum(rframes, tracerdir):
     utils.remove_files([sum])
     return csum
 
+def make_centered_mean(rframes, tracerdir):
+    mean = pp.make_mean(rframes)
+    # check center of mass of SUM
+    cm, dist, warn = nicm.CenterMass(mean).run()
+    if dist > 40:
+        cmtrans = nicm.CMTransform(mean)
+        cmean = utils.fname_presuffix(mean, newpath = tracerdir)
+        cmtrans.fix(new_file = cmean)
+    else:
+        cmean = utils.copy_file(mean, tracerdir)
+    utils.remove_files([mean])
+    return csum
+    
+
 if __name__ == '__main__':
     
     # start wx gui app
@@ -101,8 +115,10 @@ if __name__ == '__main__':
 
         # make sum
         csum = make_centered_sum(rframes, tracerdir)
+        cmean = make_centered_mean(rframes, tracerdir)
         #clean up
-        utils.zip_files([csum, rframes])
+        utils.zip_files([csum, cmean])
+        utils.zip_files(rframes)
         
 
         
