@@ -77,6 +77,7 @@ def warp_ref(ref, refdir, inv_xfm):
     utils.remove_files([cref, wref])
     
     return binwref
+
     
 if __name__ == '__main__':
     """
@@ -95,7 +96,7 @@ if __name__ == '__main__':
 
     template = bg.FileDialog(prompt = 'Choose Template',
                              indir = '/home/jagust/cindeem/CODE/ucsf')
-    template_pth, _ = os.path.split(template)
+    template_pth, template_nme, _  = utils.split_filename(template)
     ref = bg.FileDialog(prompt = 'Choose Ref Region',
                         indir = template_pth)
     _, ref_name, _ = utils.split_filename(ref)
@@ -131,7 +132,8 @@ if __name__ == '__main__':
         if sum is None:
             continue
         ### COREG TO TEMPLATE  ###
-        corgdir, exists = utils.make_dir(tracerdir, 'petonly_pet2mri')
+        corgdir, exists = utils.make_dir(tracerdir,
+                                         'petonly_coreg2_%s'%template_nme)
         if exists:
             logging.info('%s exists, remove to re-run'%(corgdir))
             continue
@@ -139,7 +141,8 @@ if __name__ == '__main__':
         if corgsum is None:
             continue
         ###  SEGMENT coregistered sum ####
-        segdir, exists = utils.make_dir(tracerdir, 'petonly_segment')
+        segdir, exists = utils.make_dir(tracerdir,
+                                        'petonly_%s_segment'%template_nme)
         if exists:
             logging.info('%s exists, remove to re-run'%(segdir))
             continue        
@@ -149,8 +152,10 @@ if __name__ == '__main__':
         gm = segout.outputs.native_gm_image
         wm = segout.outputs.native_wm_image
         inv_xfm = segout.outputs.inverse_transformation_mat
+        warpfield = segout.outputs.transformation_mat
         ### Warp Ref Region to PET
-        refdir, exists = utils.make_dir(tracerdir, 'petonly_ref')
+        refdir, exists = utils.make_dir(tracerdir,
+                                        'petonly_%s_ref'%template_nme)
         if exists:
             logging.info('%s exists, remove to re-run'%(segdir))
             continue        
@@ -158,10 +163,12 @@ if __name__ == '__main__':
         if binwref is None:
             continue
         ### Create ref normalized Image
-        outf = os.path.join(tracerdir, '%s_%s_%s_normed.nii'%(subid,
-                                                              tracer,
-                                                              ref_name))
+        outf = os.path.join(tracerdir, '%s_%s_%s_%s_normed.nii'%(subid,
+                                                                 tracer,
+                                                                 template_nme,
+                                                                 ref_name))
         pp.make_pons_normed(corgsum, binwref, outf)
         logging.info('wrote %s'%outf)
+
         ## Cleanup
-        utils.zip_files([corgsum, gm, wm, binwref])  
+        utils.zip_files([corgsum, gm, wm, binwref, outf])  
