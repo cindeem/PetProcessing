@@ -5,7 +5,7 @@
 import sys, os, shutil
 import wx
 from glob import glob
-sys.path.insert(0, '/home/jagust/cindeem/CODE/petproc-refactor/preprocessing')
+sys.path.insert(0, '/home/jagust/cindeem/CODE/petproc-stable/preprocessing')
 import preprocessing as pp
 import base_gui as bg
 import utils
