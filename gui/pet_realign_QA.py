@@ -26,7 +26,8 @@ def realign(frames, realigndir):
     tmpparameterfile = rlgnout.outputs.realignment_parameters
     rframes = rlgnout.outputs.realigned_files
     rmean = rlgnout.outputs.mean_image
-    utils.remove_files([cframes, rmean])
+    utils.remove_files(cframes)
+    utils.remove_files([rmean])
     return rframes, tmpparameterfile
 
 def run_qa(rframes, qadir, subid, tmpparameterfile):

@@ -70,7 +70,7 @@ def copy_file(infile, newdir):
     out = cl.run()
     if not out.runtime.returncode == 0:
         print 'failed to copy %s' % infile
-        print out.runtime.stderr
+        logging.error('ERROR :: %s'%out.runtime.stderr)
         return None
     else:
         basenme = os.path.split(infile)[1]
@@ -84,15 +84,13 @@ def remove_files(files):
         cl = CommandLine('rm %s'% files)
         out = cl.run()
         if not out.runtime.returncode == 0:
-            print 'failed to delete %s' % files
-            print out.runtime.stderr
+            logging.error('ERROR :: %s'% out.runtime.stderr)
         return
     for f in files:
         cl = CommandLine('rm %s'% f)
         out = cl.run()
         if not out.runtime.returncode == 0:
-            print 'failed to delete %s' % f
-            print out.runtime.stderr
+            logging.error('ERROR :: %s'% out.runtime.stderr)
 
             
 def make_dir(base_dir, dirname='fdg_nifti'):
