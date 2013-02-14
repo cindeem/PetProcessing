@@ -61,7 +61,7 @@ def make_centered_mean(rframes, tracerdir):
     else:
         cmean = utils.copy_file(mean, tracerdir)
     utils.remove_files([mean])
-    return csum
+    return cmean
     
 
 if __name__ == '__main__':
