@@ -22,7 +22,7 @@ def MyDirsDialog(prompt='Choose Subject Dirs',indir='',title='Choose Subject Dir
       dlg = mdd.MultiDirDialog(None,
                                message=prompt,
                                title=title,
-                               defaultPath=indir
+                               defaultPath=indir,
                                style = mdd.DD_MULTIPLE)
       if dlg.ShowModal() == wx.ID_OK:
           tmpdir = dlg.GetPaths()
