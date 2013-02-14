@@ -30,12 +30,11 @@ def MyDirsDialog(prompt='Choose Subject Dirs',indir='',title='Choose Subject Dir
       return tmpdir
 
 
-def DirsDialog(prompt='Choose Subject directories', indir='/home/jagst',
-               title='Choose Subjects'):
+def DirsDialog(prompt='Choose Subject directories', indir='/home/jagst'):
+               
 
     dlg = wx.DirDialog(None,
                        message = prompt,
-                       title = title,
                        style = wx.FD_MULTIPLE,
                        defaultPath = indir)
     if dlg.ShowModal() == wx.ID_OK:
