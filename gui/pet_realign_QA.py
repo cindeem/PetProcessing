@@ -67,7 +67,8 @@ def make_centered_mean(rframes, tracerdir):
 if __name__ == '__main__':
 
     try:
-        min_frames = sys.argv[1]
+        min_frames = int(sys.argv[1])
+        print min_frames
     except:
         min_frames = None
     
@@ -91,6 +92,7 @@ if __name__ == '__main__':
                'AV45':4}
     if min_frames is None:
         min_frames = tracerd[tracer]
+    logging.info('Minimum Frames is %d'%min_frames)
     user = os.environ['USER']
     logging.info('###START %s :::'%(__file__))
     logging.info('###TRACER  %s  :::'%(tracer))
