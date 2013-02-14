@@ -87,7 +87,7 @@ if __name__ == '__main__':
     logging.info('###START %s :::'%(__file__))
     logging.info('###TRACER  %s  :::'%(tracer))
     logging.info('###USER : %s'%(user))
-    subs = bg.DirsDialog(prompt='Choose Subjects ',
+    subs = bg.MyDirsDialog(prompt='Choose Subjects ',
                          indir=root)
     
     for sub in subs:

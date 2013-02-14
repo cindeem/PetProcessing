@@ -4,8 +4,6 @@ import wx
 import sys, os
 import tempfile
 import wx.lib.agw.multidirdialog as mdd
-#sys.path.insert(0, '/home/jagust/cindeem/CODE/ruffus')
-#import MultiDirDialog as mdd
 from glob import glob
 import nibabel as ni
 import nipype
@@ -36,19 +34,6 @@ def MyDirsDialog(prompt='Choose Subject Dirs',indir='',title='Choose Subject Dir
       return tmpdir
 
 
-def DirsDialog(prompt='Choose Subject directories', indir='/home/jagst'):
-               
-
-    dlg = wx.DirDialog(None,
-                       message = prompt,
-                       style = wx.FD_MULTIPLE,
-                       defaultPath = indir)
-    if dlg.ShowModal() == wx.ID_OK:
-        outfiles = dlg.GetPaths()
-    else:
-        outfiles = None
-    dlg.Destroy()
-    return outfiles   
                        
 def FileDialog(prompt='ChooseFile', indir=''):
     """
