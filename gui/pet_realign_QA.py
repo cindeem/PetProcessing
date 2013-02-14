@@ -69,7 +69,7 @@ if __name__ == '__main__':
     try:
         min_frames = sys.argv[1]
     except:
-        min_frames = None:
+        min_frames = None
     
     # start wx gui app
     app = wx.App()
