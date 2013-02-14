@@ -65,6 +65,11 @@ def make_centered_mean(rframes, tracerdir):
     
 
 if __name__ == '__main__':
+
+    try:
+        min_frames = sys.argv[1]
+    except:
+        min_frames = None:
     
     # start wx gui app
     app = wx.App()
@@ -84,7 +89,8 @@ if __name__ == '__main__':
     tracerd = {'FDG':5, # min expected frames each tracer
                'PIB': 4,
                'AV45':4}
-    min_frames = tracerd[tracer]
+    if min_frames is None:
+        min_frames = tracerd[tracer]
     user = os.environ['USER']
     logging.info('###START %s :::'%(__file__))
     logging.info('###TRACER  %s  :::'%(tracer))
