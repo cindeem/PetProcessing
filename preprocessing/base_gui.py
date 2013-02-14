@@ -30,7 +30,7 @@ def MyDirsDialog(prompt='Choose Subject Dirs',indir='',title='Choose Subject Dir
       ## fix weird HOME DIR bug
       env = os.environ
       home = env['HOME']
-      tmpdir = [x.replace('Home directory'), home for x in tmpdir]
+      tmpdir = [x.replace('Home directory', home) for x in tmpdir]
       return tmpdir
 
 
