@@ -30,6 +30,21 @@ def MyDirsDialog(prompt='Choose Subject Dirs',indir='',title='Choose Subject Dir
       return tmpdir
 
 
+def DirsDialog(prompt='Choose Subject directories', indir='/home/jagst',
+               title='Choose Subjects'):
+
+    dlg = wx.DirDialog(None,
+                       message = prompt,
+                       title = title,
+                       style = wx.FD_MULTIPLE,
+                       defaultPath = indir)
+    if dlg.ShowModal() == wx.ID_OK:
+        outfiles = dlg.GetPaths()
+    else:
+        outfiles = None
+    dlg.Destroy()
+    return outfiles   
+                       
 def FileDialog(prompt='ChooseFile', indir=''):
     """
     opens a wx dialog that allows you to select a single
