@@ -117,8 +117,8 @@ if __name__ == '__main__':
     logging.info('###USER : %s'%(user))
 
 
-    subs = bg.MyDirsDialog(prompt='Choose Subjects ',
-                           indir='/home/jagust/cindeem/CODE/test_preproc')
+    subs = bg.DirsDialog(prompt='Choose Subjects ',
+                         indir=root)
     #os.path.abspath(root))
     
 
