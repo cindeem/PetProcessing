@@ -120,13 +120,13 @@ def simple_warp(template, warped, other=None, source_weight = None):
     pth, _ = os.path.split(warped)
     os.chdir(pth)
     warp = spm.Normalize(matlab_cmd = 'matlab-spm8')
-    warp.inputs.template = template
-    warp.inputs.source = warped
+    warp.inputs.template = str(template)
+    warp.inputs.source = str(warped)
     warp.inputs.ignore_exception = True
     if other is not None:
-        warp.inputs.apply_to_files = other
+        warp.inputs.apply_to_files = [str(x) for x in other]
     if source_weight is not None:
-        warp.inputs.source_weight = source_weight
+        warp.inputs.source_weight = str(source_weight)
     warp_out = warp.run()
     os.chdir(startdir)
     return warp_out
