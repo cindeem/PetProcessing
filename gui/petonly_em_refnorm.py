@@ -52,7 +52,7 @@ def warp(corgsum, template, warpdir):
     petmaskf = fsl_tools.fsl_maths(ccorgsum, opstr = '-thr 100 -bin',
                                    outfile = petmaskf)
     petmask = utils.unzip_file(petmaskf)
-    warpout = spm_tools.simple_warp(template, ccorgsum source_weight=petmask)
+    warpout = spm_tools.simple_warp(template, ccorgsum, source_weight=petmask)
     utils.zip_files([petmask])
     utils.remove_files([ccorgsum])
     if not warpout.runtime.returncode == 0:
