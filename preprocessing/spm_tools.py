@@ -113,7 +113,7 @@ def simple_coregister(target, moving, other=None):
     os.chdir(startdir)
     return corg_out
 
-def simple_warp(template, warped, other=None):
+def simple_warp(template, warped, other=None, source_weight = None):
     """ uses basic spm Normalize to warp warped to template
     applies parameters to other if specified"""
     startdir = os.getcwd()
@@ -125,6 +125,8 @@ def simple_warp(template, warped, other=None):
     warp.inputs.ignore_exception = True
     if other is not None:
         warp.inputs.apply_to_files = other
+    if source_weight is not None:
+        warp.inputs.source_weight = source_weight
     warp_out = warp.run()
     os.chdir(startdir)
     return warp_out
@@ -319,7 +321,7 @@ def invert_warp(infile, snmat, pons):
     mfile_dir,_ = os.path.split(os.path.abspath(__file__))
     mfile = os.path.join(mfile_dir, 'inv_warp_job.m')
     startdir = os.getcwd()
-    pth, _ , _ = split_filename(infile)
+    pth, _ , _ = split_filename(pons)
     os.chdir(pth)
     
     lines = open(mfile).read()

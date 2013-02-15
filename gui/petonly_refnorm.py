@@ -48,7 +48,7 @@ def seg(corgsum, segdir):
         
     ### Make mask using coreg petfile
     petmaskf = os.path.join(segdir, 'petmask' + fsl_ext)
-    petmaskf = fsl_tools.fsl_maths(ccorgsum, opstr = '-thr 100',
+    petmaskf = fsl_tools.fsl_maths(ccorgsum, opstr = '-thr 100 -bin',
                                    outfile = petmaskf)
     petmask = utils.unzip_file(petmaskf)
     segout = spm_tools.seg_pet(ccorgsum, petmask)
