@@ -168,7 +168,7 @@ if __name__ == '__main__':
         if exists:
             logging.info('%s exists, remove to re-run'%(warpdir))
             continue        
-        warpout = warp(corgmean, warpdir)
+        warpout = warp(corgmean, template, warpdir)
         if warpout is None:
             continue
         snmat = warpout.outputs.normalization_parameters
