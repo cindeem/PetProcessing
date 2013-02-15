@@ -35,7 +35,7 @@ def corg_2_template(sum, corgdir):
     if not corgout.runtime.returncode == 0:
         logging.info('COREG FAIL: %s'%(corgout.runtime.stderr))
         return None
-    reslice_out = spm_tools.reslice(template, csum)
+    reslice_out = spm_tools.reslice(template, csum, interp=1)
     if not reslice_out.runtime.returncode == 0:
         logging.info('Reslice FAIL: %s'%(reslice_out.runtime.stderr))
         return None

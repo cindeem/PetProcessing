@@ -244,9 +244,10 @@ def apply_transform_onefile(transform,file):
     os.chdir(startdir)
     return mout
     
-def reslice(space_define, infile):
+def reslice(space_define, infile, interp=0):
     """ uses spm_reslice to resample infile into the space
-    of space_define, assumes they are already in register"""
+    of space_define, assumes they are already in register
+    interp = 0, nearest neighbor, 1=trilinear"""
     startdir = os.getcwd()
     pth, _ = os.path.split(infile)
     os.chdir(pth)
@@ -260,11 +261,11 @@ def reslice(space_define, infile):
     flags.mean = 0;
     flags.which = 1;
     flags.mask = 1;
-    flags.interp = 0;
+    flags.interp = %d;
     infiles = strvcat(\'%s\', \'%s\');
     invols = spm_vol(infiles);
     spm_reslice(invols, flags);
-    """%(space_define, infile)
+    """%(interp, space_define, infile)
     mlab_cmd.inputs.script = script
     mout = mlab_cmd.run()
     os.chdir(startdir)
