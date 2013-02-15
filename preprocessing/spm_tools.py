@@ -309,3 +309,44 @@ def apply_warp_fromseg(infiles, param_file):
     warpout = warp.run()
     os.chdir(startdir)
     return warpout
+
+
+def invert_warp(infile, snmat, pons):
+    """ updates mfile with correct info
+    calcs inverse of snmat, in space of infile and
+    applies to pons"""
+    
+    mfile_dir,_ = os.path.split(os.path.abspath(__file__))
+    mfile = os.path.join(mfile_dir, 'inv_warp_job.m')
+    startdir = os.getcwd()
+    pth, _ , _ = split_filename(infile)
+    os.chdir(pth)
+    
+    lines = open(mfile).read()
+    for tag, item in zip(['INFILE', 'SNMAT','PONS'],
+                         [infile, snmat, pons]):
+        lines = lines.replace(tag, item)
+    newmfile = os.path.join(pth, 'inv_warp_job.m')
+    with open(newmfile, 'w+') as fid:
+        fid.write(lines)
+       
+    mlab_cmd = mlab.MatlabCommand(matlab_cmd = 'matlab-spm8')
+    mlab_cmd.inputs.nodesktop = True
+    mlab_cmd.inputs.nosplash = True
+    mlab_cmd.inputs.mfile = True
+    mlab_cmd.inputs.ignore_exception = True
+    mlab_cmd.inputs.script_file = 'pyspm8_invwarp.m'
+    script = """
+    eval('inv_warp_job');
+    spm_jobman('initcfg');
+    spm('defaults','PET');
+    spm_jobman(\'run\', matlabbatch);
+    """
+    mlab_cmd.inputs.script = script
+    mout = mlab_cmd.run()
+    os.chdir(startdir)
+    return mout
+
+
+    
+    
