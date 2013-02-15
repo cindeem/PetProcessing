@@ -64,12 +64,13 @@ def main(infile):
     outdir, _ = os.path.split(infile)
     newf = save_dat(clust, img, outdir)
     print 'saved %s'%newf
+    return newf
 
 if __name__ == '__main__':
 
     try:
         infile = sys.argv[1]
-        main(infile)
+        newf = main(infile)
     except:
         print """python seg_em.py <infile>
         segments PET into 3 classes using EM algorithm"""
