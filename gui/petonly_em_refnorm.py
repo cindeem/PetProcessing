@@ -56,7 +56,7 @@ def warp(corgsum, template, warpdir):
     petmask = utils.unzip_file(petmaskf)
     warpout = spm_tools.simple_warp(template, ccorgsum, source_weight=petmask)
     utils.zip_files([petmask])
-    utils.remove_files([ccorgsum])
+    #utils.remove_files([ccorgsum])
     if not warpout.runtime.returncode == 0:
         logging.info('WARP FAIL: %s'%(warpout.runtime.traceback))
         return None    
@@ -67,7 +67,7 @@ def warp_ref(ref, refdir, pet, snmat):
     cref = utils.unzip_file(cref)
 
     out = spm_tools.invert_warp(pet, snmat, cref)
-    if not out.runtme.returncode == 0:
+    if not out.runtime.returncode == 0:
         logging.error(out.runtime.stderr)
         return None
     wref = utils.fname_presuffix(cref, prefix = 'w')
