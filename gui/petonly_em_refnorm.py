@@ -45,8 +45,10 @@ def corg_2_template(sum, corgdir):
     return corgsum
 
 def warp(corgsum, template, warpdir):
+
     ccorgsum = utils.copy_file(corgsum, warpdir)
-        
+    logging.info('Copied %s to %s: %s'%(corgsum, warpdir, ccorgsum))
+    
     ### Make mask using coreg petfile
     petmaskf = os.path.join(warpdir, 'petmask' + fsl_ext)
     petmaskf = fsl_tools.fsl_maths(ccorgsum, opstr = '-nan -thr 100 -bin',
@@ -56,7 +58,7 @@ def warp(corgsum, template, warpdir):
     utils.zip_files([petmask])
     utils.remove_files([ccorgsum])
     if not warpout.runtime.returncode == 0:
-        logging.info('WARP FAIL: %s'%(warpout.runtime.stderr))
+        logging.info('WARP FAIL: %s'%(warpout.runtime.traceback))
         return None    
     return warpout
 
