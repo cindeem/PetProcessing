@@ -13,6 +13,7 @@ import qa
 import spm_tools
 import fsl_tools
 import seg_em
+import numpy as np
 import nibabel as ni
 import logging, logging.config
 from time import asctime
