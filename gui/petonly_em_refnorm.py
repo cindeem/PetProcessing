@@ -49,14 +49,14 @@ def warp(corgsum, template, warpdir):
         
     ### Make mask using coreg petfile
     petmaskf = os.path.join(warpdir, 'petmask' + fsl_ext)
-    petmaskf = fsl_tools.fsl_maths(ccorgsum, opstr = '-thr 100 -bin',
+    petmaskf = fsl_tools.fsl_maths(ccorgsum, opstr = '-nan -thr 100 -bin',
                                    outfile = petmaskf)
     petmask = utils.unzip_file(petmaskf)
     warpout = spm_tools.simple_warp(template, ccorgsum, source_weight=petmask)
     utils.zip_files([petmask])
     utils.remove_files([ccorgsum])
     if not warpout.runtime.returncode == 0:
-        logging.info('WARP FAIL: %s'%(corgout.runtime.stderr))
+        logging.info('WARP FAIL: %s'%(warpout.runtime.stderr))
         return None    
     return warpout
 
