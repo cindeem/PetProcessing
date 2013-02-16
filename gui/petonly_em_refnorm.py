@@ -205,4 +205,4 @@ if __name__ == '__main__':
         logging.info('wrote %s'%outf)
 
         ## Cleanup
-        utils.zip_files([corgmean, gm, wm, binwref, outf])  
+        utils.zip_files([corgmean, gm, binwref, outf])  
