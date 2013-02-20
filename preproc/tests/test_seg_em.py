@@ -38,8 +38,11 @@ class TestSegEM(TestCase):
         assert_array_less(dat.flatten()[2], self.flat[2])
         assert_equal(dat.flatten()[0], self.flat[0])
 
-    def test_calc_mus_sigma(self):
-        pass 
+    def test_calc_mu_sigma(self):
+        m1,m2,m3,std1, std2 = seg_em.calc_mu_sigma(self.flat)
+        assert_equal(m1, 0.0)
+        assert_almost_equal(m2,0.61140956)
+        assert_almost_equal(std1, 0.185017225388)         
 
 if __name__ == '__main__':
     unittest.main()
