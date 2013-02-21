@@ -36,7 +36,7 @@ def make_cerebellum_nibabel(aseg):
       newdat[dat == 8] = 1
       newdat[dat == 47] = 1
       newimg = nibabel.Nifti1Image(newdat, img.get_affine())
-      newfile = os.path.join(pth, 'grey_cerebellum.nii')
+      newfile = os.path.join(pth, 'grey_cerebellum.nii.gz')
       newimg.to_filename(newfile)
       return newfile
 
