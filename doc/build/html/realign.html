@@ -1,0 +1,228 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Realigning Frames &mdash; petproc .1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="petproc .1 documentation" href="index.html" />
+    <link rel="prev" title="Structure of Data Directory" href="data_structure.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="data_structure.html" title="Structure of Data Directory"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">petproc .1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="realigning-frames">
+<h1>Realigning Frames<a class="headerlink" href="#realigning-frames" title="Permalink to this headline">¶</a></h1>
+<p>This is the first step of analyzing PET data.</p>
+<p>It does not matter if you are doing MRI guided processing or pet-only processing, in both cases you need to realign your frames.
+Since this is independent of mri-guided or pet-only, we only need to do this once, and the results will be used (and or reused) for any higher level processing.</p>
+<p>USE <strong>pet_realign_QA.py</strong> for</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>FDG (6 frames)</li>
+<li>AV45 (4 frames)</li>
+<li>4-frame PIB (4 frames)</li>
+</ol>
+</div></blockquote>
+<p>USE <strong>pet_dynpib_realignQA.py</strong> for</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>dynamic PIB acquisition (34-35 frames)</li>
+</ol>
+</div></blockquote>
+<div class="section" id="pet-realign-qa-py">
+<h2>pet_realign_QA.py<a class="headerlink" href="#pet-realign-qa-py" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>This process</dt>
+<dd><ol class="first last arabic simple">
+<li>spm_realign to align all frames to the first using a 2-pass algorithm</li>
+<li>Runs QA so movment and noise can be checked</li>
+<li>Creates a mean image, centers mean image</li>
+<li>makes a summed image, centers summed image</li>
+</ol>
+</dd>
+</dl>
+<p class="graphviz">
+<img src="_images/graphviz-d2f709936acabdb22e84e0b1b8cf46baad93142e.png" alt="graph pet_realign {
+node [shape=box]; f1 [label=&quot;Frame1&quot;]; f2 [label=&quot;Frame2&quot;]; f3 [label=&quot;Frame3&quot;]; f4 [label=&quot;Frame4&quot;]; f5 [label=&quot;Frame5&quot;];f6 [label=&quot;Frame6&quot;];
+node [shape=box,style=filled,color=lightgrey]; r1 [label=&quot;rFrame1&quot;]; r2 [label=&quot;rFrame2&quot;]; r3 [label=&quot;rFrame3&quot;]; r4 [label=&quot;rFrame4&quot;]; r5 [label=&quot;rFrame5&quot;];r6 [label=&quot;rFrame6&quot;];
+node [shape=circle]; realign
+f1 -- &quot;realign&quot; -- r1
+f2 -- &quot;realign&quot; -- r2
+f3 -- &quot;realign&quot; -- r3
+f4 -- &quot;realign&quot; -- r4
+f5 -- &quot;realign&quot; -- r5
+f6 -- &quot;realign&quot; -- r6
+r1 -- &quot;mean&quot;
+r2 -- &quot;mean&quot;
+r3 -- &quot;mean&quot;
+r4 -- &quot;mean&quot;
+r5 -- &quot;mean&quot;
+r6 -- &quot;mean&quot;
+&quot;mean&quot; -- &quot;centered mean&quot;
+r1 -- &quot;summed&quot; [color=&quot;blue&quot;]
+r2 -- &quot;summed&quot; [color=&quot;blue&quot;]
+r3 -- &quot;summed&quot; [color=&quot;blue&quot;]
+r4 -- &quot;summed&quot; [color=&quot;blue&quot;]
+r5 -- &quot;summed&quot; [color=&quot;blue&quot;]
+r6 -- &quot;summed&quot; [color=&quot;blue&quot;]
+&quot;summed&quot; -- &quot;centered summed&quot; [color=&quot;blue&quot;]
+}" />
+</p>
+</div>
+<div class="section" id="result">
+<h2>Result<a class="headerlink" href="#result" title="Permalink to this headline">¶</a></h2>
+<p>This results in a new directory in the subjects &lt;tracer&gt; directory realign_QA with subdir data_QA</p>
+<p class="graphviz">
+<img src="_images/graphviz-de82827b5eaee8d200bb0c5aff3d00f91c5061e7.png" alt="graph realignqa {
+&quot;SUBID&quot; -- &quot;fdg&quot; -- &quot;realign_QA&quot; -- &quot;data_QA&quot;
+}" />
+</p>
+<p>realign_QA holds:</p>
+<div class="highlight-python"><pre>data_QA/
+pyscript_realign.m
+rB12-319_FDG_frame0001.nii.gz
+rB12-319_FDG_frame0002.nii.gz
+rB12-319_FDG_frame0003.nii.gz
+rB12-319_FDG_frame0004.nii.gz
+rB12-319_FDG_frame0005.nii.gz
+rB12-319_FDG_frame0006.nii.gz
+rp_B12-319_FDG_frame0001.png
+rp_B12-319_FDG_frame0001.txt</pre>
+</div>
+<p>data_QA holds:</p>
+<div class="highlight-python"><pre>data4d_rB12-319_FDG_frame0001.nii.gz
+QA_framesdata4d_rB12-319_FDG_frame0001.png
+Robust_framediff_mediandata4d_rB12-319_FDG_frame0001.png</pre>
+</div>
+</div>
+<div class="section" id="data-qa">
+<h2>Data QA<a class="headerlink" href="#data-qa" title="Permalink to this headline">¶</a></h2>
+<p>So how do you know if the data is okay??</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Check realign_QA/data_qa/data4d_*</li>
+</ol>
+<blockquote>
+<div><ul>
+<li><p class="first">open fslview</p>
+</li>
+<li><p class="first">open data_4d_* file</p>
+</li>
+<li><p class="first">click play movie icon</p>
+<blockquote>
+<div><p><a class="reference internal" href="_images/playmovie.jpg"><img alt="playmovie" src="_images/playmovie.jpg" style="width: 168.5px; height: 41.5px;" /></a></p>
+</div></blockquote>
+</li>
+<li><p class="first">look for excessive movement in playback</p>
+</li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple">
+<li>Check QA plots with <strong>gthumb</strong></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li>data_QA/QA_framesdata4d_r&lt;SUBID&gt;_&lt;tracer&gt;_frame0001.png</li>
+<li>realign_QA/rp_B12-319_FDG_frame0001.png</li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Realigning Frames</a><ul>
+<li><a class="reference internal" href="#pet-realign-qa-py">pet_realign_QA.py</a></li>
+<li><a class="reference internal" href="#result">Result</a></li>
+<li><a class="reference internal" href="#data-qa">Data QA</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="data_structure.html"
+                        title="previous chapter">Structure of Data Directory</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/realign.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="data_structure.html" title="Structure of Data Directory"
+             >previous</a> |</li>
+        <li><a href="index.html">petproc .1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, jagustlab.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

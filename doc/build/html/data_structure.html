@@ -1,0 +1,152 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Structure of Data Directory &mdash; petproc .1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="petproc .1 documentation" href="index.html" />
+    <link rel="next" title="Realigning Frames" href="realign.html" />
+    <link rel="prev" title="Welcome to petproc’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="realign.html" title="Realigning Frames"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to petproc’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">petproc .1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="structure-of-data-directory">
+<h1>Structure of Data Directory<a class="headerlink" href="#structure-of-data-directory" title="Permalink to this headline">¶</a></h1>
+<p>Data should be set up as such:</p>
+<div class="highlight-python"><pre>&lt;project_dir&gt; /  &lt;SUBID&gt; / &lt;tracer&gt;</pre>
+</div>
+<p class="graphviz">
+<img src="_images/graphviz-4ed7745710c97e9f6c72393fe00810c5ce931714.png" alt="graph directory {
+&quot;project&quot; -- &quot;SUBID&quot; -- &quot;tracer&quot;
+rankdir = &quot;LR&quot;
+}" />
+</p>
+<p>For Example</p>
+<p class="graphviz">
+<img src="_images/graphviz-cf2d3877fb00f796832a6cc6234ea674c01a1d2b.png" alt="graph ucsf_dir {
+node [shape=ellipse]; fdg1 [label=&quot;fdg&quot;]; fdg2 [label=&quot;fdg&quot;]
+&quot;/home/jagust/UCSF/MCI_v1/FDG&quot; -- &quot;B12-325&quot; -- fdg1
+&quot;/home/jagust/UCSF/MCI_v1/FDG&quot; -- &quot;B13-301&quot; -- fdg2
+}" />
+</p>
+<p>A raw directory can go under the &lt;SUBID&gt; folder</p>
+<p class="graphviz">
+<img src="_images/graphviz-95544b56473ac558a2a227962ad300e93d73f64e.png" alt="graph raw_example {
+&quot;/home/jagust/UCSF/MCI_v1/FDG&quot; -- &quot;B12-325&quot; -- &quot;raw&quot;
+&quot;raw&quot; -- &quot;ecatfile.v&quot;
+&quot;raw&quot; -- &quot;fdgreconnotes.txt&quot;
+}" />
+</p>
+<p>Converted frames should go in the &lt;SUBID&gt; / &lt;tracer&gt; directory</p>
+<p class="graphviz">
+<img src="_images/graphviz-11ea4034f0042db552a35803399eab4a8e093e56.png" alt="digraph frame_example {
+node [shape=box]; project_dir;
+node [shape=ellipse]; f1 [label=&quot;B12-325_FDG_frame0001.nii.gz&quot;]; f2 [label=&quot;B12-325_FDG_frame0002.nii.gz&quot;]; f3 [label=&quot;B12-325_FDG_frame0003.nii.gz&quot;]; f4 [label=&quot;B12-325_FDG_frame0004.nii.gz&quot;]; f5 [label=&quot;B12-325_FDG_frame0005.nii.gz&quot;]; f6 [label=&quot;B12-325_FDG_frame0006.nii.gz&quot;];
+project_dir -&gt; &quot;B12-325&quot; -&gt; &quot;fdg&quot; -&gt; f1
+&quot;fdg&quot; -&gt; f2
+&quot;fdg&quot; -&gt; f3
+&quot;fdg&quot; -&gt; f4
+&quot;fdg&quot; -&gt; f5
+&quot;fdg&quot; -&gt; f6
+rankdir = &quot;LR&quot;
+}" />
+</p>
+<p>Note that this layout allows you to <em>BOTH</em> anatomy (MRI) directed processing and non-anatomy processing in the same directory</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to petproc&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="realign.html"
+                        title="next chapter">Realigning Frames</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/data_structure.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="realign.html" title="Realigning Frames"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to petproc’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">petproc .1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, jagustlab.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
