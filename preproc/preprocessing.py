@@ -457,6 +457,8 @@ def make_pons_normed(petf, maskf, outfile):
     affine = nibabel.load(petf).get_affine()
     pet = nibabel.load(petf).get_data().squeeze()
     mask = nibabel.load(maskf).get_data().squeeze()
+    pet = np.nan_to_num(pet)
+    mask = np.nan_to_num(mask)
     if not pet.shape == mask.shape:
         raise AssertionError, 'pet and mask are different dimensions'
     allmask = logical_and(pet> 0, mask> 0)
