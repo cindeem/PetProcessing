@@ -127,7 +127,7 @@ def make_brainstem(aseg):
       cout = cl.run()
       os.chdir(cwd)
       if not cout.runtime.returncode == 0:
-            print 'Unable to create brainstem for %s'%(aseg)
+            logging.error('Unable to create brainstem for %s'%(aseg))
             return None
       else:
             os.remove(aseg)
@@ -169,6 +169,7 @@ def ecat2nifti(ecat, newname):
     out = cl.run()
     if not out.runtime.returncode == 0:
         return False
+        logging.error(out.runtime.stderr)
     else:
         return True
 
@@ -244,7 +245,7 @@ def set_up_dir(root, subid, tracer):
                                 dirname = '%s' % (tracer.lower()) )
     outdirs.update(dict(tracerdir=[tracerdir, exists]))
     
-    rawdatadir, exists  = make_dir(subdir, dirname = 'RawData')
+    rawdatadir, exists  = make_dir(subdir, dirname = 'raw')
     outdirs.update(dict(rawdatadir=[rawdatadir, exists]))
     
     rawtracer, exists  = make_dir(rawdatadir, dirname = tracer)
