@@ -156,7 +156,7 @@ def convertallecat(ecats, newname):
         result = ecat2nifti(f, newname)
         os.remove(f)
         allresult.append(result)
-    if all(result):
+    if all(allresult):
         return True
     else:
         return False
