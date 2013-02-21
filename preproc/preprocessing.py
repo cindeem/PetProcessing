@@ -30,12 +30,12 @@ def make_cerebellum_nibabel(aseg):
       #cwd = os.getcwd()
       pth, nme = os.path.split(aseg)
       #os.chdir(pth)
-      img = ni.load(aseg)
+      img = nibabel.load(aseg)
       newdat = np.zeros(img.get_shape())
       dat = img.get_data()
       newdat[dat == 8] = 1
       newdat[dat == 47] = 1
-      newimg = ni.Nifti1Image(newdat, img.get_affine())
+      newimg = nibabel.Nifti1Image(newdat, img.get_affine())
       newfile = os.path.join(pth, 'grey_cerebellum.nii')
       newimg.to_filename(newfile)
       return newfile

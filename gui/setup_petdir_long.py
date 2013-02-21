@@ -110,16 +110,27 @@ if __name__ == '__main__':
         else:
             # copy aseg+aparc to refdir
             try:
-                caparcnii = utils.copy_file(aparcnii, refdir)                        
+                caparcnii = utils.copy_file(aparcnii, refdir)                  
                 pp.make_brainstem(caparcnii)
                 brainstem = utils.unzip_file(brainstem)
-                utils.remove_files([caparcnii.replace('.gz','')])
+                
             except:
                 logging.warning('Check  %s'%(brainstem))
-        
+        # make cerebellum
+        cerebellum = os.path.join(refdir, 'grey_cerebellum.nii.gz')
+        if os.path.isfile(cerebellum):
+            logging.warning('%s exists, skipping'%(cerebellum))
+            
+        else:
+            
+            try:
+                caparcnii = utils.copy_file(aparcnii, refdir)                  
+                pp.make_cerebellum_nibabel(caparcnii)
+                utils.remove_files([caparcnii])
+            except:
+                logging.warning('Check  %s'%(cerebellum))
+        # convert PET
         rawtracer, exists = outdirs['rawtracer']
-        rawtracer_base, _ = os.path.split(rawtracer)
-        #os.system('rm -rf %s'%rawtracer_base)
         tracerdir, _ = outdirs['tracerdir']
         
         newname = '%s_%s' % (subid, tracer)
