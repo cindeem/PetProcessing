@@ -112,8 +112,6 @@ if __name__ == '__main__':
             try:
                 caparcnii = utils.copy_file(aparcnii, refdir)                  
                 pp.make_brainstem(caparcnii)
-                brainstem = utils.unzip_file(brainstem)
-                
             except:
                 logging.warning('Check  %s'%(brainstem))
         # make cerebellum

@@ -253,10 +253,7 @@ def set_up_dir(root, subid, tracer):
     
     rawdatadir, exists  = make_dir(subdir, dirname = 'raw')
     outdirs.update(dict(rawdatadir=[rawdatadir, exists]))
-    
-    rawtracer, exists  = make_dir(rawdatadir, dirname = tracer)
-    outdirs.update(dict(rawtracer=[rawtracer, exists]))
-    
+        
     anatomydir, exists  = make_dir(subdir,dirname='anatomy')
     outdirs.update(dict(anatomydir=[anatomydir, exists]))
     
