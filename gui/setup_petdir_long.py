@@ -51,11 +51,11 @@ if __name__ == '__main__':
         _, subid = os.path.split(s)
         globstr = '%s/raw/*.v'%(s)
         
-        rawpibs = glob(globstr)
-        if len(rawpibs) < 1:
+        rawpet = glob(globstr)
+        if len(rawpet) < 1:
             outdict.update({subid:[None]})
         else:
-            outdict.update({subid:rawpibs})
+            outdict.update({subid:rawpet})
             
     for item in sorted(outdict):
         if outdict[item][0] is None:
@@ -117,10 +117,8 @@ if __name__ == '__main__':
         # make cerebellum
         cerebellum = os.path.join(refdir, 'grey_cerebellum.nii.gz')
         if os.path.isfile(cerebellum):
-            logging.warning('%s exists, skipping'%(cerebellum))
-            
-        else:
-            
+            logging.warning('%s exists, skipping'%(cerebellum))            
+        else:            
             try:
                 caparcnii = utils.copy_file(aparcnii, refdir)                  
                 pp.make_cerebellum_nibabel(caparcnii)
@@ -128,7 +126,6 @@ if __name__ == '__main__':
             except:
                 logging.warning('Check  %s'%(cerebellum))
         # convert PET
-        rawtracer, exists = outdirs['rawtracer']
         tracerdir, _ = outdirs['tracerdir']
         
         newname = '%s_%s' % (subid, tracer)
