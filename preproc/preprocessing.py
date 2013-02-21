@@ -150,10 +150,16 @@ def move_and_convert(mgz, dest, newname):
 
 
 def convertallecat(ecats, newname):
-      """ converts all ecat files and removes .v files"""
-      for f in ecats:
-            ecat2nifti(f, newname)
-            os.remove(f)
+    """ converts all ecat files and removes .v files"""
+    allresult = []
+    for f in ecats:
+        result = ecat2nifti(f, newname)
+        os.remove(f)
+        allresult.append(result)
+    if all(result):
+        return True
+    else:
+        return False
 
 
 
