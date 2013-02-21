@@ -123,9 +123,18 @@ if __name__ == '__main__':
         tracerdir, _ = outdirs['tracerdir']
         
         newname = '%s_%s' % (subid, tracer)
+        globstr = os.path.join(tracerdir, '%s*.nii*'%newname)
+        converted = glob(globstr)
+        if len(converted) > 1:
+            logging.warning('%s already converted, remove to redo'%(converted))
+            continue
         copied_ecats = utils.copy_files(ecats, tracerdir)
         all_converted = pp.convertallecat(copied_ecats, newname)
         if all_converted:
-            logging.info('ecats converted for %s ' % (subid))                
+            converted = glob(globstr)
+            utils.zip_files(converted)
+            converted = glob(globstr)
+            logging.info('ecats converted to  %s ' % (converted))                
         else:
             logging.error('failed to convert ecats for %s'%(ecats))
+        
