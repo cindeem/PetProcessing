@@ -33,18 +33,17 @@ def apply_coreg(target, source, xfm):
 
 if __name__ == '__main__':
     """
-    Uses specified FDG directory
-    finds fdg nifti files
-    check number of files
-    realignes to first
-    sum 1-5
-    run qa on scans
+    for fdg, av45, 4frame pib
+    find mean and sum
+    finds reference_regions
+    registers ref_regions to pet via mri
+    creates reference normalized volumes
     """
     # start wx gui app
     app = wx.App()
 
     arda = '/home/jagust/arda/lblid'
-    root = bg.SimpleDirDialog(prompt='Choose FDG data dir',
+    root = bg.SimpleDirDialog(prompt='Choose Project dir',
                               indir = '/home/jagust')
     
     cleantime = asctime().replace(' ','-').replace(':', '-')
@@ -146,4 +145,4 @@ if __name__ == '__main__':
                 pp.make_pons_normed(pet, ref, outfname)
                 logging.info('saved %s'%(outfname))
 
-        logging.info( '%s finished coreg ponsnorm' % subid)
+        logging.info( '%s finished coreg norm' % subid)
