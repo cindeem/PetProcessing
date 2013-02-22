@@ -98,7 +98,7 @@ if __name__ == '__main__':
         aparc = utils.find_single_file(searchstring)
         if aparc is None:
             logging.error('%s not found'%(searchstring))
-            continu
+            continue
         
         for pet in [mean, sum]:
             _, petnme, _ = utils.split_filename(pet)
