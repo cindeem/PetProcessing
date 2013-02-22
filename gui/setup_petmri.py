@@ -59,7 +59,7 @@ if __name__ == '__main__':
             
     for item in sorted(outdict):
         if outdict[item][0] is None:
-            logging.info('skipping %s, no FDG found' %(item))
+            logging.info('skipping %s, no %s found' %(item, tracer))
             continue
         else:
             ecats = outdict[item]
@@ -71,7 +71,7 @@ if __name__ == '__main__':
 
         ## set up MRI
         brainmask = os.path.join(outdirs['anatomydir'][0],
-                                 'brainmask.nii')
+                                 'brainmask.nii.gz')
         fsmri = utils.find_single_file(os.path.join(mridir,
                                                  subid,
                                                  'mri/brainmask.mgz'))
