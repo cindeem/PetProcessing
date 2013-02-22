@@ -165,6 +165,8 @@ if __name__ == '__main__':
             utils.zip_files(converted)
             # get zipped versions
             converted = glob(globstr)
+            # clean up
+            utils.remove_files(copied_rawpets)
             logging.info('rawpets converted to  %s ' % (converted))                
         else:
             logging.error('failed to convert rawpets: %s'%(rawpets))
