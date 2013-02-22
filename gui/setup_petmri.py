@@ -9,8 +9,20 @@ sys.path.insert(0, '/home/jagust/cindeem/CODE/petproc-stable/preproc')
 import preprocessing as pp
 import base_gui as bg
 import utils
+import dicom_tools as dt
 import logging, logging.config
 from time import asctime
+
+
+def find_raw_pet(globstr):
+    rawpet = glob(globstr)
+    if len(rawpet) > 0:
+        rawpet.sort()
+        return rawpet
+    else:
+        return False
+
+
 
 if __name__ == '__main__':
     """sets up subject directory structure
@@ -49,20 +61,26 @@ if __name__ == '__main__':
     outdict = {}
     for s in subs:
         _, subid = os.path.split(s)
-        globstr = '%s/raw/*.v'%(s)
-        
-        rawpet = glob(globstr)
-        if len(rawpet) < 1:
-            outdict.update({subid:[None]})
+        # try ecat first
+        globstr_ecat = '%s/raw/*.v'%(s)
+        rawecat = find_raw_pet(globstr_ecat)
+        globstr_bio = '%s/raw/*.tgz'%(s)
+        rawbio = find_raw_pet(globstr_bio)
+        if rawecat:
+            outdict.update({subid:rawecat})
+        elif rawbio:
+            outdict.update({subid:rawbio})
         else:
-            outdict.update({subid:rawpet})
+            outdict.update({subid:[None]})
+
+            
             
     for item in sorted(outdict):
         if outdict[item][0] is None:
             logging.info('skipping %s, no %s found' %(item, tracer))
             continue
         else:
-            ecats = outdict[item]
+            rawpets = outdict[item]
         subid = item
         logging.info(subid)
         ### XXXXXXXXXXXXXXXXX
@@ -128,19 +146,26 @@ if __name__ == '__main__':
         # convert PET
         tracerdir, _ = outdirs['tracerdir']
         
-        newname = '%s_%s' % (subid, tracer)
+        newname = '%s_%s_frame' % (subid, tracer)
         globstr = os.path.join(tracerdir, '%s*.nii*'%newname)
         converted = glob(globstr)
         if len(converted) > 1:
             logging.warning('%s already converted, remove to redo'%(converted))
             continue
-        copied_ecats = utils.copy_files(ecats, tracerdir)
-        all_converted = pp.convertallecat(copied_ecats, newname)
+        copied_rawpets = utils.copy_files(rawpets, tracerdir)
+        try:
+            all_converted = pp.convertallecat(copied_rawpets, newname)
+        except:
+            all_converted = dt.biograph_dicom_convert(copied_rawpets[0],
+                                                      tracerdir,
+                                                      subid,
+                                                      tracer)
         if all_converted:
             converted = glob(globstr)
             utils.zip_files(converted)
+            # get zipped versions
             converted = glob(globstr)
-            logging.info('ecats converted to  %s ' % (converted))                
+            logging.info('rawpets converted to  %s ' % (converted))                
         else:
-            logging.error('failed to convert ecats for %s'%(ecats))
+            logging.error('failed to convert rawpets: %s'%(rawpets))
         

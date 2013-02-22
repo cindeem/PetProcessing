@@ -10,6 +10,7 @@ from utils import (get_subid, make_rec_dir,make_dir, copy_file,
 from fsl_tools import fsl_split4d
 import tempfile
 from nipype.interfaces import dcm2nii
+from nipype.interfaces.base import CommandLine
 
 def get_dicoms(indir):
     """ given an indir (dicomdirectory)

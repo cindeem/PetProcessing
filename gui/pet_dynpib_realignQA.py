@@ -99,7 +99,7 @@ if __name__ == '__main__':
         if frames is None:
             #logging error handled in find_files
             continue
-        frames = utils.unzip_files(frames)
+        
         ###  REALIGN allow for using existing data ###
         realigndir, exists = utils.make_dir(tracerdir, 'realign_QA')
         if exists:
