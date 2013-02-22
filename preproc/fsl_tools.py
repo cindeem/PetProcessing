@@ -203,7 +203,7 @@ def fsl_split4d(in4d, basenme = None):
     if basenme is None:
         basenme = nme
     os.chdir(pth)
-    split = fsl_split()
+    split = fsl.Split()
     split.inputs.in_file = in4d
     split.inputs.dimension = 't'
     split.inputs.out_base_name = basenme
