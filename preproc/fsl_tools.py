@@ -199,7 +199,7 @@ def erode(infile, niter=1):
 
 def fsl_split4d(in4d, basenme = None):
     cwd = os.getcwd()
-    pth, nme, ext = nipype.utils.filemanip.split_filename(in4d)
+    pth, nme, ext = split_filename(in4d)
     if basenme is None:
         basenme = nme
     os.chdir(pth)
