@@ -1,14 +1,12 @@
 # emacs: -*- mode: python; py-indent-offset: 4; indent-tabs-mode: nil -*-
 # vi: set ft=python sts=4 ts=4 sw=4 et:
-import sys, os
+import os
 from glob import glob
 import time
 import numpy as np
 import nibabel as ni
 import scipy.integrate
-#from scipy.weave import inline, converters
 import matplotlib.pyplot as plt
-import tempfile
 
  
 def get_ref(refroi, dat):
@@ -17,7 +15,8 @@ def get_ref(refroi, dat):
     """
     refdat = ni.load(refroi).get_data().squeeze()
     if not refdat.shape == dat.shape[:-1]:
-        raise IOError('%s has shape %s, not %s'%(refroi, refdat.shape, dat.shape[1:]))
+        raise IOError('%s has shape %s, not %s'%(refroi, refdat.shape, 
+                                                 dat.shape[1:]))
     means = np.zeros(dat.shape[-1])
     refdat = np.nan_to_num(refdat)
     for val,slice in enumerate(dat.T):
