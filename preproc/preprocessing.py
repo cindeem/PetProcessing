@@ -441,7 +441,7 @@ def make_summed_image(niftilist, prefix='sum_'):
     generates a summed image
     removes any nan"""
     newfile = prefix_filename(niftilist[0], prefix=prefix)
-    affine = nibabel.load(niftilist[0]).get_affine()
+    affine = nibabel.load(niftilist[-1]).get_affine()
     shape =  nibabel.load(niftilist[0]).get_shape()
     newdat = zeros(shape)
     for item in niftilist:
