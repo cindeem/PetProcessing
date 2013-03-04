@@ -166,6 +166,15 @@ class MyRadioChoices(wx.Dialog):
             #print self.outdict
             return self.outdict
                   
+def singlechoice(options, text='Start Time'):
+    dlg = wx.SingleChoiceDialog(None,text, text, options, wx.CHOICEDLG_STYLE)
+    if dlg.ShowModal() == wx.ID_OK:
+        choice = dlg.GetStringSelection()
+    else:
+        choice = None
+    dlg.Destroy()
+    return choice
+
             
             
 #### END WX ###
