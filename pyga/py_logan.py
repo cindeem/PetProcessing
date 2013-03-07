@@ -3,7 +3,7 @@
 import os
 from glob import glob
 import time
-import tempdir
+import tempfile
 import numpy as np
 import nibabel as ni
 import scipy.integrate
