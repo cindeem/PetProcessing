@@ -18,17 +18,10 @@ import nicm.nicm as nicm
 
 def realign(frames, realigndir):
     # center frames if necessary
-    cframes = []
-    for frame in frames:
-        cm, dist, warn = nicm.CenterMass(frame).run()
-        if dist > 40:
-            cmtrans = nicm.CMTransform(frame)
-            cframe = utils.fname_presuffix(frame, newpath = realigndir)
-            cmtrans.fix(new_file = cframe)
-            logging.info('Centering %s'%cframe)
-        else:
-            cframe = utils.copy_file(frame, realigndir)
-        cframes.append(cframe)
+    cpframes = utils.copy_files(frames, realigndir)
+    cm = nicm.CenterMass(cpframes[17])
+    cframes = cm.fix_batch(cpframes)
+    logging.info('Centering %s'%cframes)
     cframes = utils.unzip_files(cframes)
     
     rlgnout, newnifti = spm_tools.realigntoframe17(cframes, copied=True)
@@ -47,6 +40,7 @@ def realign(frames, realigndir):
     rframes = rframes1_5 + rlgnout.outputs.realigned_files
     rframes.sort()
     utils.remove_files(cframes)
+    utils.remove_files(cpframes)
     utils.remove_files([rmean, sum1_5, crg_out.outputs.coregistered_source])
     return rframes, tmpparameterfile
 
