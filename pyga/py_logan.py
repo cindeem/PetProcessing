@@ -200,6 +200,7 @@ def calc_ki(x,y, timing_file, range=(35,90)):
     if Len(x.shape) == len(y.shape) == 1:
         ## regional ki
         allki, allvd, residues = get_lstsq(x[start_end],y[start_end])
+        return allki, allvd, residues
     else:    
         allki = np.zeros(x.shape[0])
         resids = np.zeros(x.shape[0])
