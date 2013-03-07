@@ -3,6 +3,7 @@
 import os
 from glob import glob
 import time
+import tempdir
 import numpy as np
 import nibabel as ni
 import scipy.integrate
@@ -196,16 +197,20 @@ def calc_ki(x,y, timing_file, range=(35,90)):
     
     
     ft = frametimes_from_file(timing_file)
-    
-    allki = np.zeros(x.shape[0])
-    resids = np.zeros(x.shape[0])
-    start_end = np.logical_and(ft[1:,0] / 60. >= range[0],
+   start_end = np.logical_and(ft[1:,0] / 60. >= range[0],
                                ft[1:,2] / 60. <= range[1])
-    for val, (tmpx, tmpy) in enumerate(zip(x,y)):
-        ki,vd,residues = get_lstsq(tmpx[start_end],tmpy[start_end])
-        allki[val] = ki
-        resids[val] = residues
-    return allki, resids
+    if Len(x.shape) == len(y.shape) == 1:
+        ## regional ki
+        allki, allvd, residues = get_lstsq(x[start_end],y[start_end])
+    else:    
+        allki = np.zeros(x.shape[0])
+        resids = np.zeros(x.shape[0])
+        for val, (tmpx, tmpy) in enumerate(zip(x,y)):
+            ki,vd,residues = get_lstsq(tmpx[start_end],tmpy[start_end])
+            allki[val] = ki
+            resids[val] = residues
+            allvd = None
+    return allki, allvd, resids
 
 def results_to_array(results, mask):
     """ puts values in results back in fill data array
@@ -213,6 +218,37 @@ def results_to_array(results, mask):
     dat = np.zeros(mask.shape)
     dat[mask] = results
     return dat
+
+def loganplot(x,y, timingf):
+    """given integrated ref, and integrated region
+    calculate best fit line and create logan plot"""
+    ## Need to set proper range of x, y data (eek)
+    slope, intercept, err = calc_ki(x,y)
+    
+
+
+def region_xy(ref, region, midtimes):
+    """ used to calc cumulative integral
+    for one dimensional region"""
+    if len(region.shape) < 2:
+        region.shape = (1, region.shape[0])
+    return  calc_xy(ref, region, midtimes)
+
+
+
+def generate_region(data, labels):
+    """given a data file with labels, generate
+    a new binary mask made up of labels"""
+    tmpdir = tempfile.mkdtemp()
+    img = ni.load(data)
+    newdat = np.zeros(img.get_shape())
+    for label in labels:
+        newdat[dat == label ] = 1
+    newimg = ni.Nifti1Image(newdat, img.get_affine())
+    outf = os.path.join(tmpdir, 'labelmask.nii.gz')
+    newimg.to_filename(outf)
+    return outf
+
 
 if __name__ == '__main__':
 
