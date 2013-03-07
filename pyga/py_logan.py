@@ -194,10 +194,8 @@ def get_lstsq(x,y):
 def calc_ki(x,y, timing_file, range=(35,90)):
     """ calculates ki of data given reference, timing file,
     and range of steady state data (in minutes)"""
-    
-    
     ft = frametimes_from_file(timing_file)
-   start_end = np.logical_and(ft[1:,0] / 60. >= range[0],
+    start_end = np.logical_and(ft[1:,0] / 60. >= range[0],
                                ft[1:,2] / 60. <= range[1])
     if Len(x.shape) == len(y.shape) == 1:
         ## regional ki
