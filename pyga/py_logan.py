@@ -222,8 +222,11 @@ def loganplot(x,y, timingf):
     """given integrated ref, and integrated region
     calculate best fit line and create logan plot"""
     ## Need to set proper range of x, y data (eek)
-    slope, intercept, err = calc_ki(x,y)
+    slope, intercept, err = calc_ki(x,y, timingf)
     
+    fity = x * slope + intercept
+    return fity
+
 
 
 def region_xy(ref, region, midtimes):

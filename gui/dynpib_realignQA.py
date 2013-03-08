@@ -13,6 +13,7 @@ import qa
 import spm_tools
 import logging, logging.config
 from time import asctime
+sys.path.insert(0, '/home/jagust/cindeem/local/lib/python2.7/site-packages')
 import nicm.nicm as nicm
 
 
