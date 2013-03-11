@@ -20,7 +20,7 @@ import nicm.nicm as nicm
 def realign(frames, realigndir):
     # center frames if necessary
     cpframes = utils.copy_files(frames, realigndir)
-    cm = nicm.CenterMass(cpframes[17])
+    cm = nicm.CMTransform(cpframes[17])
     cframes = cm.fix_batch(cpframes)
     logging.info('Centering %s'%cframes)
     cframes = utils.unzip_files(cframes)
