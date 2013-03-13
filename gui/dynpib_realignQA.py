@@ -48,7 +48,7 @@ def realign(frames, realigndir):
 def run_qa(rframes, qadir, subid, tmpparameterfile):
     data4d = qa.make_4d_nibabel(rframes, outdir=qadir)
     qa.plot_movement(tmpparameterfile, subid)
-    qa.calc_robust_median_diff(data4d)
+    #qa.calc_robust_median_diff(data4d)
     qa.screen_pet(data4d)
     utils.zip_files([data4d])
     

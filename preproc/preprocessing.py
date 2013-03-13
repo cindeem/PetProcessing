@@ -477,7 +477,7 @@ def make_mean_20min(niftilist):
     generate mean image"""
     first_23 = niftilist[:23]
     first_23.sort()
-    if not '23' in first_23[-1]:
+    if not '22' in first_23[-1]:
         print "badframe numbers, unable to generate 20min mean"
         print 'frames', first_23
         return None
