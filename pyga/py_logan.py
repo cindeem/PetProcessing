@@ -237,12 +237,11 @@ def region_xy(ref, region, midtimes):
     return  calc_xy(ref, region, midtimes)
 
 
-def get_labelroi_data(dataf, labelf, labels):
-    """ given a 4d volumne of data, a 3d file with label rois
+def get_labelroi_data(data, labelf, labels):
+    """ given a 4d volume of data (array), a 3d file with label rois
     and a set of labels, extract mean of data (made from combining
     labels)
     """
-    data = ni.load(dataf).get_data()
     labeldat = label_mask(labelf, labels)
     assert data.shape[:3] == labeldat.shape
     means = np.zeros(data.shape[3])
@@ -298,7 +297,14 @@ if __name__ == '__main__':
     allki, residuals = calc_ki(x, y, timing_file, range=range)
     dvr = results_to_array(allki, mask_roi)
     # logan plot
-    roi = generate_region(aparc, [
+    labels = [1003,
+              1012,1014,1018,1019,1020,1027,1028,1032,1008,
+              1025,1029,1031,1002,1023,1010,1026,2003,
+              2012,2014,2018,2019,2020,2027,2028,2032,2008,
+              2025,2029,2031,2002,2023,2010,2026,1015,1030,
+              2015,2030,2009,1009]
+
+    region_x =  get_labelroi_data(data4d, aparc, labels)
 
     save_data2nii(dvr, mask, filename='DVR', outdir=root)
 
