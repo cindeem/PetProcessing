@@ -496,7 +496,7 @@ def make_mean_40_60(niftilist):
     
     m = re.search('frame0*28',frames_28_31[0])
     if m is None:
-        m = re.search('frame*27', frames_28_31[0])
+        m = re.search('frame0*27', frames_28_31[0])
         if m is None:
             print 'bad frame numbers, unable to generate 40-60 mean'
             print 'frames', frames_28_31
