@@ -221,7 +221,7 @@ def results_to_array(results, mask):
 def loganplot(x,y, timingf):
     """given integrated ref, and integrated region
     calculate best fit line and create logan plot"""
-    ## Need to set proper range of x, y data (eek)
+    ## Need to set proper range of x, y data 
     slope, intercept, err = calc_ki(x,y, timingf)
     
     fity = x * slope + intercept
@@ -235,6 +235,31 @@ def region_xy(ref, region, midtimes):
     if len(region.shape) < 2:
         region.shape = (1, region.shape[0])
     return  calc_xy(ref, region, midtimes)
+
+
+def get_labelroi_data(dataf, labelf, labels):
+    """ given a 4d volumne of data, a 3d file with label rois
+    and a set of labels, extract mean of data (made from combining
+    labels)
+    """
+    data = ni.load(dataf).get_data()
+    labeldat = label_mask(labelf, labels)
+    assert data.shape[:3] == labeldat.shape
+    means = np.zeros(data.shape[3])
+    for val,slice in enumerate(data.T):
+        ind = np.logical_and(slice > 0,
+                             labelldat.T > 0)
+        means[val] = slice[ind].mean()
+    return means
+
+def label_mask(labelf, labels):
+    """ given a label image and a set of labels
+    return the combined label mask"""
+    dat = ni.load(labelf).get_data()
+    new = np.zeros(dat.shape)
+    for label in labels:
+        new[dat == label] = 1
+    return new
 
 
 
@@ -257,11 +282,12 @@ if __name__ == '__main__':
     root = '/home/jagust/cindeem/CODE/GraphicalAnalysis/pyGA_refactor/test/pib2'
     k2ref = 0.15
     range = (35,90)
-    frames = glob(root + '/rB*PIB*.nii')
+    frames = glob(root + '/rB*PIB*.nii*')
     frames.sort()
     refroifile = '%s/rgrey_cerebellum.nii'%root
-    mask = '%s/rbrainmask.nii'%root
+    mask = '%s/rbrainmask.ni*'%root
     timing_file = '%s/frametimes.csv'%root
+    aparc = '%s/rB09-210_v1_aparc_aseg.nii'%root
     midtimes, durs = midframes_from_file(timing_file)
     data4d = get_data_nibabel(frames)
     
@@ -271,7 +297,9 @@ if __name__ == '__main__':
     x,y  = calc_xy(ref,masked_data, midtimes)
     allki, residuals = calc_ki(x, y, timing_file, range=range)
     dvr = results_to_array(allki, mask_roi)
-    
+    # logan plot
+    roi = generate_region(aparc, [
+
     save_data2nii(dvr, mask, filename='DVR', outdir=root)
 
     

@@ -11,7 +11,17 @@ import csv
 from nipype.interfaces.base import CommandLine
 from nipype.utils.filemanip import split_filename, fname_presuffix
 
-
+def desikan_pibindex_regions():
+    """ returns labels form desikan atlas representing regions
+    used to determin global pibindex"""
+    pibindex = ['1003',
+               '1012','1014','1018','1019','1020','1027','1028','1032','1008',
+               '1025','1029','1031','1002','1023','1010','1026','2003',
+               '2012','2014','2018','2019','2020','2027','2028','2032','2008',
+               '2025','2029','2031','2002','2023','2010','2026','1015','1030',
+               '2015','2030','2009','1009']
+    return pibindex
+                                                    
 def bbreg_pet_2_mri(subid, pet):
     """bbregister --s B05-216_v1 --mov nonan-ponsnormed_B05-216_v1_fdg.nii
     --init-fsl --reg register.dat --t2"""
