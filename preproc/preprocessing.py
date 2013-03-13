@@ -489,15 +489,18 @@ def make_mean_40_60(niftilist):
     generate mean image"""
     #framen = [28,29,30,31]
     try:
-        frames_28_31 = niftilist[27:31] #note frames start counting from 1
+        frames_28_31 = niftilist[27:31] #note frames start counting from 1 or 0
     except:
         print 'incorrect number of frames for making sum_40_60'
         return None
-    m = re.search('frame0*28.nii',frames_28_31[0])
+    
+    m = re.search('frame0*28',frames_28_31[0])
     if m is None:
-        print 'bad frame numbers, unable to generate 40-60 mean'
-        print 'frames', frames_28_31
-        return None
+        m = re.search('frame*27', frame_28_31[0])
+        if m is None:
+            print 'bad frame numbers, unable to generate 40-60 mean'
+            print 'frames', frames_28_31
+            return None
     newfile = make_mean(frames_28_31, prefix='mean40_60min_')
     return newfile
 
