@@ -141,7 +141,8 @@ def save_inputplot(ref, midframes, outdir):
     ax1.grid()
     basename = 'REF_TAC_%s'%(time.strftime('%Y-%m-%d-%H-%M'))
     figname = os.path.join(outdir, '%s.png'%(basename))
-    plt.savefig(figname, format='png')  
+    plt.savefig(figname, format='png') 
+    fig.clf()
     return figname
   
 def save_data2nii(data, reference_img, filename='generic_file',outdir='.'):
@@ -218,23 +219,40 @@ def results_to_array(results, mask):
     dat[mask] = results
     return dat
 
-def loganplot(x,y, timingf):
-    """given integrated ref, and integrated region
-    calculate best fit line and create logan plot"""
-    ## Need to set proper range of x, y data 
-    slope, intercept, err = calc_ki(x,y, timingf)
-    
-    fity = x * slope + intercept
-    return fity
+def loganplot(ref,region, timingf, outdir):
+    """given (ref), and  (region)
+    calculate best fit line"""
+    midtimes, durs = midframes_from_file(timing_file)
+    refx, refy = region_xy(ref, ref, midtimes)
+    rx,ry = region_xy(ref, region, midtimes)
+    slope, intercept, err = calc_ki(rx,ry, timingf)
+    refslope, refintercept, referr = calc_ki(refx, refy, timingf)
+    fity = rx * slope + intercept
+    fitrefy = refx * refslope + refintercept
+    fig = plt.figure() 
+    fig.set_label('Logan Plot')
+    ax1 = fig.add_subplot(111)
 
+    ax1.plot(rx, ry, 'ro', label = 'pibindex')
+    ax1.plot(refx, refy, 'bo', label = 'ref region')
+    ax1.plot(rx, fity, 'k-', label = 'region slope : %2.2f'%slope)
+    ax1.plot(refx, fitrefy, 'b-', label='ref slope : %2.2f'%refslope)
+    ax1.legend(loc='lower right')
+    ax1.set_ylabel('$\int data / data$')
+    ax1.set_xlabel('$(\int ref / data) + (1 / k2rf) * t / data$')
+    outfile = os.path.join(outdir, 'loganplot.png')
+    plt.savefig(outfile)
+    plt.clf()
 
 
 def region_xy(ref, region, midtimes):
     """ used to calc cumulative integral
     for one dimensional region"""
-    if len(region.shape) < 2:
-        region.shape = (1, region.shape[0])
-    return  calc_xy(ref, region, midtimes)
+    int_dat = scipy.integrate.cumtrapz(region,midtimes,axis=0) 
+    int_ref = scipy.integrate.cumtrapz(ref.squeeze(), midtimes, axis=0)
+    y = int_dat / region[1:]
+    x = (int_ref / region[1:]) + ( 1 / k2ref) *(midtimes[1:] / region[1:])
+    return x, y
 
 
 def get_labelroi_data(data, labelf, labels):
@@ -247,7 +265,7 @@ def get_labelroi_data(data, labelf, labels):
     means = np.zeros(data.shape[3])
     for val,slice in enumerate(data.T):
         ind = np.logical_and(slice > 0,
-                             labelldat.T > 0)
+                             labeldat.T > 0)
         means[val] = slice[ind].mean()
     return means
 
@@ -283,10 +301,10 @@ if __name__ == '__main__':
     range = (35,90)
     frames = glob(root + '/rB*PIB*.nii*')
     frames.sort()
-    refroifile = '%s/rgrey_cerebellum.nii'%root
-    mask = '%s/rbrainmask.ni*'%root
+    refroifile = '%s/rgrey_cerebellum.nii.gz'%root
+    mask = '%s/rbrainmask.nii.gz'%root
     timing_file = '%s/frametimes.csv'%root
-    aparc = '%s/rB09-210_v1_aparc_aseg.nii'%root
+    aparc = '%s/rB09-210_v1_aparc_aseg.nii.gz'%root
     midtimes, durs = midframes_from_file(timing_file)
     data4d = get_data_nibabel(frames)
     
@@ -294,7 +312,7 @@ if __name__ == '__main__':
     ref_fig = save_inputplot(ref, (midtimes + durs/2.), root)
     masked_data, mask_roi = mask_data(mask, data4d)
     x,y  = calc_xy(ref,masked_data, midtimes)
-    allki, residuals = calc_ki(x, y, timing_file, range=range)
+    allki,allvd, residuals = calc_ki(x, y, timing_file, range=range)
     dvr = results_to_array(allki, mask_roi)
     # logan plot
     labels = [1003,
@@ -305,9 +323,10 @@ if __name__ == '__main__':
               2015,2030,2009,1009]
 
     region_x =  get_labelroi_data(data4d, aparc, labels)
-
+    
+    loganplot(ref,region_x, timing_file, root)
     save_data2nii(dvr, mask, filename='DVR', outdir=root)
-
+    
     
 
 
