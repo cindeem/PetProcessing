@@ -222,7 +222,7 @@ def results_to_array(results, mask):
 def loganplot(ref,region, timingf, outdir):
     """given (ref), and  (region)
     calculate best fit line"""
-    midtimes, durs = midframes_from_file(timing_file)
+    midtimes, durs = midframes_from_file(timingf)
     refx, refy = region_xy(ref, ref, midtimes)
     rx,ry = region_xy(ref, region, midtimes)
     slope, intercept, err = calc_ki(rx,ry, timingf)
@@ -287,7 +287,7 @@ def generate_region(data, labels):
     img = ni.load(data)
     newdat = np.zeros(img.get_shape())
     for label in labels:
-        newdat[dat == label ] = 1
+        newdat[data == label ] = 1
     newimg = ni.Nifti1Image(newdat, img.get_affine())
     outf = os.path.join(tmpdir, 'labelmask.nii.gz')
     newimg.to_filename(outf)
