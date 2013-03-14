@@ -11,6 +11,8 @@ from fsl_tools import fsl_split4d
 import tempfile
 from nipype.interfaces import dcm2nii
 from nipype.interfaces.base import CommandLine
+import numpy as np
+
 
 def get_dicoms(indir):
     """ given an indir (dicomdirectory)
