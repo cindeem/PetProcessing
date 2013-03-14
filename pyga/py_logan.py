@@ -245,7 +245,7 @@ def loganplot(ref,region, timingf, outdir):
     plt.clf()
 
 
-def region_xy(ref, region, midtimes):
+def region_xy(ref, region, midtimes, k2ref = .15):
     """ used to calc cumulative integral
     for one dimensional region"""
     int_dat = scipy.integrate.cumtrapz(region,midtimes,axis=0) 
