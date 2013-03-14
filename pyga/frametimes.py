@@ -2,12 +2,12 @@
 # vi: set ft=python sts=4 ts=4 sw=4 et:
 import sys, os
 import nibabel.ecat as ecat
-sys.path.insert(0, '/home/jagust/cindeem/src/pydicom-0.9.7')
 import dicom
 import numpy as np
 from datetime import datetime
 import csv
 from glob import glob
+import pandas
 
 def get_series_iter(infile):
     """ based on structure of current dicoms
@@ -140,12 +140,8 @@ def write_frametimes(inarray, outfile):
         csv_writer.writerow(row)
 
 def read_frametimes(infile):
-    outarray = []
-    jnk = csv.reader(open(infile),delimiter=',' )
-    for row in jnk:
-        if not 'frame' in row[0]:
-            outarray.append(row)
-    outarray = np.asarray(outarray, dtype=float)
+    dat = pandas.read_csv(infile)
+    outarray = dat.values
     # sort by frame
     outarray = outarray[outarray[:,0].argsort(),]
     return outarray
