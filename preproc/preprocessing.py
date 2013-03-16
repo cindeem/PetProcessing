@@ -335,7 +335,7 @@ def reslice_data(space_define_file, resample_file):
 def make_summed_image(niftilist, prefix='sum_'):
     """given a list of nifti files
     generates a summed image"""
-    newfile = prefix_filename(niftilist[0], prefix=prefix)
+    newfile = fname_presuffix(niftilist[0], prefix=prefix)
     affine = nibabel.load(niftilist[0]).get_affine()
     shape =  nibabel.load(niftilist[0]).get_shape()
     newdat = zeros(shape)
