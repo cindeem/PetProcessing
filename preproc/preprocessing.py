@@ -387,6 +387,16 @@ def make_mean_usrdefined(niftilist, start, end):
     newfile = make_mean(frames, prefix = prefix)
     return newfile
 
+def make_mean_20min(niftilist):
+    """ given list of nifti files, grab frames 1-23
+    to generate a mean image (good pseudo-anatomical for PIB"""
+    first_23 = niftilist[:23]
+    first_23.sort()
+    if not any(['23' in first_23[-1], '22' in first_23[-1]]):
+        logging.error("frame 22 not in first 23, meake mean20 by hand")
+        return None
+    newfile = meak_mean(first_23, prefix = 'mean20min_')
+    return newfile
 
 def make_mean(niftilist, prefix='mean_'):
     """given a list of nifti files
@@ -403,15 +413,6 @@ def make_mean(niftilist, prefix='mean_'):
     newimg = nibabel.Nifti1Image(newdat, affine)
     newimg.to_filename(newfile)
     return newfile
-
-    
-
-    
-
-
-
-
-
 
 
 def run_logan(subid, nifti, ecat, refroi, outdir):
