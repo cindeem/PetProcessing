@@ -331,6 +331,22 @@ def reslice_data(space_define_file, resample_file):
     resample_file = str(resample_file)
     img = nibabel.load(space_define_file)
 
+
+def make_summed_image(niftilist, prefix='sum_'):
+    """given a list of nifti files
+    generates a summed image"""
+    newfile = prefix_filename(niftilist[0], prefix=prefix)
+    affine = nibabel.load(niftilist[0]).get_affine()
+    shape =  nibabel.load(niftilist[0]).get_shape()
+    newdat = zeros(shape)
+    for item in niftilist:
+        newdat += nibabel.load(item).get_data().copy()
+    newimg = nibabel.Nifti1Image(newdat, affine)
+    newimg.to_filename(newfile)
+    return newfile
+
+
+
 def make_mean_40_60(niftilist):
     """given list of niftis, grab frame 28-31
     generate mean image"""
