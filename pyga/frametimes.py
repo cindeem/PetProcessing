@@ -142,6 +142,13 @@ def write_frametimes(inarray, outfile):
 def read_frametimes(infile):
     dat = pandas.read_csv(infile)
     outarray = dat.values
+    rows, cols = outarray.shape
+    if cols < 4:
+        dat =  pandas.read_csv(infile, sep='\t')
+        outarray = dat.values
+        rows, cols = outarray.shape
+        if cols < 4:
+            raise IOError('CSV not parsing properly, check file')
     # sort by frame
     outarray = outarray[outarray[:,0].argsort(),]
     return outarray
