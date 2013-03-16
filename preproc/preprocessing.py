@@ -395,7 +395,7 @@ def make_mean_20min(niftilist):
     if not any(['23' in first_23[-1], '22' in first_23[-1]]):
         logging.error("frame 22 not in first 23, meake mean20 by hand")
         return None
-    newfile = meak_mean(first_23, prefix = 'mean20min_')
+    newfile = make_mean(first_23, prefix = 'mean20min_')
     return newfile
 
 def make_mean(niftilist, prefix='mean_'):
