@@ -438,6 +438,25 @@ def make_mean(niftilist, prefix='mean_'):
     return newfile
 
 
+def make_pons_normed(petf, maskf, outfile):
+    """given petf and maskf (aligned and in same dims
+    normalize entire volume by mean of values in maskf
+    save to outfile"""
+    affine = nibabel.load(petf).get_affine()
+    pet = nibabel.load(petf).get_data().squeeze()
+    mask = nibabel.load(maskf).get_data().squeeze()
+    pet = np.nan_to_num(pet)
+    mask = np.nan_to_num(mask)
+    if not pet.shape == mask.shape:
+        raise AssertionError, 'pet and mask have different dims'
+    allmask = logical_and( pet > 0, mask > 0)
+    meanval = pet[allmask].mean()
+    normpet = pet / meanval
+    newimg = nibabel.Nifti1Image(normpet, affine)
+    newimg.to_filename(outfile)
+
+    pass
+
 def run_logan(subid, nifti, ecat, refroi, outdir):
     """run pyGraphicalAnalysis Logan Plotting on PIB frames
     """
