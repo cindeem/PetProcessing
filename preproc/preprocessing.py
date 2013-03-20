@@ -15,10 +15,6 @@ import nibabel
 from numpy import zeros, nan_to_num, mean, logical_and, eye, dot
 from scipy.ndimage import affine_transform
 import numpy as np
-
-sys.path.insert(0, '/home/jagust/cindeem/CODE/GraphicalAnalysis/pyGA')
-import pyGraphicalAnalysis as pyga
-
 import csv
 from utils import (make_rec_dir,make_dir, copy_file,
                    copy_files, tar_cmd, copy_tmpdir)
@@ -26,96 +22,96 @@ import utils
 #made non writeable by lab
 
 def make_cerebellum_nibabel(aseg):
-      """ use nibabel to make cerebellum"""
-      #cwd = os.getcwd()
-      pth, nme = os.path.split(aseg)
-      #os.chdir(pth)
-      img = nibabel.load(aseg)
-      newdat = np.zeros(img.get_shape())
-      dat = img.get_data()
-      newdat[dat == 8] = 1
-      newdat[dat == 47] = 1
-      newimg = nibabel.Nifti1Image(newdat, img.get_affine())
-      newfile = os.path.join(pth, 'grey_cerebellum.nii.gz')
-      newimg.to_filename(newfile)
-      return newfile
+    """ use nibabel to make cerebellum"""
+    #cwd = os.getcwd()
+    pth, nme = os.path.split(aseg)
+    #os.chdir(pth)
+    img = nibabel.load(aseg)
+    newdat = np.zeros(img.get_shape())
+    dat = img.get_data()
+    newdat[dat == 8] = 1
+    newdat[dat == 47] = 1
+    newimg = nibabel.Nifti1Image(newdat, img.get_affine())
+    newfile = os.path.join(pth, 'grey_cerebellum.nii.gz')
+    newimg.to_filename(newfile)
+    return newfile
 
 def make_cerebellum(aseg):
-      cwd = os.getcwd()
-      pth, nme = os.path.split(aseg)
-      os.chdir(pth)
-      cl = CommandLine('fslmaths %s -thr 47 -uthr 47 right_cerebellum'% (aseg))
-      cout = cl.run()
-      
-      if not cout.runtime.returncode == 0:
-            os.chdir(cwd)
-            print 'Unable to create  right cerebellum for %s'%(aseg)
-            return None
+    cwd = os.getcwd()
+    pth, nme = os.path.split(aseg)
+    os.chdir(pth)
+    cl = CommandLine('fslmaths %s -thr 47 -uthr 47 right_cerebellum'% (aseg))
+    cout = cl.run()
+  
+    if not cout.runtime.returncode == 0:
+        os.chdir(cwd)
+        print 'Unable to create  right cerebellum for %s'%(aseg)
+        return None
 
-      cl2 = CommandLine('fslmaths %s -thr 8 -uthr 8 left_cerebellum'% (aseg))
-      cout2 = cl2.run()
+    cl2 = CommandLine('fslmaths %s -thr 8 -uthr 8 left_cerebellum'% (aseg))
+    cout2 = cl2.run()
 
-      if not cout2.runtime.returncode == 0:
-            os.chdir(cwd)
-            print 'Unable to create  left cerebellum for %s'%(aseg)
-            return None
+    if not cout2.runtime.returncode == 0:
+        os.chdir(cwd)
+        print 'Unable to create  left cerebellum for %s'%(aseg)
+        return None
 
-      cl3 = CommandLine('fslmaths left_cerebellum -add right_cerebellum -bin grey_cerebellum')
-      cout3 = cl3.run()
-      if not cout3.runtime.returncode == 0:
-            print 'Unable to create whole cerebellum for %s'%(aseg)
-            print cout3.runtime.stderr
-            print cout3.runtime.stdout
-            return None
-      
-      cmd = 'rm right_cerebellum.* left_cerebellum.*'
-      cl4 = CommandLine(cmd)
-      cout4 = cl4.run()
-      os.chdir(cwd)
-      cerebellum = glob('%s/grey_cerebellum.*'%(pth))
-      return cerebellum[0]
+    cl3 = CommandLine('fslmaths left_cerebellum -add right_cerebellum -bin grey_cerebellum')
+    cout3 = cl3.run()
+    if not cout3.runtime.returncode == 0:
+        print 'Unable to create whole cerebellum for %s'%(aseg)
+        print cout3.runtime.stderr
+        print cout3.runtime.stdout
+        return None
+
+    cmd = 'rm right_cerebellum.* left_cerebellum.*'
+    cl4 = CommandLine(cmd)
+    cout4 = cl4.run()
+    os.chdir(cwd)
+    cerebellum = glob('%s/grey_cerebellum.*'%(pth))
+    return cerebellum[0]
 
 def make_whole_cerebellume(aseg):
-      """
-      os.system('fslmaths rad_aseg -thr 46 -uthr 47 whole_right_cerebellum')
-      os.system('fslmaths rad_aseg -thr 7 -uthr 8 whole_left_cerebellum')
-      os.system('fslmaths whole_left_cerebellum -add whole_right_cerebellum -bin whole_cerebellum')
-      """
-      cwd = os.getcwd()
-      pth, nme = os.path.split(aseg)
-      os.chdir(pth)
-      cmd = 'fslmaths %s -thr 46 -uthr 47 whole_right_cerebellum'%(aseg)
-      cl = CommandLine(cmd)
-      cout = cl.run()
-      if not cout.runtime.returncode == 0:
-            os.chdir(cwd)
-            print 'Unable to create  right whole cerebellum for %s'%(aseg)
-            return None
-      
-      cmd = 'fslmaths %s -thr 7 -uthr 8 whole_left_cerebellum'%(aseg)
-      cl2 = CommandLine(cmd)
-      cout2 = cl2.run()
-      if not cout2.runtime.returncode == 0:
-            os.chdir(cwd)
-            print 'Unable to create  whole left cerebellum for %s'%(aseg)
-            return None     
+    """
+    os.system('fslmaths rad_aseg -thr 46 -uthr 47 whole_right_cerebellum')
+    os.system('fslmaths rad_aseg -thr 7 -uthr 8 whole_left_cerebellum')
+    os.system('fslmaths whole_left_cerebellum -add whole_right_cerebellum -bin whole_cerebellum')
+    """
+    cwd = os.getcwd()
+    pth, nme = os.path.split(aseg)
+    os.chdir(pth)
+    cmd = 'fslmaths %s -thr 46 -uthr 47 whole_right_cerebellum'%(aseg)
+    cl = CommandLine(cmd)
+    cout = cl.run()
+    if not cout.runtime.returncode == 0:
+        os.chdir(cwd)
+        print 'Unable to create  right whole cerebellum for %s'%(aseg)
+        return None
+  
+    cmd = 'fslmaths %s -thr 7 -uthr 8 whole_left_cerebellum'%(aseg)
+    cl2 = CommandLine(cmd)
+    cmdout2 = cl2.run()
+    if not cout2.runtime.returncode == 0:
+        os.chdir(cwd)
+        print 'Unable to create  whole left cerebellum for %s'%(aseg)
+        return None     
 
-      cmd = 'fslmaths whole_left_cerebellum -add whole_right_cerebellum' + \
-            ' -bin whole_cerebellum'
-      cl3 = CommandLine(cmd)
-      cout3 = cl3.run()
-      if not cout3.runtime.returncode == 0:
-            os.chdir(cwd)
-            print 'Unable to create  whole cerebellum for %s'%(aseg)
-            print cout3.runtime.stderr
-            print cout3.runtime.stdout
-            return None     
-      cmd = 'rm whole_right_cerebellum.* whole_left_cerebellum.*'
-      cl4 = CommandLine(cmd)
-      cout4 = cl4.run()      
-      whole_cerebellum = glob('%s/whole_cerebellum.*'%(pth))
-      os.chdir(cwd)
-      return whole_cerebellum[0]
+    cmd = 'fslmaths whole_left_cerebellum -add whole_right_cerebellum' + \
+          ' -bin whole_cerebellum'
+    cl3 = CommandLine(cmd)
+    cout3 = cl3.run()
+    if not cout3.runtime.returncode == 0:
+        os.chdir(cwd)
+        print 'Unable to create  whole cerebellum for %s'%(aseg)
+        print cout3.runtime.stderr
+        print cout3.runtime.stdout
+        return None     
+    cmd = 'rm whole_right_cerebellum.* whole_left_cerebellum.*'
+    cl4 = CommandLine(cmd)
+    cout4 = cl4.run()      
+    whole_cerebellum = glob('%s/whole_cerebellum.*'%(pth))
+    os.chdir(cwd)
+    return whole_cerebellum[0]
 
 
 def make_brainstem(aseg):
@@ -135,18 +131,18 @@ def make_brainstem(aseg):
 
 
 def move_and_convert(mgz, dest, newname):
-      """takes a mgz file, moves it,
-      converts it to nifti and then removes
-      the original mgz file"""
-      cwd = os.getcwd()
-      new_mgz = copy_file(mgz, dest)
-      os.chdir(dest)
-      nii = convert(new_mgz, newname)
-      os.chdir(cwd)
-      os.remove(new_mgz)
-      return nii
+    """takes a mgz file, moves it,
+    converts it to nifti and then removes
+    the original mgz file"""
+    cwd = os.getcwd()
+    new_mgz = copy_file(mgz, dest)
+    os.chdir(dest)
+    nii = convert(new_mgz, newname)
+    os.chdir(cwd)
+    os.remove(new_mgz)
+    return nii
 
-    
+
 
 
 def convertallecat(ecats, newname):
@@ -160,10 +156,6 @@ def convertallecat(ecats, newname):
         return True
     else:
         return False
-
-
-
-
 
 def ecat2nifti(ecat, newname):
     """run ecat_convert_nibabel.py"""
@@ -313,13 +305,15 @@ def check_subject(subject_directory):
         return False, None
         
 
-def reslice_data(space_define_file, resample_file):
+def reslice_data(space_define_file, resample_file, order = 0):
     """ reslices data in space_define_file to matrix of
     resample_file
     Parameters
     ----------
     space_define_file :  filename of space defining image
     resample_file : filename of image be resampled
+    order : int 
+        order of spline used for reslicing 0=nearest, 3 = trilinear
 
     Returns
     -------
@@ -330,6 +324,35 @@ def reslice_data(space_define_file, resample_file):
     space_define_file = str(space_define_file)
     resample_file = str(resample_file)
     img = nibabel.load(space_define_file)
+    change_img = nibabel.load(resample_file)
+    transform = eye(4) # identity transform
+    newtransform = dot(np.linalg.inv(change_img.get_affine()),
+                       dot(transform, img.get_affine()))
+    data = affine_transform(change_img.get_data().squeeze(),
+                            newtransform[:3, :3],
+                            offset = newtransform[:3,3],
+                            output_shape = img.get_shape()[:3],
+                            order = order)
+    return img, data
+
+def roi_stats_nibabel(data, mask, gm=None, gmthresh=0.3):
+    """ Uses nibabel to pull mean, std, nvox from 
+    data <file> using mask <file> and gm <file> (if
+    provided) """
+    img, newmask = reslice_data(data, mask)
+    if gm is not None:
+        gmat = nibabel.load(gm).get_data()
+        if not gmdat.shape == newmask.shape:
+            raise IOError('matrix dim mismatch %s %s'%(gm,data))
+        fullmask = np.logical_and(gmat > gmthresh, newmask > 0)
+    else:
+        fullmask = newmask
+    dat = img.get_data()
+    allmask = np.logical_and(fullmask, dat > 0)
+    roidat = dat[allmask]
+    return roidat.mean(), roidat.std(), roidat.shape[0]
+
+
 
 
 def make_summed_image(niftilist, prefix='sum_'):
@@ -402,7 +425,7 @@ def make_mean(niftilist, prefix='mean_'):
     """given a list of nifti files
     generates a mean image"""
     n_images = len(niftilist)
-    newfile = prefix_filename(niftilist[0], prefix=prefix)
+    newfile = fname_presuffix(niftilist[0], prefix=prefix)
     affine = nibabel.load(niftilist[0]).get_affine()
     shape =  nibabel.load(niftilist[0]).get_shape()
     newdat = zeros(shape)
@@ -418,6 +441,7 @@ def make_mean(niftilist, prefix='mean_'):
 def run_logan(subid, nifti, ecat, refroi, outdir):
     """run pyGraphicalAnalysis Logan Plotting on PIB frames
     """
+    raise IOError('Not Implemented')
     midframes,frametimes = pyga.get_midframes_fromecat(ecat, units='sec')
     data = pyga.get_data(nifti)
     ref = pyga.get_ref(refroi, data)
@@ -563,46 +587,6 @@ def parse_fs_statsfile_vert(statsfile):
         roidict.update({roi:[mean, std, nvox]})
     return roidict
 
-
-
-def aseg_label_dict(lut, type='ctx'):
-    """ Given a color LUT (look up table)
-    return a dict of label : region
-    (eg, {17:  'Left-Hippocampus'} )
-
-    Inputs
-    ------
-
-    lut : file storing label to region look up table
-          /usr/local/freesurfer_x86_64-4.5.0/ASegStatsLUT.txt
-
-    type : string ('ctx', None)
-           if ctx, only returns cortex regions
-	   else returns all in file
-
-    Returns
-    -------
-
-    dict : dictionary mapping label -> region
-	   
-    """
-    outd = {}
-    for line in open(lut):
-        if '#' in line or 'G_' in line or 'S_' in line:
-	    continue
-        if type is 'ctx':
-            if not type in line:
-	        continue
-        parts = line.split()
-	if len(parts) < 2:
-	    continue
-        name_as_int = int(parts[0])
-        valrange = np.vstack((np.arange(1002, 1036),np.arange(2002, 2036)))
-        if type is 'ctx' and name_as_int not in valrange:
-            # label is not a cortical label we care about
-            continue
-        outd[parts[0]] = parts[1]
-    return outd
 	
 def roilabels_fromcsv(infile):
     """ given a csv file with fields
@@ -682,14 +666,7 @@ def meand_to_file(meand, csvfile):
     
 if __name__ == '__main__':
 
-	## test generateing freesurfer label dictionaries
-	lut = '/usr/local/freesurfer_x86_64-4.5.0/ASegStatsLUT.txt'
-	outd = aseg_label_dict(lut)
-	assert outd == {}
-	outd = aseg_label_dict(lut,type=None)
-	assert outd['50'] == 'Right-Caudate'
-	lut = '/usr/local/freesurfer_x86_64-4.5.0/FreeSurferColorLUT.txt'
-	outd = aseg_label_dict(lut, type='ctx')
-	## all values should have ctx in them
-	assert 'ctx' in  outd.values()[0]
-	
+    print 'preprocessing module'
+
+
+
