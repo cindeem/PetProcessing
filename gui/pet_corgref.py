@@ -24,7 +24,7 @@ def apply_coreg(target, source, xfm):
         logging.error(rout_aparc.runtime.stderr)
         return None
     else:
-        rsource = pp.prefix_filename(source, prefix='r')
+        rsource = pp.fname_presuffix(source, prefix='r')
         utils.remove_files([source])
         utils.zip_files([rsource])
         rsource = rsource + '.gz'
@@ -124,7 +124,7 @@ if __name__ == '__main__':
             if not rout_mri.runtime.returncode == 0:
                 logging.error(rout_mri.runtime.stderr)
             else:
-                rmri = pp.prefix_filename(cmri, prefix='r')
+                rmri = pp.fname_presuffix(cmri, prefix='r')
                 utils.remove_files([cmri])
                 utils.zip_files([rmri])
             ## Apply transform to rest
