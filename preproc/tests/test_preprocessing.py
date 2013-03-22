@@ -83,30 +83,22 @@ class TestROIStatsNibabel(TestCase):
         assert_almost_equal(newdatf[9,9,:], newdat[9,9,:])
 
 
-    """
-    def setUp(self):
-        
-        self.template = join(self.get_data_dir(),  'test_template.nii.gz')
-        dat = ni.load(self.template).get_data()
-        dat = np.nan_to_num(dat)
-        dat[dat < 0] = 0
-        self.flat = dat.flatten()
-        self.seq = range(10)
+    def test_roistats(self):
+        label = self.filemap['label']
+        mask = self.filemap['mask']
+        gm = self.filemap['data']
+        bigmask = self.filemap['bigmask']
 
-    def test_load_img(self):
-        # make sure the shuffled sequence does not lose any elements
-        dat = ni.load(self.template).get_data()
+        # simple test
+        mean, std, shape = preprocessing.roi_stats_nibabel(label, mask)
+        assert_equal(shape, 32)
+        assert_almost_equal(std, 0.0 )
+        assert_almost_equal(mean, 2.0)
+        mean, std, shape = preprocessing.roi_stats_nibabel(label, bigmask)
+        assert_equal(shape, 16)
+        assert_almost_equal(mean, 2.0)
+        assert_almost_equal(std, 0.0)
 
-        # flat sets negative values to zero
-        assert_array_less(dat.flatten()[2], self.flat[2])
-        assert_equal(dat.flatten()[0], self.flat[0])
-
-    def test_calc_mu_sigma(self):
-        m1,m2,m3,std1, std2 = seg_em.calc_mu_sigma(self.flat)
-        assert_equal(m1, 0.0)
-        assert_almost_equal(m2,0.61140956)
-        assert_almost_equal(std1, 0.185017225388)         
-    """
 
 if __name__ == '__main__':
 
