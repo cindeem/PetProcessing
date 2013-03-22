@@ -100,6 +100,39 @@ class TestROIStatsNibabel(TestCase):
         assert_almost_equal(std, 0.0)
 
 
+class TestMeanSum(TestCase):
+    def get_data_dir(self):
+        pth, _  = os.path.split(abspath(__file__))
+        return join(pth, 'data')
+
+    def setUp(self):
+        """ create small multiframe data and write to tmp directory"""
+        self.template = join(self.get_data_dir(),  'test_template.nii.gz')
+        filemap = []
+        tmpdir = tempfile.mkdtemp()
+        for val in range(35):
+            data = np.ones((10,10,2)) * val # vary values in vols
+            aff = np.eye(4) # identitiy matrix
+            newimg = ni.Nifti1Image(data, aff)
+            newfile = join(tmpdir, 'frame%02d.nii.gz'%(val))
+            newimg.to_filename(newfile)
+            filemap.append(newfile)
+        self.filemap = filemap
+        self.tmpdir = tmpdir
+
+    def tearDown(self):
+        """get rid of tmp files and directory"""
+        cmd = 'rm -rf %s'%(self.tmpdir)
+        print cmd
+        os.system(cmd)
+
+    def test_make_summed(self):
+        """tests for make_summed_image"""
+        files = self.filemap
+        summed = preprocessing.make_summed_image(files[:10])
+        assert_equal(ni.load(summed).get_data().max(), 45)
+
+
 if __name__ == '__main__':
 
     unittest.main()
