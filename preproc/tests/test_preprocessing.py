@@ -73,6 +73,14 @@ class TestROIStatsNibabel(TestCase):
         assert_array_equal(newdat, ni.load(mask).get_data())
         assert_raises(RuntimeError, 
                       preprocessing.reslice_data, mask, self.template)
+        # test label image not cast to float 
+        label = self.filemap['label']
+        img, newdat = preprocessing.reslice_data(data, label)
+        assert_equal(newdat.shape, ni.load(data).get_shape())
+        assert_equal(set(newdat.flatten()), set([0.0,2.0]))
+        # test label is cast to float
+        img, newdatf = preprocessing.reslice_data(data, label, order=3)
+        assert_almost_equal(newdatf[9,9,:], newdat[9,9,:])
 
 
     """
