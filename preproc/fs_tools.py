@@ -5,6 +5,7 @@ from glob import glob
 import tempfile
 import logging
 import numpy as np
+import nibabel
 from shutil import rmtree
 sys.path.insert(0,'/home/jagust/cindeem/CODE/PetProcessing')
 import base_gui as bg
