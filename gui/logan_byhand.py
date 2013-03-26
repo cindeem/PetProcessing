@@ -12,7 +12,7 @@ sys.path.insert(0, '/home/jagust/cindeem/CODE/petproc-stable/preproc')
 import preprocessing as pp
 import base_gui as bg
 import utils
-from fs_tools import desikan_pibindex_regions
+from fs_tools import (desikan_pibindex_regions, roilabels_fromcsv)
 sys.path.insert(0, '/home/jagust/cindeem/CODE/petproc-stable/pyga')
 import py_logan as pyl
 import frametimes as ft
@@ -126,7 +126,7 @@ if __name__ == '__main__':
     region = pyl.get_labelroi_data(data4d, raparc, labels)
     pyl.loganplot( ref, region, timingf, dvrdir)
     logging.info('%s Finished Logan: %s'%(subid, outf))
-    roid = pp.roilabels_fromcsv(roifile[0])
+    roid = roilabels_fromcsv(roifile[0])
     
 
     ## Calc pibindex
