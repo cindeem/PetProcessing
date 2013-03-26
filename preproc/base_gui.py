@@ -13,6 +13,19 @@ import nipype.interfaces.dcm2nii as dcm2nii
 import numpy as np
 import logging
 
+
+def TextEntry(message='Enter Directory Glob', default = 'rpons_tunormed_mean*'):
+    """Text entry dialog to help specify directory or file to search for"""
+    dlg = wx.TextEntryDialog(None,
+                             message = message,
+                             defaultValue = default)
+    if dlg.ShowModal() == wx.ID_OK:
+        outstr = dlg.GetValue()
+    else:
+        outstr = ''
+    dlg.Destroy()
+    return outstr
+
 def MyDirsDialog(prompt='Choose Subject Dirs',indir='',title='Choose Subject Dirs'):
       """
       Advanced  directory dialog and returns selected directories
