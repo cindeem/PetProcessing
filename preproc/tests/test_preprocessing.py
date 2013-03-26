@@ -131,7 +131,12 @@ class TestMeanSum(TestCase):
         files = self.filemap
         summed = preprocessing.make_summed_image(files[:10])
         assert_equal(ni.load(summed).get_data().max(), 45)
-
+        self.assertTrue('sum_frame' in summed)
+        sum_prefix = preprocessing.make_summed_image(files[:2], 
+                                                     prefix = 'blue_')
+        self.assertTrue('blue_frame' in sum_prefix)
+        self.assertRaises(ValueError,preprocessing.make_summed_image,
+                          [files[0], self.template])
 
 if __name__ == '__main__':
 
