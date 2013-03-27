@@ -4,7 +4,7 @@
 
 import sys
 import argparse
-sys.path.insert(0,'/home/jagust/cindeem/CODE/petproc-refactor/preprocessing')
+sys.path.insert(0,'/home/jagust/cindeem/CODE/petproc-stable/preproc')
 import dicom_tools 
 
 if __name__ == '__main__':
