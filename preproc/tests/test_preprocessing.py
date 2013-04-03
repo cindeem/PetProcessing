@@ -112,6 +112,7 @@ class TestMeanSum(TestCase):
         tmpdir = tempfile.mkdtemp()
         for val in range(35):
             data = np.ones((10,10,2)) * val # vary values in vols
+            data[:1,:1,:] = np.nan
             aff = np.eye(4) # identitiy matrix
             newimg = ni.Nifti1Image(data, aff)
             newfile = join(tmpdir, 'frame%02d.nii.gz'%(val))
@@ -137,6 +138,11 @@ class TestMeanSum(TestCase):
         self.assertTrue('blue_frame' in sum_prefix)
         self.assertRaises(ValueError,preprocessing.make_summed_image,
                           [files[0], self.template])
+
+        # test for removing nan
+        sumdat = ni.load(summed).get_data()
+        self.assertFalse(np.isnan(sumdat).any())        
+
 
 if __name__ == '__main__':
 

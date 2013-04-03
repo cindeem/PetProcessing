@@ -363,7 +363,8 @@ def make_summed_image(niftilist, prefix='sum_'):
     shape =  nibabel.load(niftilist[0]).get_shape()
     newdat = zeros(shape)
     for item in niftilist:
-        newdat += nibabel.load(item).get_data().copy()
+        tmpdat = np.nan_to_num(nibabel.load(item).get_data().copy())
+        newdat += tmpdat
     newimg = nibabel.Nifti1Image(newdat, affine)
     newimg.to_filename(newfile)
     return newfile
