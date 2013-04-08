@@ -3,6 +3,7 @@
 import os
 from glob import glob
 import time
+import warnings
 import tempfile
 import numpy as np
 import nibabel as ni
@@ -26,6 +27,22 @@ def get_ref(refroi, dat):
         means[val] = slice[ind].mean()
     return means
 
+def parse_file(infile):
+    """parse frametimes file to get data"""
+    try:
+        return  np.loadtxt(infile, delimiter = ',',
+                           usecols = (1,2,3), skiprows = 1)
+    except:
+        warnings.warn('%s is not comma separated'%infile)
+
+    try:
+        return np.loadtxt(infile, delimiter = '\t',
+                          usecols = (1,2,3), skiprows = 1)
+    except:
+        raise IOError("""unable to parse %s, format should be
+                         frame, starttime, stoptime, duration
+                         comma or tabe separated, with header"""%(infile))
+
 
 def midframes_from_file(infile, units='sec'):
     """infile is a frametimes file each row has
@@ -36,8 +53,7 @@ def midframes_from_file(infile, units='sec'):
     midframes: vector of start-dur/2
     starttimes: vector of durations
     """
-    ft = np.loadtxt(infile, delimiter = ',',
-                    usecols = (1,2,3), skiprows = 1)
+    ft = parse_file(infile)
     midframes = ft[:,0] + ft[:,1] / 2
     return midframes, ft[:,1]
 
@@ -49,8 +65,7 @@ def frametimes_from_file(infile):
     -------
     ft: array [start, duration, stop] in seconds for each frame
     """
-    ft = np.loadtxt(infile, delimiter = ',',
-                    usecols = (1,2,3), skiprows = 1)
+    ft = parse_file(infile)
     return ft
 
 def is_iterable(input):
