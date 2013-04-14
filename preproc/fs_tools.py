@@ -139,9 +139,9 @@ def surface_aparc_stats(subid, hemi, infile):
     print os.environ['SUBJECTS_DIR']
     pth, fname, ext = split_filename(infile)
     if hemi not in fname:
-        outf = os.path.join(path, hemi + '-' + fname + '.txt')
+        outf = os.path.join(pth, hemi + '-' + fname + '.txt')
     else:
-        outf = os.path.join(path, fname + '.txt')
+        outf = os.path.join(pth, fname + '.txt')
     cmd = ' '.join('mri_segstats',
                     '--annot',
                     subid,
