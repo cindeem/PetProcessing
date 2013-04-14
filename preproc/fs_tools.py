@@ -7,8 +7,10 @@ import logging
 import numpy as np
 import nibabel
 from shutil import rmtree
-sys.path.insert(0,'/home/jagust/cindeem/CODE/PetProcessing')
+sys.path.insert(0,'/home/jagust/cindeem/CODE/petproc-stable/preproc')
 import base_gui as bg
+import preprocessing as pp
+import utils
 import csv
 from nipype.interfaces.base import CommandLine
 from nipype.utils.filemanip import split_filename, fname_presuffix
@@ -128,6 +130,36 @@ def fs_extract_label_rois(subdir, pet, dat, labels):
     return stats_file, label_file
 
     
+def surface_aparc_stats(subid, hemi, infile):
+    """ generates a summary stats file using mri_segstats
+    pulling cortical parcellation data from infile
+    returns stats filei
+    
+    REQUIRES SUBJECTS_DIR TO BE GLOBALLY SET"""
+    print os.environ['SUBJECTS_DIR']
+    pth, fname, ext = split_filename(infile)
+    if hemi not in fname:
+        outf = os.path.join(path, hemi + '-' + fname + '.txt')
+    else:
+        outf = os.path.join(path, fname + '.txt')
+    cmd = ' '.join('mri_segstats',
+                    '--annot'
+                    subid,
+                    hemi,
+                    'aparc',
+                    '--i',
+                    infile, 
+                    '--sum',
+                    outf)
+    cout = CommandLine(cmd).run()
+    if not cout.runtime.returncode == 0:
+        print 'mri_segstats failed for %s'%(pet)
+        print cout.runtime.stderr
+        return None
+    return outf
+ 
+                    
+
 def parse_fs_statsfile(statsfile):
     """opens a fs generated stats file and returns
     a dict of roi keys with [mean, std, nvox], for
