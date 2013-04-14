@@ -142,7 +142,7 @@ def surface_aparc_stats(subid, hemi, infile):
         outf = os.path.join(pth, hemi + '-' + fname + '.txt')
     else:
         outf = os.path.join(pth, fname + '.txt')
-    cmd = ' '.join('mri_segstats',
+    cmd = ' '.join(['mri_segstats',
                     '--annot',
                     subid,
                     hemi,
@@ -150,7 +150,7 @@ def surface_aparc_stats(subid, hemi, infile):
                     '--i',
                     infile, 
                     '--sum',
-                    outf)
+                    outf])
     cout = CommandLine(cmd).run()
     if not cout.runtime.returncode == 0:
         print 'mri_segstats failed for %s'%(pet)
