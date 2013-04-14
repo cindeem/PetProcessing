@@ -170,10 +170,10 @@ def parse_fs_statsfile(statsfile):
         if line[0] == '#':
             continue
         tmp = line.split()
-        roi = tmp[0]
-        mean = eval(tmp[4])
-        std = eval(tmp[5])
-        nvox = eval(tmp[1])
+        roi = tmp[4]
+        mean = eval(tmp[5])
+        std = eval(tmp[6])
+        nvox = eval(tmp[2])
         roidict.update({roi:[mean, std, nvox]})
     return roidict
 
