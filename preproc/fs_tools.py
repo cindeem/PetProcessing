@@ -143,7 +143,7 @@ def surface_aparc_stats(subid, hemi, infile):
     else:
         outf = os.path.join(path, fname + '.txt')
     cmd = ' '.join('mri_segstats',
-                    '--annot'
+                    '--annot',
                     subid,
                     hemi,
                     'aparc',
