@@ -30,8 +30,9 @@ if __name__ == '__main__':
                               indir = '/home/jagust')
     userhome = os.environ['HOME']
     cleantime = asctime().replace(' ','-').replace(':', '-')
+    _, fname, _ = pp.split_filename(__file__)
     logfile = os.path.join(userhome,
-                           '%s_%s.log'%(__file__, cleantime))
+                           '%s_%s.log'%(fname, cleantime))
 
     log_settings = pp.get_logging_configdict(logfile)
     logging.config.dictConfig(log_settings)
