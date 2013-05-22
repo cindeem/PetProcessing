@@ -346,7 +346,7 @@ def roi_stats_nibabel(data, mask, gm=None, gmthresh=0.3):
             raise IOError('matrix dim mismatch %s %s'%(gm,data))
         fullmask = np.logical_and(gmat > gmthresh, newmask > 0)
     else:
-        fullmask = newmask > -1
+        fullmask = newmask > 0
     dat = img.get_data()
     allmask = np.logical_and(fullmask, dat > 0)
     roidat = dat[allmask]
