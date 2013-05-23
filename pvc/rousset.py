@@ -40,7 +40,7 @@ def compute_rsf(rois):
         zresult = petpsf.convolve_z()
         file = petpsf.save_result()
         sfile = pp.fname_presuffix(file, prefix='s')
-        smfile = metzler.smooth_mask_nipy(file,sfile,fwhm=4)
+        smfile = metzler.smooth_mask_nipy(file,sfile,fwhm=7)
         smdata = smfile.get_data()
         rsfs[ind,:,:,:]  = smdata
     
