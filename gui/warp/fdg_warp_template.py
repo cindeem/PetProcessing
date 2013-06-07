@@ -149,5 +149,12 @@ if __name__ == '__main__':
             logging.error('warp to template failed %s'%subid)
             shutil.rmtree(warpdir)
             continue            
+        ## zip files
+        cmd = 'gzip %s/*.nii'%warpdir
+        out = utils.CommandLine(cmd).run()
+        if out.runtime.returncode == 0:
+            logging.info('zipped files in %s'%warpdir)
+        else:
+            logging.warn('zipping failed for files in %s'%warpdir)
         logging.info('Finished warping %s'%subid)
-        
+               
