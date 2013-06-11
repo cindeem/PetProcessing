@@ -133,5 +133,6 @@ if __name__ == '__main__':
             logging.error('warp to template failed %s'%subid)
             shutil.rmtree(warpdir)
             continue            
-        logging.info('Finished warping %s'%subid)
-        
+       
+       logging.info('Finished warping %s'%subid)
+       utils.CommandLine('gzip %s/*.nii'%warpdir).run() 
