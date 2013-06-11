@@ -134,5 +134,5 @@ if __name__ == '__main__':
             shutil.rmtree(warpdir)
             continue            
        
-       logging.info('Finished warping %s'%subid)
-       utils.CommandLine('gzip %s/*.nii'%warpdir).run() 
+        logging.info('Finished warping %s'%subid)
+        utils.CommandLine('gzip %s/*.nii'%warpdir).run() 
