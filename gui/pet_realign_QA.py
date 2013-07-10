@@ -1,6 +1,6 @@
+#!/usr/bin/env python
 # emacs: -*- mode: python; py-indent-offset: 4; indent-tabs-mode: nil -*-
 # vi: set ft=python sts=4 ts=4 sw=4 et:
-#!/usr/bin/env python
 
 import sys, os, shutil
 import wx
@@ -13,6 +13,7 @@ import qa
 import spm_tools
 import logging, logging.config
 from time import asctime
+sys.path.insert(0, '/home/jagust/cindeem/local/lib/python2.7/site-packages')
 import nicm.nicm as nicm
 
 
