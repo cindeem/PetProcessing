@@ -57,7 +57,7 @@ if __name__ == '__main__':
     logging.info('###START %s :::'%__file__)
     logging.info('###TRACER  %s  :::'%(tracer))
     logging.info('###USER : %s'%(user))
-    
+
     roifile = bg.FilesDialog(prompt='Choose roifile',
                            indir='/home/jagust/cindeem/CODE/PetProcessing/pib')
     nifti = bg.FilesDialog(prompt='Choose realigned ',
@@ -72,6 +72,16 @@ if __name__ == '__main__':
                               indir = tracerdir)
     ref_region = bg.FilesDialog('Choose rRefRegion',
                                 indir = tracerdir)
+
+    ## add more data to log
+    logging.info('Root Directory : %s'%root)
+    logging.info('NIFTIS : %s'%nifti)
+    logging.info('ROI file (csv) : %s'%roifile)
+    logging.info('Brainmask : %s'%rbrainmask)
+    logging.info('APARC file : %s'%raparc)
+    logging.info('Timing File : %s'%timingf)
+    logging.info('Reference Region : %s'%ref_region)
+    
     try: 
         m = pp.re.search('B[0-9]{2}-[0-9]{3}', nifti[0])
         subid = m.group()
