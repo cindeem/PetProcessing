@@ -13,7 +13,28 @@ import nipype.interfaces.dcm2nii as dcm2nii
 import numpy as np
 import logging
 
+from PySide import QtCore, QtGui
 
+   
+def qt_dirs(indir = '/home/jagust', caption='Select Subjects'):
+    app = QtGui.QApplication(sys.argv)
+    win = QtGui.QMainWindow()
+    file_dialog = QtGui.QFileDialog(win, caption=caption)
+    file_dialog.setFileMode(QtGui.QFileDialog.DirectoryOnly)
+    file_dialog.setDirectory(indir)
+    tree_view = file_dialog.findChild(QtGui.QTreeView)
+    tree_view.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
+    list_view = file_dialog.findChild(QtGui.QListView, "listView")
+    list_view.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
+
+    if file_dialog.exec_() == QtGui.QDialog.Accepted:
+            files =  file_dialog.selectedFiles()
+    else:
+            files = file_dialog.getOpenFileNames(win, "", "/")
+    win.destroy()
+    app.quit()
+    return files
+    
 def TextEntry(message='Enter Directory Glob', default = 'rpons_tunormed_mean*'):
     """Text entry dialog to help specify directory or file to search for"""
     dlg = wx.TextEntryDialog(None,
@@ -26,25 +47,28 @@ def TextEntry(message='Enter Directory Glob', default = 'rpons_tunormed_mean*'):
     dlg.Destroy()
     return outstr
 
-def MyDirsDialog(prompt='Choose Subject Dirs',indir='',title='Choose Subject Dirs'):
-      """
-      Advanced  directory dialog and returns selected directories
-      """
-      dlg = mdd.MultiDirDialog(None,
-                               message=prompt,
-                               title=title,
-                               defaultPath=indir,
-                               style = mdd.DD_MULTIPLE)
-      if dlg.ShowModal() == wx.ID_OK:
-          tmpdir = dlg.GetPaths()
-      else:
-          tmpdir = []
-      dlg.Destroy()
-      ## fix weird HOME DIR bug
-      env = os.environ
-      home = env['HOME']
-      tmpdir = [x.replace('Home directory', home) for x in tmpdir]
-      return tmpdir
+def MyDirsDialog(prompt='Choose Subject Dirs',
+        indir='',title='Choose Subject Dirs'):
+    """
+    Advanced  directory dialog and returns selected directories
+    """
+
+    #agwStyle=MDD.DD_MULTIPLE|MDD.DD_DIR_MUST_EXIST
+    dlg = mdd.MultiDirDialog(None,
+                             message=prompt,
+                             title=title,
+                             defaultPath=indir,
+                             style = mdd.DD_MULTIPLE)
+    if dlg.ShowModal() == wx.ID_OK:
+      tmpdir = dlg.GetPaths()
+    else:
+      tmpdir = []
+    dlg.Destroy()
+    ## fix weird HOME DIR bug
+    env = os.environ
+    home = env['HOME']
+    tmpdir = [x.replace('Home directory', home) for x in tmpdir]
+    return tmpdir
 
 
                        
