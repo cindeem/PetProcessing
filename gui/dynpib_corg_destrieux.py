@@ -117,8 +117,12 @@ if __name__ == '__main__':
         if len(raparc2009) > 0:
             logging.info('reslice destrieux exists %s'%subid)
             continue
-        caparc = pp.move_and_convert(aparc, coreg_dir, 
-                                     '%s_destrieux_aparc.nii.gz'%subid)
+        aparc2009 = glob(os.path.join(coreg_dir, 'B*destrieux_aparc.nii*'))
+        if not len(aparc2009) > 0:
+            caparc = pp.move_and_convert(aparc, coreg_dir, 
+                                         '%s_destrieux_aparc.nii.gz'%subid)
+        else:
+            caparc = aparc2009[0]
         caparc = utils.unzip_files([caparc])
         caparc = caparc[0]
         globstr = os.path.join(coreg_dir, '*.mat')
@@ -128,6 +132,10 @@ if __name__ == '__main__':
             continue
         ## Apply transform 
         rcaparc = apply_coreg(pet, caparc, xfm_file)
-        utils.zip_files([ pet])
-
+        """
+        try: 
+            utils.zip_files([ pet,])
+        except:
+            logging.warning('gzip fail %s'%subid)
+        """
         logging.info( '%s finished coreg destrieux' % subid)
