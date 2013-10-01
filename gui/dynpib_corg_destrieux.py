@@ -112,6 +112,11 @@ if __name__ == '__main__':
             logging.error('no coreg dir found, %s'%coreg_dir)
             continue
         # anatomy
+        ## check for coreg file
+        raparc2009 = glob(os.path.join(coreg_dir, 'rB*destrieux_aparc.nii*'))
+        if len(raparc2009) > 0:
+            logging.info('reslice destrieux exists %s'%subid)
+            continue
         caparc = pp.move_and_convert(aparc, coreg_dir, 
                                      '%s_destrieux_aparc.nii.gz'%subid)
         caparc = utils.unzip_files([caparc])
