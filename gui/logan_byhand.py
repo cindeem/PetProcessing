@@ -93,19 +93,19 @@ if __name__ == '__main__':
     raparc = check_selection(raparc)
     timingf = check_selection(timingf)
     ref_region = check_selection(ref_region)
-    ## get frametimes
+    ## get frametimes (coerce into sec format)
     ft_sec = ft.read_frametimes(timingf)
-    if not ft_sec[1,1] > 1: # times in minutes
-        ft_sec = ft_sec.copy() / 60.
+    if not ft_sec[1,1] <  1: # times in minutes
+        ft_sec = ft_sec.copy() *  60.
     ## get start and end time
-    start = bg.singlechoice(['%d'%int(x/60) for x in ft_sec[:,1]], 
-                            text='Start Time')
+    start = bg.singlechoice(['%d'%int(x/60.) for x in ft_sec[:,1]], 
+                            text='Start Time (eg 35)')
     if ft_sec[-1,-1] > 600:
-        end = bg.singlechoice(['%d'%int(x/60) for x in ft_sec[:,-1]], 
-                             text='End Time')
+        end = bg.singlechoice(['%d'%int(x/60.) for x in ft_sec[:,-1]], 
+                             text='End Time (eg 90)')
     else:
         # durs stored in -2
-        end = bg.singlechoice(['%d'%int(x/60) for x in ft_sec[:,-2]], 
+        end = bg.singlechoice(['%d'%int(x/60.) for x in ft_sec[:,-2]], 
                              text='End Time')
  
     
