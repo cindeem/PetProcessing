@@ -19,13 +19,31 @@ import preprocessing as pp
 import utils
 import spm_tools as spm
 
+
+
 def find_raw(subdir):
     """ looks for raw or RawData/PIB directory for subject"""
-    pass
+    raw = os.path.join(subdir, 'raw')
+    if not os.path.isdir(raw):
+        raw = os.path.join(subdir, 'RawData', 'PIB')
+    if not os.path.isdir(raw):
+        return None
+    return raw
 
-def get_filetype(rawdir):
+def is_biograph(rawdir):
     """ checks if subject has biograph or ecat files"""
-    pass
+    # check for biograph
+    bio = glob(os.path.join(rawdir, 'B*.tgz'))
+    if len(bio) > 0:
+        return True, []
+    ecat = sorted(glob(os.path.join(rawdir, 'B*.v*')))
+    if len(ecat) < 1:
+        return False, None
+    # if zipped, unzip ecats
+    ecats = [utils.unzip_file(x) for x in ecat]
+    return False, ecats
+
+    
 
 def get_ecat_timing(ecats):
     """ finds ecats, unzips, extracts timing info and writes to file?"""
@@ -33,7 +51,12 @@ def get_ecat_timing(ecats):
 
 def get_biograph_timing(rawdir):
     """ trys to grab Timing file for Biograph data"""
-    pass
+    globstr = os.path.join(rawdir, 'PIBtiming_*.csv*')
+    timing_file = utils.find_single_file(globstr)
+    if timing_file is None:
+        return None
+    # unzip if necessary
+    return utils.unzip_file(timing_file)
 
 
 try:
@@ -61,6 +84,10 @@ allsub = glob(os.path.join(datadir, 'B*'))
 
 for sub in allsub:
     _, sid = os.path.split(sub)
+    ## check for whole cerebellum dvr dir, skip if exists
+    dvrdir, exists = utils.make_dir(os.path.join(sub, tracer), 'dvr_rwhole_cerebellum')
+    if exists:
+        logging.warning('%s: dvr_rwhole_cerebellum exists, remove ro re-run'%sid)
     # get aparc, make whole cerebellum
     globstr = os.path.join(sub,'anatomy', 'B*_aparc_aseg.nii*')
     aparc = utils.find_single_file(globstr)
@@ -130,8 +157,24 @@ for sub in allsub:
     if frames is None:
         logging.error('%s: realigned not sufficient'%sid)
         continue
-    # timing file
-
+    # find raw directory
+    rawdir = find_raw(sub)
+    if rawdir is None:
+        logging.error('%s: no raw dir'%sid)
+        continue
+    isbio, files = is_biograph(rawdir)
+    if not isbio and files is None:
+        logging.error('%s: not biograph, no ecats'%sid)
+        continue
+    # if biograph, grab timing file
+    if isbio:
+        timing_file = get_biograph_timing(rawdir)
+        if timing_file is None:
+            logging.error('%s: no biograph timing file'%sid)
+            continue
+        
+    # if ecat, generate timing file form ecats
+    
     dvrdir =  
 
 

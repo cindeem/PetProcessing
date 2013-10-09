@@ -28,7 +28,9 @@ def get_ref(refroi, dat):
     return means
 
 def parse_file(infile):
-    """parse frametimes file to get data"""
+    """parse frametimes file to get data
+    file has one header row
+    data is [framenumber, start, stop, duration]"""
     try:
         return  np.loadtxt(infile, delimiter = ',',
                            usecols = (1,2,3), skiprows = 1)
@@ -46,7 +48,7 @@ def parse_file(infile):
 
 def midframes_from_file(infile, units='sec'):
     """infile is a frametimes file each row has
-    [frame number, start dur, stop] in seconds
+    [frame number, start, stop, duration] in seconds
 
     Returns
     -------
@@ -54,16 +56,16 @@ def midframes_from_file(infile, units='sec'):
     starttimes: vector of durations
     """
     ft = parse_file(infile)
-    midframes = ft[:,0] + ft[:,1] / 2
-    return midframes, ft[:,1]
+    midframes = ft[:,0] + ft[:,-1] / 2.
+    return midframes, ft[:,-1]
 
 def frametimes_from_file(infile):
     """infile is a frametimes file each row has
-    [frame number, start dur, stop] in seconds
+    [frame number, start,stop, duration] in seconds
 
     Returns
     -------
-    ft: array [start, duration, stop] in seconds for each frame
+    ft: array [start, stop, duration] in seconds for each frame
     """
     ft = parse_file(infile)
     return ft
