@@ -19,6 +19,23 @@ import preprocessing as pp
 import utils
 import spm_tools as spm
 
+def find_raw(subdir):
+    """ looks for raw or RawData/PIB directory for subject"""
+    pass
+
+def get_filetype(rawdir):
+    """ checks if subject has biograph or ecat files"""
+    pass
+
+def get_ecat_timing(ecats):
+    """ finds ecats, unzips, extracts timing info and writes to file?"""
+    pass
+
+def get_biograph_timing(rawdir):
+    """ trys to grab Timing file for Biograph data"""
+    pass
+
+
 try:
     datadir = sys.argv[1]
 except:
@@ -107,7 +124,14 @@ for sub in allsub:
     if not os.path.isdir(realign_dir):
         logging.error('%s: no realign dir'%sid)
         continue
-    
+    ## find realigned, require at least 34 frames
+    globstr = os.path.join(realign_dir, 'rB*.nii*')
+    frames = utils.find_files(globstr, n=34)
+    if frames is None:
+        logging.error('%s: realigned not sufficient'%sid)
+        continue
+    # timing file
+
     dvrdir =  
 
 
