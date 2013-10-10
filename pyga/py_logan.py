@@ -214,7 +214,7 @@ def calc_ki(x,y, timing_file, range=(35,90)):
     and range of steady state data (in minutes)"""
     ft = frametimes_from_file(timing_file)
     start_end = np.logical_and(ft[1:,0] / 60. >= range[0],
-                               ft[1:,2] / 60. <= range[1])
+                               ft[1:,1] / 60. <= range[1])
     if len(x.shape) == len(y.shape) == 1:
         ## regional ki
         allki, allvd, residues = get_lstsq(x[start_end],y[start_end])
