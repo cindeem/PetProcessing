@@ -194,13 +194,13 @@ for sub in allsub:
         # if ecat, generate timing file from ecats
     ## get files needed
     # rbrainmask
-    globstr = os.path.join(coreg_dir, 'rbrainmask.nii*')
+    globstr = os.path.join(coregdir, 'rbrainmask.nii*')
     brainmask = utils.find_single_file(globstr)
     if brainmask is None:
         logging.error('%s: no brainmask %s'%(sid, globstr))
         continue
     # raparc
-    globstr = os.path.join(coreg_dir, 'rB*aparc_aseg.nii*')
+    globstr = os.path.join(coregdir, 'rB*aparc_aseg.nii*')
     aparc = utils.find_single_file(globstr)
     if aparc is None:
         logging.error('%s: no %s'%(sid, globstr))

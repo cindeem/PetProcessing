@@ -38,6 +38,8 @@ def unzip_file(infile):
     if not ext == '.gz':
         return infile
     else:
+        if os.path.isfile(base):
+            return base
         cmd = CommandLine('gunzip %s' % infile)
         cout = cmd.run()
         if not cout.runtime.returncode == 0:
