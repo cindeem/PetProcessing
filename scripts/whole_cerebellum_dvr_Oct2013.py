@@ -107,7 +107,7 @@ for sub in allsub:
         logging.error('%s: has no %s'%(sid, globstr))
         continue
     # make whole cerebellum
-    wcere = pp.make_whole_cerebellume(aparc)
+    wcere = pp.make_whole_cerebellum(aparc)
     if wcere is None:
         logging.error('no wcere for %s'%sid)
     # move to ref_region directory
@@ -133,12 +133,17 @@ for sub in allsub:
     if len(xfm) < 1:
         logging.error('%s: not found: %s'%(sid, xfm))
         continue
+    xfm = xfm[0]
     # find mean image
     globstr = os.path.join(coregdir, 'mean20min*.nii*')
     mean = utils.find_single_file(globstr)
     if mean is None:
-        logging.error('%s: no mean %s'%(sid, globstr))
-        continue
+        ## look in realign directory
+        globstr = os.path.join(sub, tracer, 'realign_QA', 'mean20min*.nii*')
+        mean = utils.find_single_file(globstr)
+        if mean is None:
+            logging.error('%s: no mean %s'%(sid, globstr))
+            continue
     # unzip files if necessary
     # cere
     wcere = utils.unzip_file(wcere)
