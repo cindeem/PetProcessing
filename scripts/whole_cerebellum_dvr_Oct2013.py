@@ -18,8 +18,12 @@ sys.path.insert(0, '/home/jagust/cindeem/CODE/petproc-stable/preproc')
 import preprocessing as pp
 import utils
 import spm_tools as spm
+from fs_tools import (desikan_pibindex_regions, roilabels_fromcsv)
 
 
+sys.path.insert(0, '/home/jagust/cindeem/CODE/petproc-stable/pyga')
+import py_logan as pyl
+import frametimes as ft
 
 def find_raw(subdir):
     """ looks for raw or RawData/PIB directory for subject"""
@@ -46,8 +50,16 @@ def is_biograph(rawdir):
     
 
 def get_ecat_timing(ecats):
-    """ finds ecats, unzips, extracts timing info and writes to file?"""
-    pass
+    """ given unzipped ecats extracts timing info and writes to file
+    rezips ecats"""
+    raw_ftimes = ft.frametimes_from_ecats(ecats)
+    ftimes = ft.frametimes_to_seconds(raw_ftimes)
+    timingf = ft.make_outfile(ecats[0])
+    ft.write_frametimes(ftimes, timingf)
+    logging.info('wrote %s'%(timingf))
+    utils.zip_files(ecats)
+    return timingf
+
 
 def get_biograph_timing(rawdir):
     """ trys to grab Timing file for Biograph data"""
@@ -172,10 +184,54 @@ for sub in allsub:
         if timing_file is None:
             logging.error('%s: no biograph timing file'%sid)
             continue
-        
-    # if ecat, generate timing file form ecats
-    
-    dvrdir =  
+    else:
+        timing_file = get_ecat_timing(files)
+        # if ecat, generate timing file from ecats
+    ## get files needed
+    # rbrainmask
+    globstr = os.path.join(coreg_dir, 'rbrainmask.nii*')
+    brainmask = utils.find_single_file(globstr)
+    if brainmask is None:
+        logging.error('%s: no brainmask %s'%(sid, globstr))
+        continue
+    # raparc
+    globstr = os.path.join(coreg_dir, 'rB*aparc_aseg.nii*')
+    aparc = utils.find_single_file(globstr)
+    if aparc is None:
+        logging.error('%s: no %s'%(sid, globstr))
+        continue
+    # set defaults
+    ki = 0.15
+    start = 35
+    stop = 90
+    logging.info('Running Logan')
+    midtimes, durs = pyl.midframes_from_file(timing_file)
+    data4d = pyl.get_data_nibabel(frames)
+    ref = pyl.get_ref(rwcere, data4d)
+    ref_fig = pyl.save_inputplot(ref, (midtimes + durs/2.), dvrdir)
+    masked_data, mask_roi = pyl.mask_data(brainmask, data4d)
+    x,y  = pyl.calc_xy(ref, masked_data, midtimes)
+    allki, allvd, residuals = pyl.calc_ki(x, y, timingf, range=range)
+    dvr = pyl.results_to_array(allki, mask_roi)
+    resid = pyl.results_to_array(residuals, mask_roi)
+    outf = pyl.save_data2nii(dvr, rbrainmask,
+            filename='DVR-%s'%subid, outdir=dvrdir)
+    _ = pyl.save_data2nii(resid, rbrainmask,
+            filename = 'RESID-%s'%subid,outdir = dvrdir)
+
+    ## calc logan plot
+    labels = desikan_pibindex_regions()
+    region = pyl.get_labelroi_data(data4d, raparc, labels)
+    pyl.loganplot( ref, region, timingf, dvrdir)
+    logging.info('%s Finished Logan: %s'%(subid, outf))
+    roid = roilabels_fromcsv(roifile[0])
+
+    ## Calc pibindex
+    logging.info('PIBINDEX ROI file: %s'%(roifile[0]))
+    meand = pp.mean_from_labels(roid, raparc, dvr)
+    csvfile = os.path.join(dvrdir, 'PIBINDEX_%s_%s.csv'%(subid,cleantime))
+    pp.meand_to_file(meand, csvfile)
+
 
 
 

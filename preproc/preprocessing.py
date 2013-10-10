@@ -36,6 +36,20 @@ def make_cerebellum_nibabel(aseg):
     newimg.to_filename(newfile)
     return newfile
 
+
+def make_whole_cerebellum(aseg):
+    pth, nme = os.path.split(aseg)
+    img = nibabel.load(aseg)
+    newdat = np.zeros(img.get_shape())
+    dat = img.get_data()
+    regions = [7,8,46,47]
+    for reg in regions:
+        newdat[dat == reg] = 1
+    newimg = nibabel.Nifti1Image(newdat, img.get_affine())
+    newfile = os.path.join(pth, 'grey_cerebellum.nii.gz')
+    newimg.to_filename(newfile)
+    return newfile
+
 def make_cerebellum(aseg):
     cwd = os.getcwd()
     pth, nme = os.path.split(aseg)
