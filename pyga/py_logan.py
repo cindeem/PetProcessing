@@ -43,7 +43,7 @@ def parse_file(infile):
     except:
         raise IOError("""unable to parse %s, format should be
                          frame, starttime, stoptime, duration
-                         comma or tabe separated, with header"""%(infile))
+                         comma or tab separated, with header"""%(infile))
 
 
 def midframes_from_file(infile, units='sec'):

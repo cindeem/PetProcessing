@@ -95,7 +95,7 @@ if __name__ == '__main__':
     ref_region = check_selection(ref_region)
     ## get frametimes (coerce into sec format)
     ft_sec = ft.read_frametimes(timingf)
-    if not ft_sec[1,1] <  1: # times in minutes
+    if not ft_sec[-1,1] >  1000.: # times in minutes
         ft_sec = ft_sec.copy() *  60.
     ## get start and end time
     start = bg.singlechoice(['%d'%int(x/60.) for x in ft_sec[:,1]], 
