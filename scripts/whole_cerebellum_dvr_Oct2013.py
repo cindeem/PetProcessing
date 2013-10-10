@@ -63,7 +63,7 @@ def get_ecat_timing(ecats):
 
 def get_biograph_timing(rawdir):
     """ trys to grab Timing file for Biograph data"""
-    globstr = os.path.join(rawdir, 'PIBtiming_*.csv*')
+    globstr = os.path.join(rawdir, 'PIBtiming*.csv*')
     timing_file = utils.find_single_file(globstr)
     if timing_file is None:
         return None
@@ -100,6 +100,8 @@ for sub in allsub:
     dvrdir, exists = utils.make_dir(os.path.join(sub, tracer), 'dvr_rwhole_cerebellum')
     if exists:
         logging.warning('%s: dvr_rwhole_cerebellum exists, remove ro re-run'%sid)
+        continue
+    """
     # get aparc, make whole cerebellum
     globstr = os.path.join(sub,'anatomy', 'B*_aparc_aseg.nii*')
     aparc = utils.find_single_file(globstr)
@@ -117,6 +119,7 @@ for sub in allsub:
         continue
     # put one copy in ref regions
     wcere = utils.copy_file(wcere, refdir)
+    """
     # put copy we use in coreg directory
     globstr = os.path.join(sub, tracer, 'coreg*')
     allcoreg = sorted(glob((globstr)))
@@ -126,6 +129,14 @@ for sub in allsub:
     # remove symbolic links
     allcoreg = [ x for x in allcoreg if not os.path.islink(x)]
     coregdir = allcoreg[0]
+    # raparc
+    globstr = os.path.join(coregdir, 'rB*aparc_aseg.nii*')
+    aparc = utils.find_single_file(globstr)
+    if aparc is None:
+        logging.error('%s: no %s'%(sid, globstr))
+        continue
+    wcere = pp.make_whole_cerebellum(aparc)
+    """
     wcere = utils.copy_file(wcere, coregdir)
     # find transform in coreg directory
     globstr = os.path.join(coregdir, '*.mat*')
@@ -168,6 +179,7 @@ for sub in allsub:
     if not os.path.isdir(realign_dir):
         logging.error('%s: no realign dir'%sid)
         continue
+    """
     ## find realigned, require at least 34 frames
     globstr = os.path.join(realign_dir, 'rB*.nii*')
     frames = utils.find_files(globstr, n=34)
@@ -199,42 +211,37 @@ for sub in allsub:
     if brainmask is None:
         logging.error('%s: no brainmask %s'%(sid, globstr))
         continue
-    # raparc
-    globstr = os.path.join(coregdir, 'rB*aparc_aseg.nii*')
-    aparc = utils.find_single_file(globstr)
-    if aparc is None:
-        logging.error('%s: no %s'%(sid, globstr))
-        continue
     # set defaults
+    roifile = 'fsrois_pibindex.csv'
     ki = 0.15
     start = 35
     stop = 90
-    logging.info('Running Logan')
+    logging.info('%s: Running Logan'%sid)
     midtimes, durs = pyl.midframes_from_file(timing_file)
     data4d = pyl.get_data_nibabel(frames)
     ref = pyl.get_ref(rwcere, data4d)
     ref_fig = pyl.save_inputplot(ref, (midtimes + durs/2.), dvrdir)
     masked_data, mask_roi = pyl.mask_data(brainmask, data4d)
     x,y  = pyl.calc_xy(ref, masked_data, midtimes)
-    allki, allvd, residuals = pyl.calc_ki(x, y, timing_file, range=range)
+    allki, allvd, residuals = pyl.calc_ki(x, y, timing_file, trange=(start,stop))
     dvr = pyl.results_to_array(allki, mask_roi)
     resid = pyl.results_to_array(residuals, mask_roi)
-    outf = pyl.save_data2nii(dvr, rbrainmask,
-            filename='DVR-%s'%subid, outdir=dvrdir)
-    _ = pyl.save_data2nii(resid, rbrainmask,
-            filename = 'RESID-%s'%subid,outdir = dvrdir)
+    outf = pyl.save_data2nii(dvr, brainmask,
+            filename='DVR-%s'%sid, outdir=dvrdir)
+    _ = pyl.save_data2nii(resid, brainmask,
+            filename = 'RESID-%s'%sid,outdir = dvrdir)
 
     ## calc logan plot
     labels = desikan_pibindex_regions()
-    region = pyl.get_labelroi_data(data4d, raparc, labels)
-    pyl.loganplot( ref, region, timingf, dvrdir)
-    logging.info('%s Finished Logan: %s'%(subid, outf))
-    roid = roilabels_fromcsv(roifile[0])
+    region = pyl.get_labelroi_data(data4d, aparc, labels)
+    pyl.loganplot( ref, region, timing_file, dvrdir)
+    logging.info('%s Finished Logan: %s'%(sid, outf))
+    roid = roilabels_fromcsv(roifile)
 
     ## Calc pibindex
-    logging.info('PIBINDEX ROI file: %s'%(roifile[0]))
-    meand = pp.mean_from_labels(roid, raparc, dvr)
-    csvfile = os.path.join(dvrdir, 'PIBINDEX_%s_%s.csv'%(subid,cleantime))
+    logging.info('PIBINDEX ROI file: %s'%(roifile))
+    meand = pp.mean_from_labels(roid, aparc, dvr)
+    csvfile = os.path.join(dvrdir, 'PIBINDEX_%s_%s.csv'%(sid,cleantime))
     pp.meand_to_file(meand, csvfile)
 
 

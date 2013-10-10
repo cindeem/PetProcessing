@@ -37,7 +37,7 @@ def make_cerebellum_nibabel(aseg):
     return newfile
 
 
-def make_whole_cerebellum(aseg):
+def make_whole_cerebellum(aseg, name = 'whole_cerebellum.nii.gz'):
     pth, nme = os.path.split(aseg)
     img = nibabel.load(aseg)
     newdat = np.zeros(img.get_shape())
@@ -46,7 +46,7 @@ def make_whole_cerebellum(aseg):
     for reg in regions:
         newdat[dat == reg] = 1
     newimg = nibabel.Nifti1Image(newdat, img.get_affine())
-    newfile = os.path.join(pth, 'whole_cerebellum.nii.gz')
+    newfile = os.path.join(pth, name)
     newimg.to_filename(newfile)
     return newfile
 
