@@ -100,13 +100,9 @@ if __name__ == '__main__':
     ## get start and end time
     start = bg.singlechoice(['%d'%int(x/60.) for x in ft_sec[:,1]], 
                             text='Start Time (eg 35)')
-    if ft_sec[-1,-1] > 600:
-        end = bg.singlechoice(['%d'%int(x/60.) for x in ft_sec[:,-1]], 
+    # durs stored in -1 start stop duration
+    end = bg.singlechoice(['%d'%int(x/60.) for x in ft_sec[:,-1]], 
                              text='End Time (eg 90)')
-    else:
-        # durs stored in -2
-        end = bg.singlechoice(['%d'%int(x/60.) for x in ft_sec[:,-2]], 
-                             text='End Time')
  
     
     k2ref = 0.15
