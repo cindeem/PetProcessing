@@ -61,7 +61,7 @@ def frametime_from_ecat(ecatf):
     Returns
     -------
     out : array
-          array holding framenumber, starttime, duration, endtime
+          array holding framenumber, starttime, endtime, duration
           in milliseconds
     """
     img = ecat.load(ecatf)
@@ -79,8 +79,8 @@ def frametime_from_ecat(ecatf):
         out[i,0] = fn 
         out[i,1] = startt - adj
         # fix adj, divide by 60000 to get minutes
-        out[i,2] = dur
-        out[i,3] = startt - adj + dur
+        out[i,3] = dur
+        out[i,2] = startt - adj + dur
     out = out[out[:,0].argsort(),]
     return out
 
@@ -95,7 +95,7 @@ def frametimes_from_ecats(filelist):
     Returns
     -------
     out : array
-          array holding framenumber, starttime, duration, endtime
+          array holding framenumber, starttime, endtime, duration
           in milliseconds
           
     """
@@ -135,7 +135,7 @@ def make_outfile(infile, name = 'frametimes'):
 
 def write_frametimes(inarray, outfile):
     csv_writer = csv.writer(open(outfile, 'w+'))
-    csv_writer.writerow(['frame', 'start', 'duration','stop'])
+    csv_writer.writerow(['frame', 'start','stop', 'duration'])
     for row in inarray:
         csv_writer.writerow(row)
 
@@ -144,7 +144,7 @@ def read_frametimes(infile):
     outarray = dat.values
     rows, cols = outarray.shape
     if cols < 4:
-        dat =  pandas.read_csv(infile, sep='\t')
+        dat =  pandas.read_csv(infile, sep=None)# guess correct sep
         outarray = dat.values
         rows, cols = outarray.shape
         if cols < 4:
