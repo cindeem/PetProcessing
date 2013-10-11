@@ -56,6 +56,7 @@ def make_means(rframes, tracerdir):
     mean20 = pp.make_mean_20min(rframes)
     cmean20 = utils.copy_file(mean20, tracerdir)
     suvr = pp.make_mean_40_60(rframes)
+    suvr2 = pp.make_mean_50_70(rframes)
     utils.zip_files([suvr])
     utils.remove_files([mean20])
     return cmean20

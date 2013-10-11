@@ -78,11 +78,11 @@ if __name__ == '__main__':
 
         globstr = os.path.join(tracerdir,
                                'realign_QA',
-                               'mean40_60min_r%s*nii*'%(subid))
+                               'mean50_70min_r%s*nii*'%(subid))
         sum = utils.find_single_file(globstr)
 
         if None in [mean,sum]:
-            logging.error('%s missing [mean20, mean40_60]:%s'%([mean,sum]))
+            logging.error('%s missing [mean20, mean50_70]:%s'%([mean,sum]))
             continue
 
         # find ref regions
@@ -112,7 +112,7 @@ if __name__ == '__main__':
         
         pet = mean
         _, petnme, _ = utils.split_filename(pet)
-        _, m40_60, _ = utils.split_filename(sum)
+        _, m50_70, _ = utils.split_filename(sum)
         logging.info('coreg ref region to %s'%pet)
         coreg_dir,exists = utils.make_dir(tracerdir,
                                           dirname='coreg_mri2%s'%petnme)
@@ -152,7 +152,7 @@ if __name__ == '__main__':
             _, refname, _ = utils.split_filename(ref)
             outfname = os.path.join(tracerdir,
                                     '%snormedSUVR_%s.nii.gz'%(refname,
-                                                              m40_60))
+                                                              m50_70))
             # generate ref  normed image
             pp.make_pons_normed(sum, ref, outfname)
             logging.info('saved %s'%(outfname))
