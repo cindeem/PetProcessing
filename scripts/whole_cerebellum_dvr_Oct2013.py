@@ -135,7 +135,7 @@ for sub in allsub:
     if aparc is None:
         logging.error('%s: no %s'%(sid, globstr))
         continue
-    wcere = pp.make_whole_cerebellum(aparc)
+    wcere = pp.make_whole_cerebellum(aparc, 'rwhole_cerebellum.nii.gz')
     """
     wcere = utils.copy_file(wcere, coregdir)
     # find transform in coreg directory
@@ -174,12 +174,13 @@ for sub in allsub:
         continue
     # get reslice wcere
     rwcere = wcere.replace('whole', 'rwhole')
+    """
     # get realigned
     realign_dir = os.path.join(sub, tracer, 'realign_QA')
     if not os.path.isdir(realign_dir):
         logging.error('%s: no realign dir'%sid)
         continue
-    """
+    
     ## find realigned, require at least 34 frames
     globstr = os.path.join(realign_dir, 'rB*.nii*')
     frames = utils.find_files(globstr, n=34)
@@ -219,7 +220,7 @@ for sub in allsub:
     logging.info('%s: Running Logan'%sid)
     midtimes, durs = pyl.midframes_from_file(timing_file)
     data4d = pyl.get_data_nibabel(frames)
-    ref = pyl.get_ref(rwcere, data4d)
+    ref = pyl.get_ref(wcere, data4d)
     ref_fig = pyl.save_inputplot(ref, (midtimes + durs/2.), dvrdir)
     masked_data, mask_roi = pyl.mask_data(brainmask, data4d)
     x,y  = pyl.calc_xy(ref, masked_data, midtimes)
