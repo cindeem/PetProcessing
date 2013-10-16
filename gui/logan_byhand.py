@@ -120,7 +120,7 @@ if __name__ == '__main__':
     ref_fig = pyl.save_inputplot(ref, (midtimes + durs/2.), dvrdir)
     masked_data, mask_roi = pyl.mask_data(rbrainmask, data4d)
     x,y  = pyl.calc_xy(ref, masked_data, midtimes)
-    allki, allvd, residuals = pyl.calc_ki(x, y, timingf, range=range)
+    allki, allvd, residuals = pyl.calc_ki(x, y, timingf, trange=range)
     dvr = pyl.results_to_array(allki, mask_roi)
     resid = pyl.results_to_array(residuals, mask_roi)
     outf = pyl.save_data2nii(dvr, rbrainmask,

@@ -92,12 +92,16 @@ logging.info('###START %s :::'%__file__)
 logging.info('###TRACER  %s  :::'%(tracer))
 logging.info('###USER : %s'%(user))
 
-allsub = glob(os.path.join(datadir, 'B*'))
+allsub = sorted(glob(os.path.join(datadir, 'B*')))
 
 for sub in allsub:
     _, sid = os.path.split(sub)
     ## check for whole cerebellum dvr dir, skip if exists
-    dvrdir, exists = utils.make_dir(os.path.join(sub, tracer), 'dvr_rwhole_cerebellum')
+    try:
+        dvrdir, exists = utils.make_dir(os.path.join(sub, tracer), 'dvr_rwhole_cerebellum')
+    except:
+        logging.error('%s: pib not worked up'%sid)
+        continue
     if exists:
         logging.warning('%s: dvr_rwhole_cerebellum exists, remove ro re-run'%sid)
         continue
@@ -221,6 +225,11 @@ for sub in allsub:
     midtimes, durs = pyl.midframes_from_file(timing_file)
     data4d = pyl.get_data_nibabel(frames)
     ref = pyl.get_ref(wcere, data4d)
+    if not len(frames) == ref.shape[0] == midtimes.shape[0]:
+        # mismatch between number of frames and number timepoints
+        logging.error('%s: mismatch nframes=%d, ntimepoints=%d'%(sid, 
+            len(frames), ref.shape[0]))
+        continue
     ref_fig = pyl.save_inputplot(ref, (midtimes + durs/2.), dvrdir)
     masked_data, mask_roi = pyl.mask_data(brainmask, data4d)
     x,y  = pyl.calc_xy(ref, masked_data, midtimes)
