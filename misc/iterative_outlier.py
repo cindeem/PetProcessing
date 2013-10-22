@@ -12,15 +12,40 @@ def calc_quartiles(data):
     return q1, q3, iqr
 
 
-def find_outliers(data):
+def find_outliers_uppertail(data):
     q1, q3, iqr = calc_quartiles(data)
     thr = q3 + 1.5 * iqr
     print thr, q1, q3
-    outliers = data[data >= thr]
-    if len(outliers) > 0: #no more outliers
-        return data[data < thr]
+    outliers = data[data > thr]
+    if len(outliers) > 0: #outliers
+        return find_outliers_uppertail(data[data<=thr])
     else:
-        return find_outliers(data)
+        return data[data <= thr]
+
+
+def find_outliers_lowertail(data):
+    q1, q3, iqr = calc_quartiles(data)
+    thr = q1 - 1.5 * iqr
+    print thr, q1, q3
+    outliers = data[data < thr]
+    if len(outliers) > 0 : #outliers
+        return find_outliers_lowertail(data[data >=thr])
+    else:
+        return data[data >= thr]
+
+
+def find_outliers_twotail(data):
+    q1, q3, iqr = calc_quartiles(data)
+    lowthr = q1 - 1.5 * iqr
+    highthr = q3 + 1.5 * iqr
+    mask = np.logical_and(data< lowthr, data > highthr)
+    outliers = data[mask]
+    if len(outliers) > 0 : #outliers
+        return find_outliers_lowertail(data[mask])
+    else:
+        return data[mask]
+
+
 
 
 if __name__ == '__main__':
@@ -34,6 +59,6 @@ if __name__ == '__main__':
     #q1, q3, iqr = calc_quartiles(pibdat)
     #thr = q3 + 1.5 * (q3 - q1)
     #newdat = pibdat[pibdat < thr]
-    nooutlier_data = find_outliers(pibdat)
+    nooutlier_data = find_outliers_uppertail(pibdat)
     q1, q3, iqr = calc_quartiles(nooutlier_data)
     cutoff = q3 + 1.5 * iqr
