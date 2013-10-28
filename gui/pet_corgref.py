@@ -101,6 +101,8 @@ if __name__ == '__main__':
             continue
         
         for pet in [mean, sum]:
+            if pet is None:
+                continue
             _, petnme, _ = utils.split_filename(pet)
             logging.info('coreg ref region to %s'%pet)
             coreg_dir,exists = utils.make_dir(tracerdir, dirname='coreg_mri2%s'%petnme)

@@ -148,8 +148,9 @@ if __name__ == '__main__':
         
         newname = '%s_%s_frame' % (subid, tracer)
         globstr = os.path.join(tracerdir, '%s*.nii*'%newname)
+        print 'converted', globstr
         converted = glob(globstr)
-        if len(converted) > 1:
+        if len(converted) > 0:
             logging.warning('%s already converted, remove to redo'%(converted))
             continue
         copied_rawpets = utils.copy_files(rawpets, tracerdir)
