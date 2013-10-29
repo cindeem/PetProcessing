@@ -395,7 +395,7 @@ def make_mean_50_70(niftilist):
         logging.error('no enough frames to make mean 50_70')
         return None
     
-    if len(nifitlist) == 34:
+    if len(niftilist) == 33:
         frames = niftilist[29:33] #note frames start counting from 1 or 0
     else:
         frames = niftilist[29:32] # for 35 frames
