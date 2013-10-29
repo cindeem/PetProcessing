@@ -391,7 +391,7 @@ def make_mean_50_70(niftilist):
     generate mean image for 50_70 minute SUVR
     ref: http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2694747/
     """
-    if len(nifitlist) < 34:
+    if len(niftilist) < 33:
         logging.error('no enough frames to make mean 50_70')
         return None
     
