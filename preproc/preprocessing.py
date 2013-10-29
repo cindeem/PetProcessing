@@ -385,26 +385,21 @@ def make_summed_image(niftilist, prefix='sum_'):
 
 
 def make_mean_50_70(niftilist):
-    """given list of niftis, grab frame 28-31
-    generate mean imagei
+    """given list of niftis, grab frame 
+    [29:33] if 34 frames (eg if frames start at 1 frames  30, 31, 32,33)
+    [29:32] if 35 frames (eg if frames start at 1 frames  30, 31, 32)
+    generate mean image for 50_70 minute SUVR
     ref: http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2694747/
     """
-    #framen = [30,31,32]
-    try:
-        frames_30_32 = niftilist[29:32] #note frames start counting from 1 or 0
-    except:
-        print 'incorrect number of frames for making sum_50_70'
+    if len(nifitlist) < 34:
+        logging.error('no enough frames to make mean 50_70')
         return None
     
-    m = re.search('frame0*30',frames_30_32[0])
-    if m is None:
-        # frames numbered from 0?
-        m = re.search('frame0*29', frames_30_32[0])
-        if m is None:
-            print 'bad frame numbers, unable to generate 50-70 mean'
-            print 'frames', frames_30_32
-            return None
-    newfile = make_mean(frames_30_32, prefix='mean50_70min_')
+    if len(nifitlist) == 34:
+        frames = niftilist[29:33] #note frames start counting from 1 or 0
+    else:
+        frames = niftilist[29:32] # for 35 frames
+    newfile = make_mean(frames, prefix='mean50_70min_')
     return newfile
 
 
