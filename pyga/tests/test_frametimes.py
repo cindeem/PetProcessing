@@ -11,7 +11,7 @@ from glob import glob
 import nibabel.ecat as ecat
 import dicom
 import numpy as np
-from numpy.testing import assert_equal
+from numpy.testing import (assert_equal, assert_raises)
 import pandas
 
 from .. import frametimes as ft
@@ -23,6 +23,26 @@ class TestFrametimes(unittest.TestCase):
         self.ecats = ecats
         bio_csv = os.path.join(pth, 'PIBtiming_B00-000.csv')
         self.bio = bio_csv
+
+    def test_read_frametimes(self):
+        ## test pandas ability to correctly read frametimes
+        timing_arr = ft.read_frametimes(self.bio)
+        assert_equal(timing_arr.shape[1], 4)
+        ## create file with tab sep to make sure it parses
+        tmpdir = tempfile.mkdtemp()
+        outf = os.path.join(tmpdir, 'timing_test_tab.csv')
+        with open(outf, 'w+') as fid:
+            for line in open(self.bio):
+                fid.write(line.replace(',', '\t'))
+        tab_arr = ft.read_frametimes(outf)
+        assert_equal(timing_arr[0], tab_arr[0])
+        ## create file missing first col
+        badf = os.path.join(tmpdir, 'timing_missing_col.csv')
+        missing = pandas.DataFrame(timing_arr[:,1:])
+        missing.to_csv(badf, index=False, header=False)
+        assert_raises(IOError, ft.read_frametimes, badf)
+        os.unlink(badf)
+        os.unlink(outf)
 
     def test_frametime_from_ecat(self):
         infile = self.ecats[0]
