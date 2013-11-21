@@ -47,10 +47,10 @@ class TestFrametimes(unittest.TestCase):
     def test_frametime_from_ecat(self):
         infile = self.ecats[0]
         times = ft.frametime_from_ecat(infile)
-        assert_equal(times[0,0], 1.0)
-        assert_equal(times[0,1], 0.0)#start time
-        assert_equal(times[1,2], 600000.0) #endtime second frame
-        assert_equal(times[1,3], 300000.0) # frame 2 duration
+        assert_equal(times[0,0], 1.0)# col 0:frame number
+        assert_equal(times[0,1], 0.0)# col 1: start time
+        assert_equal(times[1,2], 600000.0) # col 2: endtime 
+        assert_equal(times[1,3], 300000.0) # col 3: duration
 
     def test_frametimes_from_ecat(self):
         allv  = self.ecats

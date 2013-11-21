@@ -153,6 +153,23 @@ def read_frametimes(infile):
     outarray = outarray[outarray[:,0].argsort(),]
     return outarray
 
+def parse_frametimes(ftarr):
+    """given a frame time array (ftarr) 
+    from `read_frametimes`
+    check/coerce to seconds
+    generate
+    list of starttimes as strings
+    list of endtimes as strings
+    """
+    ## check if times in minutes or seconds
+    if not ftarr[-1,1] >  1000.: 
+        # times are in in minutes
+        ftarr = ftarr.copy() *  60.
+    ## get start and end time
+    start = ['%d'%int(x/60.) for x in ftarr[:,1]]
+    stop = ['%d'%int(x/60.) for x in ftarr[:,-2]]
+    return ftarr, start, stop
+
 
 
 
