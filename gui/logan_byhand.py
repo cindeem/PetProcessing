@@ -95,17 +95,13 @@ if __name__ == '__main__':
     ref_region = check_selection(ref_region)
     ## get frametimes (coerce into sec format)
     ft_sec = ft.read_frametimes(timingf)
-    if not ft_sec[-1,1] >  1000.: # times in minutes
-        ft_sec = ft_sec.copy() *  60.
-    ## get start and end time
-    start = bg.singlechoice(['%d'%int(x/60.) for x in ft_sec[:,1]], 
-                            text='Start Time (eg 35)')
-    # durs stored in -1 start stop duration
-    end = bg.singlechoice(['%d'%int(x/60.) for x in ft_sec[:,-1]], 
-                             text='End Time (eg 90)')
- 
+    ft_sec, start_times, stop_times = ft.parse_frametimes(ft_sec)
+    start = bg.singlechoice(start_times,text='Start Time (eg 35)')
+    end = bg.singlechoice(stop_times, text='End Time (eg 90)')
+    logging.info('start: %s ; stop: %s'%(start, end))
     
     k2ref = 0.15
+    logging.info('k2ref = %s'%(k2ref))
     range = (int(start),int(end))
     logging.info('Running Logan')
     _, refnme, _ = utils.split_filename(ref_region)
