@@ -57,7 +57,18 @@ def realigntoframe1(niftilist, copied = False):
     #print rlgn.mlab.cmdline
     rlgnout = rlgn.run()
     os.chdir(startdir)
+    # fix naming bug in nipype
+    rlgnout = fix_nipype_outputnames(rlgnout)
     return rlgnout, copiednifti    
+
+def fix_nipype_outputnames(results):
+    """ if the realigned files does not have a file prepended with r
+    in the first mage, fix the naming bug"""
+    if not results.outputs.realigned_files[0][0] == 'r':
+        tmp = fname_presuffix(results.outputs.realigned_files[0], 'r')
+        results.outputs.realigned_files[0] = tmp
+        return results
+    return results
 
 def realigntoframe17(niftilist, copied = False):
     """given list of nifti files
@@ -94,6 +105,7 @@ def realigntoframe17(niftilist, copied = False):
     rlgn.inputs.ignore_exception = True
     rlgnout = rlgn.run()
     os.chdir(startdir)
+    rlgnout = fix_nipype_outputnames(rlgnout)
     return rlgnout, copiednifti
 
 
